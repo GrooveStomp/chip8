@@ -8,7 +8,6 @@
 #include "system.c"
 #include "opcode.c"
 
-
 int main(int argc, char **argv) {
         // Set up render system and register input callbacks
         // setupGraphics();
@@ -41,6 +40,5 @@ int main(int argc, char **argv) {
                 // myChip8.setKeys();
         }
 
-        printf("Hello!\n");
         return 0;
 }

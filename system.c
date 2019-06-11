@@ -2,6 +2,11 @@
   Chip-8 CPU State
 */
 
+#ifndef SYSTEM_C
+#define SYSTEM_C
+
+#include <string.h> // memset
+
 struct system {
         // 35 opcodes
         unsigned short opcode;
@@ -13,11 +18,11 @@ struct system {
         // named V0,V1 up to VE. The 16th register is used for the ‘carry
         // flag’. Eight bits is one byte so we can use an unsigned char for this
         // purpose:
-        unsigned char V[16];
+        unsigned char v[16];
 
         // There is an Index register I and a program counter (pc) which can
         // have a value from 0x000 to 0xFFF
-        unsigned short I;
+        unsigned short i;
         unsigned short pc;
 
         // System memory map:
@@ -44,4 +49,14 @@ struct system {
 };
 
 void SystemInit(struct system *s) {
+        memset(s->memory, 0, 4096);
+        memset(s->gfx, 0, 64 * 32);
+        memset(s->key, 0, 16);
 }
+
+// Each opcode is a two-byte instruction, so we have to double increment each time.
+void SystemIncrementPC(struct system *s) {
+        s->pc += 2;
+}
+
+#endif // SYSTEM_C
