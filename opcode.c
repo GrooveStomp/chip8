@@ -5,8 +5,9 @@
 #ifndef OPCODE_C
 #define OPCODE_C
 
-#include <stdlib.h> // rand
 #include <limits.h> // UINT_MAX
+#include <stdlib.h> // rand
+#include <string.h> // memset
 
 #include "system.c"
 
@@ -14,10 +15,16 @@ struct opcode;
 
 typedef void (*opcode_fn)(struct opcode *c, struct system *);
 
+struct opcode_fn_map {
+        char *name;
+        opcode_fn address;
+};
+
 // All instructions are 2 bytes store most-significant byte first. (Big Endian)
 struct opcode {
         unsigned short instruction;
         opcode_fn fn;
+        struct opcode_fn_map debug_fn_map[35];
 };
 
 void __opcode_Debug(struct opcode *c) {
@@ -25,11 +32,16 @@ void __opcode_Debug(struct opcode *c) {
         printf("\tunsigned short instruction = 0x%04X;\n", c->instruction);
         printf("\topcode_fn fn = %p;\n", c->fn);
         printf("};\n");
-}
 
-void OpcodeInit(struct opcode *c) {
-        c->instruction = 0;
-        c->fn = NULL;
+        for (int i=0; i<35; i++) {
+                printf("%s: %p\n", c->debug_fn_map[i].name, c->debug_fn_map[i].address);
+        }
+
+        for (int i=0; i<35; i++) {
+                if (c->fn == c->debug_fn_map[i].address) {
+                        printf("Opcode fn is: %s\n", c->debug_fn_map[i].name);
+                }
+        }
 }
 
 unsigned int __opcode_HighByte(struct opcode *c) {
@@ -62,22 +74,19 @@ unsigned int __opcode_NibbleAt(struct opcode *c, unsigned int pos) {
 
 // See full fn listing: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 
+// Call: Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
 void __opcode_0NNN(struct opcode *c, struct system *s) {
-        // type: Call
-        // C Pseudo:
-        // Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
+        // TODO
 }
 
+// Display: Clears the screen.
 void __opcode_00E0(struct opcode *c, struct system *s) {
-        // type: Display
-        // C Pseudo: disp_clear()
-        // Clears the screen.
+        memset(s->gfx, 0, 64 * 32);
 }
 
+// Flow control: Returns from a subroutine.
 void __opcode_00EE(struct opcode *c, struct system *s) {
-        // type: Flow
-        // C Pseudo: return;
-        // Returns from a subroutine.
+        // TODO
 }
 
 // Flow control: goto NNNN;
@@ -150,7 +159,7 @@ void __opcode_8XY0(struct opcode *c, struct system *s) {
         s->v[x] = s->v[y];
 }
 
-// Bitwise Operation: Sets VX to: VX | VY.
+// Bitwise operation: Sets VX to: VX | VY.
 void __opcode_8XY1(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
         unsigned int y = __opcode_NibbleAt(c, 1);
@@ -158,7 +167,7 @@ void __opcode_8XY1(struct opcode *c, struct system *s) {
         s->v[x] = s->v[x] | s->v[y];
 }
 
-// Bitwise Operation: Sets VX to: VX & VY.
+// Bitwise operation: Sets VX to: VX & VY.
 void __opcode_8XY2(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
         unsigned int y = __opcode_NibbleAt(c, 1);
@@ -166,7 +175,7 @@ void __opcode_8XY2(struct opcode *c, struct system *s) {
         s->v[x] = s->v[x] & s->v[y];
 }
 
-// Bitwise Operation: Sets VX to: VX ^ VY.
+// Bitwise operation: Sets VX to: VX ^ VY.
 void __opcode_8XY3(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
         unsigned int y = __opcode_NibbleAt(c, 1);
@@ -201,7 +210,7 @@ void __opcode_8XY5(struct opcode *c, struct system *s) {
         }
 }
 
-// Bitwise Operation: Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
+// Bitwise operation: Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
 void __opcode_8XY6(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
         unsigned int y = __opcode_NibbleAt(c, 1);
@@ -225,7 +234,7 @@ void __opcode_8XY7(struct opcode *c, struct system *s) {
         }
 }
 
-// Bitwise Operation: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
+// Bitwise operation: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
 void __opcode_8XYE(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
         unsigned int y = __opcode_NibbleAt(c, 1);
@@ -329,27 +338,129 @@ void __opcode_EXA1(struct opcode *c, struct system *s) {
         }
 }
 
+// Timer: Sets VX to the value of the delay timer.
+void __opcode_FX07(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        s->v[x] = s->delay_timer;
+}
+
+// Key operation: Block until a key press occurs, then store it in VX.
+void __opcode_FX0A(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        // TODO Wait for keypress.
+}
+
+// Timer: Sets the delay timer to VX.
+void __opcode_FX15(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        s->delay_timer = s->v[x];
+}
+
+// Sound: Sets the sound timer to VX.
+void __opcode_FX18(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        s->sound_timer = s->v[x];
+}
+
+// Memory: Adds VX to I.
+void __opcode_FX1E(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        s->i += s->v[x];
+}
+
+// Memory: Sets I to the location of the sprite for the character in
+// VX. Characters 0-F (hex) are represented by a 4x5 font.
+void __opcode_FX29(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        // TODO
+}
+
+// Binary coded decimal: Stores the binary-coded decimal representation of VX,
+// with the most significant of three digits at the address in I, the middle
+// digit at I plus 1, and the least significant digit at I plus 2. (In other
+// words, take the decimal representation of VX, place the hundreds digit in
+// memory at location in I, the tens digit at location I+1, and the ones digit
+// at location I+2.)
+void __opcode_FX33(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        // TODO
+}
+
+// Memory: Stores V0 to VX (inclusive) in memory starting at address I. I is
+// unmodified.
+void __opcode_FX55(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        for (int i=0; i < x; i++) {
+                s->memory[s->i + i] = s->v[i];
+        }
+}
+
+// Memory: Fills V0 to VX (inclusive) with values from memory starting at
+// address I.  I is unmodified.
+void __opcode_FX65(struct opcode *c, struct system *s) {
+        unsigned int x = __opcode_NibbleAt(c, 2);
+
+        for (int i=0; i < x; i++) {
+                s->v[i] = s->memory[s->i + i];
+        }
+}
+
+void OpcodeInit(struct opcode *c) {
+        c->instruction = 0;
+        c->fn = NULL;
+
+        c->debug_fn_map[0] = (struct opcode_fn_map){ "0NNN", __opcode_0NNN };
+        c->debug_fn_map[1] = (struct opcode_fn_map){ "00E0", __opcode_00E0 };
+        c->debug_fn_map[2] = (struct opcode_fn_map){ "00EE", __opcode_00EE };
+        c->debug_fn_map[3] = (struct opcode_fn_map){ "1NNN", __opcode_1NNN };
+        c->debug_fn_map[4] = (struct opcode_fn_map){ "2NNN", __opcode_2NNN };
+        // TODO: Finish initializing list here.
+}
+
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
 void OpcodeFetch(struct opcode *c, struct system *s) {
+        // NOTE: opcodes are stored as Big-Endian 16-bit values in memory.
+        // We need to convert from Big-Endian to Little-Endian since I'm writing
+        // this on x86-64.
+
         // Fetch the first byte from memory.
         // Left shift 8 bits, padding on the right with zeroes.
         // Binary OR with the next byte from memory.
         // eg.:
         //     A200
-        //  OR 00A2
+        //  OR 00B7
         //  =======
-        //     A2A2
+        //     A2B7
         c->instruction = s->memory[s->pc] << 8 | s->memory[s->pc + 1];
 }
 
-// TODO: Use a proper hashing routine and do fast lookup?
-//       Although, with just 35 values we're probably okay?
 void OpcodeDecode(struct opcode *c) {
         int msb = __opcode_NibbleAt(c, 3);
 
         switch (msb) {
                 case 0: {
-                        // TODO
+                        unsigned int low_byte = __opcode_LowByte(c);
+                        switch (low_byte) {
+                                case 0xE0: {
+                                        c->fn = __opcode_00E0;
+                                } break;
+
+                                case 0xEE: {
+                                        c->fn = __opcode_00EE;
+                                } break;
+
+                                default: {
+                                        c->fn = __opcode_0NNN;
+                                } break;
+                        }
                 } break;
 
                 case 1: {
@@ -444,7 +555,7 @@ void OpcodeDecode(struct opcode *c) {
                 case 0xE: {
                         unsigned int low_byte = __opcode_LowByte(c);
                         switch (low_byte) {
-                                case 0X9E: {
+                                case 0x9E: {
                                         c->fn = __opcode_EX9E;
                                 } break;
                                 case 0xA1: {
@@ -454,17 +565,56 @@ void OpcodeDecode(struct opcode *c) {
                 } break;
 
                 case 0xF: {
-                        // TODO
+                        unsigned int low_byte = __opcode_LowByte(c);
+                        switch (low_byte) {
+                                case 0x07: {
+                                        c->fn = __opcode_FX07;
+                                } break;
+
+                                case 0x0A: {
+                                        c->fn = __opcode_FX0A;
+                                } break;
+
+                                case 0x15: {
+                                        c->fn = __opcode_FX15;
+                                } break;
+
+                                case 0x18: {
+                                        c->fn = __opcode_FX18;
+                                } break;
+
+                                case 0x1E: {
+                                        c->fn = __opcode_FX1E;
+                                } break;
+
+                                case 0x29: {
+                                        c->fn = __opcode_FX29;
+                                } break;
+
+                                case 0x33: {
+                                        c->fn = __opcode_FX33;
+                                } break;
+
+                                case 0x55: {
+                                        c->fn = __opcode_FX55;
+                                } break;
+
+                                case 0x65: {
+                                        c->fn = __opcode_FX65;
+                                } break;
+                        }
                 } break;
         }
 
         printf("Unknown opcode: %#X\n", c->instruction);
+        __opcode_Debug(c);
 }
 
 void OpcodeExecute(struct opcode *c, struct system *s) {
-        // TODO: What happens if c->fn is NULL? Consume as normal or abort?
-        //       Probably abort!
+        __opcode_Debug(c);
         if (c->fn == NULL) {
+                // TODO: How to properly handle this case? Abort loudly?
+                printf("Unknown opcode instruction:\n");
                 __opcode_Debug(c);
                 return;
         }
