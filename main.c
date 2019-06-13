@@ -8,12 +8,14 @@
 #include "system.h"
 #include "opcode.c"
 
-void ArgParse(int argc, char **argv) {
-        // printf("argc: %d, argv: ", argc);
-        // for (int i=0; i< argc; i++) {
-        //         printf("%s ", argv[i]);
-        // }
-        // printf("\n");
+void ArgParse(int argc, char **argv, int debug) {
+        if (debug) {
+                printf("argc: %d, argv: ", argc);
+                for (int i=0; i< argc; i++) {
+                        printf("%s ", argv[i]);
+                }
+                printf("\n");
+        }
 
         if (argc != 2) {
                 printf("chip-8 PROGRAM\n");
@@ -30,10 +32,11 @@ int main(int argc, char **argv) {
         struct system *system = (struct system*)malloc(sizeof(struct system));
         SystemInit(system);
 
+        // TODO: Input system.
         //        struct input *input = (struct input*)malloc(sizeof(struct input));
         //        InputInit(input);
 
-        ArgParse(argc, argv);
+        ArgParse(argc, argv, 0);
 
         size_t fsize = 0;
         char *mem;
@@ -65,11 +68,13 @@ int main(int argc, char **argv) {
 
                 fclose(f);
         }
-        SystemLoadProgram(system, mem, fsize);
+        if (!SystemLoadProgram(system, mem, fsize)) {
+                printf("Couldn't load program into Chip-8\n");
+        }
 
         // Emulation loop
-        // for(;;)
-        {
+        for(int i=0; i<256; i++) { // TODO: Run full program, not just 256 iterations.
+                // TODO: Run on some frequency, not just as fast as possible.
                 // Emulate one cycle:
                 OpcodeFetch(opcode, system);
                 OpcodeDecode(opcode);

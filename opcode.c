@@ -632,15 +632,15 @@ void OpcodeDecode(struct opcode *c) {
         }
 
         printf("Unknown opcode: %#X\n", c->instruction);
-        __opcode_Debug(c);
+//        __opcode_Debug(c);
 }
 
 void OpcodeExecute(struct opcode *c, struct system *s) {
-        __opcode_Debug(c);
+//        __opcode_Debug(c);
         if (c->fn == NULL) {
                 // TODO: How to properly handle this case? Abort loudly?
-                printf("Unknown opcode instruction:\n");
-                __opcode_Debug(c);
+//                printf("Unknown opcode instruction:\n");
+//                __opcode_Debug(c);
                 return;
         }
 
