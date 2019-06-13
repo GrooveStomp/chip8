@@ -1,57 +1,58 @@
 /*
   Chip-8 CPU State
 */
-
-#ifndef SYSTEM_C
-#define SYSTEM_C
-
 #include <string.h> // memset
+#include <stdlib.h> // malloc
 
-struct system {
-        // 35 opcodes
-        unsigned short opcode;
+#include "system.h"
+#include "gs_stack.h"
 
-        // 4k memory
-        unsigned char memory[4096];
+#define MEMORY_SIZE 4096
+#define NUM_REGISTERS 16
+#define GRAPHICS_MEM_SIZE 64 * 32
+#define STACK_SIZE 16
+#define NUM_KEYS 16
+#define FONT_SIZE 80
 
-        // CPU registers: The Chip 8 has 15 8-bit general purpose registers
-        // named V0,V1 up to VE. The 16th register is used for the ‘carry
-        // flag’. Eight bits is one byte so we can use an unsigned char for this
-        // purpose:
-        unsigned char v[16];
+static unsigned char MEMORY[MEMORY_SIZE];
+static unsigned char GFX[GRAPHICS_MEM_SIZE];
 
-        // There is an Index register I and a program counter (pc) which can
-        // have a value from 0x000 to 0xFFF
-        unsigned short i;
-        unsigned short pc;
-
-        // System memory map:
-        // 0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
-        // 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
-        // 0x200-0xFFF - Program ROM and work RAM
-
-        // The graphics of the Chip 8 are black and white and the screen has a
-        // total of 2048 pixels (64 x 32). This can easily be implemented using
-        // an array that hold the pixel state (1 or 0):
-        unsigned char gfx[64 * 32];
-
-        // There are two timer registers that count at 60 Hz. When set above
-        // zero they will count down to zero.
-        unsigned char delay_timer;
-        unsigned char sound_timer;
-
-        unsigned short stack[16];
-        unsigned short sp;
-
-        // Finally, the Chip 8 has a HEX based keypad (0x0-0xF), you can use an
-        // array to store the current state of the key.
-        unsigned char key[16];
+static unsigned char fontset[FONT_SIZE] = {
+        0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+        0x20, 0x60, 0x20, 0x20, 0x70, // 1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+        0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+        0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+        0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+        0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+        0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
 void SystemInit(struct system *s) {
-        memset(s->memory, 0, 4096);
-        memset(s->gfx, 0, 64 * 32);
-        memset(s->key, 0, 16);
+        memset(s, 0, sizeof(struct system));
+
+        s->memory = MEMORY;
+        memset(MEMORY, 0, MEMORY_SIZE);
+
+        s->gfx = GFX;
+        memset(GFX, 0, GRAPHICS_MEM_SIZE);
+
+        s->pc = 0x200;
+
+        s->subroutine_callers = GSStackInit(malloc, 12);
+
+        s->fontp = 0;
+        for (int i=s->fontp; i<FONT_SIZE; i++) {
+                s->memory[i] = fontset[i];
+        }
 }
 
 // Each opcode is a two-byte instruction, so we have to double increment each time.
@@ -59,4 +60,21 @@ void SystemIncrementPC(struct system *s) {
         s->pc += 2;
 }
 
-#endif // SYSTEM_C
+unsigned char *SystemFontSprite(struct system *s, unsigned int index) {
+        return &s->memory[s->fontp + (index * 5)];
+}
+
+int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
+        unsigned char *mem = &s->memory[0x200];
+        unsigned short max_size = MEMORY_SIZE - 0x200;
+
+        if (size > max_size) {
+                return 0;
+        }
+
+        for (int i=0; i<size; i++) {
+                mem[i] = m[i];
+        }
+
+        return !0;
+}

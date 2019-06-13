@@ -1,3 +1,7 @@
 #!/bin/sh
 
-gcc -std=c11 main.c
+rm -rf *.o
+gcc -std=c11 -c system.c
+gcc -std=c11 -c gs_stack.c
+gcc -std=c11 -c main.c
+gcc -std=c11 -o chip-8 gs_stack.o system.o main.o

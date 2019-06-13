@@ -9,7 +9,8 @@
 #include <stdlib.h> // rand
 #include <string.h> // memset
 
-#include "system.c"
+#include "gs_stack.h"
+#include "system.h"
 
 struct opcode;
 
@@ -86,7 +87,16 @@ void __opcode_00E0(struct opcode *c, struct system *s) {
 
 // Flow control: Returns from a subroutine.
 void __opcode_00EE(struct opcode *c, struct system *s) {
-        // TODO
+        void *address = GSStackPop(s->subroutine_callers);
+        if (address == NULL) {
+                printf("%s\n", GSStackErr(s->subroutine_callers));
+                // TODO: Error handling?
+        }
+
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+        s->pc = (unsigned short)address;
+        #pragma GCC diagnostic pop
 }
 
 // Flow control: goto NNNN;
@@ -94,7 +104,7 @@ void __opcode_1NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = __opcode_LowByte(c);
         unsigned int nibble = __opcode_NibbleAt(c, 2);
         unsigned int address = ((nibble << 3) | address);
-        s->pc = address;
+        s->pc = (unsigned short)address;
 }
 
 // Flow control: Call subroutine at NNN;
@@ -102,7 +112,17 @@ void __opcode_2NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = __opcode_LowByte(c);
         unsigned int nibble = __opcode_NibbleAt(c, 2);
         unsigned int address = ((nibble << 3) | address);
-        // TODO
+
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+        int pushed = GSStackPush(s->subroutine_callers, (void *)s->pc);
+        #pragma GCC diagnostic pop
+
+        if (!pushed) {
+                printf("%s\n", GSStackErr(s->subroutine_callers));
+                // TODO: Error handling?
+        }
+        s->pc = (unsigned short)address;
 }
 
 // Condition: Skip next instruction if VX equals NN.
@@ -378,7 +398,12 @@ void __opcode_FX1E(struct opcode *c, struct system *s) {
 void __opcode_FX29(struct opcode *c, struct system *s) {
         unsigned int x = __opcode_NibbleAt(c, 2);
 
-        // TODO
+        unsigned char sprite = s->v[x];
+
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+        s->i = (unsigned short)SystemFontSprite(s, sprite);
+        #pragma GCC diagnostic pop
 }
 
 // Binary coded decimal: Stores the binary-coded decimal representation of VX,
