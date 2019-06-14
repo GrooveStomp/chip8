@@ -2,7 +2,7 @@
   Chip-8 CPU State
 */
 #include <string.h> // memset
-#include <stdlib.h> // malloc
+#include <stdlib.h> // malloc, free
 
 #include "system.h"
 #include "gs_stack.h"
@@ -14,8 +14,13 @@
 #define NUM_KEYS 16
 #define FONT_SIZE 80
 
+typedef void *(*allocator)(size_t);
+typedef void (*deallocator)(void *);
+
 static unsigned char MEMORY[MEMORY_SIZE];
 static unsigned char GFX[GRAPHICS_MEM_SIZE];
+static allocator ALLOCATOR = malloc;
+static deallocator DEALLOCATOR = free;
 
 static unsigned char fontset[FONT_SIZE] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -36,7 +41,13 @@ static unsigned char fontset[FONT_SIZE] = {
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void SystemInit(struct system *s) {
+void SystemMemControl(allocator Alloc, deallocator Dealloc) {
+        ALLOCATOR = Alloc;
+        DEALLOCATOR = Dealloc;
+}
+
+struct system *SystemInit() {
+        struct system *s = (struct system *)malloc(sizeof(struct system));
         memset(s, 0, sizeof(struct system));
 
         s->memory = MEMORY;
@@ -47,12 +58,15 @@ void SystemInit(struct system *s) {
 
         s->pc = 0x200;
 
-        s->subroutine_callers = GSStackInit(malloc, 12);
+        GSStackMemControl(ALLOCATOR, DEALLOCATOR);
+        s->subroutine_callers = GSStackInit(12);
 
         s->fontp = 0;
         for (int i=s->fontp; i<FONT_SIZE; i++) {
                 s->memory[i] = fontset[i];
         }
+
+        return s;
 }
 
 // Each opcode is a two-byte instruction, so we have to double increment each time.

@@ -4,9 +4,10 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #include "system.h"
-#include "opcode.c"
+#include "opcode.h"
 
 void ArgParse(int argc, char **argv, int debug) {
         if (debug) {
@@ -25,13 +26,8 @@ void ArgParse(int argc, char **argv, int debug) {
 
 int main(int argc, char **argv) {
         // TODO: Initialize graphics subsystem.
-
-        struct opcode *opcode = (struct opcode*)malloc(sizeof(struct opcode));
-        OpcodeInit(opcode);
-
-        struct system *system = (struct system*)malloc(sizeof(struct system));
-        SystemInit(system);
-
+        struct opcode *opcode = OpcodeInit();
+        struct system *system = SystemInit();
         // TODO: Input system.
         //        struct input *input = (struct input*)malloc(sizeof(struct input));
         //        InputInit(input);
@@ -73,7 +69,8 @@ int main(int argc, char **argv) {
         }
 
         // Emulation loop
-        for(int i=0; i<256; i++) { // TODO: Run full program, not just 256 iterations.
+        for (;;) {
+                // for (int i=0; i<256; i++) { // TODO: Run full program, not just 256 iterations.
                 // TODO: Run on some frequency, not just as fast as possible.
                 // Emulate one cycle:
                 OpcodeFetch(opcode, system);

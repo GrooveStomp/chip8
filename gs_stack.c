@@ -1,5 +1,6 @@
 #include <string.h> // memset
 #include <stdio.h> // fprintf, FILE
+#include <stdlib.h> // malloc, free
 
 struct gs_stack {
         void **Items;
@@ -8,6 +9,9 @@ struct gs_stack {
         const char *Error;
 };
 
+typedef void *(*allocator)(size_t);
+typedef void (*deallocator)(void *);
+
 static const char *ERROR_NONE = "No error";
 static const char *ERROR_NULL_POINTER = "Stack is pointing at NULL";
 static const char *ERROR_NO_ITEMS = "Can't pop an item when the stack is empty.";
@@ -15,21 +19,25 @@ static const char *ERROR_FULL = "Can't push an item when the stack is full.";
 
 static const char *BANNER = "--------------------------------------------------------------------------------";
 
+static allocator ALLOCATOR = malloc;
+static deallocator DEALLOCATOR = free;
+
+void GSStackMemControl(allocator Alloc, deallocator Dealloc) {
+        ALLOCATOR = Alloc;
+        DEALLOCATOR = Dealloc;
+}
+
 size_t AllocSize(unsigned int max) {
         unsigned int NumItems = sizeof(void *) * max;
         return sizeof(struct gs_stack) + NumItems;
 }
 
 // allocator: Function that implements the malloc interface.
-struct gs_stack *GSStackInit(void *(*allocator)(size_t), unsigned int max) {
+struct gs_stack *GSStackInit(unsigned int max) {
         struct gs_stack *s;
 
-        if (allocator == NULL) {
-                return NULL;
-        }
-
         size_t Size = AllocSize(max);
-        s = (struct gs_stack *)allocator(Size);
+        s = (struct gs_stack *)ALLOCATOR(Size);
         if (s == NULL) {
                 return NULL;
         }

@@ -45,7 +45,9 @@ struct system {
         struct gs_stack *subroutine_callers;
 };
 
-void SystemInit(struct system *s);
+void SystemMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
+
+struct system *SystemInit();
 void SystemIncrementPC(struct system *s);
 unsigned char *SystemFontSprite(struct system *s, unsigned int index);
 
