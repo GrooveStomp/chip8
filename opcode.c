@@ -35,23 +35,6 @@ void OpcodeMemControl(allocator Alloc, deallocator Dealloc) {
         DEALLOCATOR = Dealloc;
 }
 
-void Debug(struct opcode *c) {
-        printf("struct opcode {\n");
-        printf("\tunsigned short instruction = 0x%04X;\n", c->instruction);
-        printf("\topcode_fn fn = %p;\n", c->fn);
-        printf("};\n");
-
-        for (int i=0; i<35; i++) {
-                printf("%s: %p\n", c->debug_fn_map[i].name, c->debug_fn_map[i].address);
-        }
-
-        for (int i=0; i<35; i++) {
-                if (c->fn == c->debug_fn_map[i].address) {
-                        printf("Opcode fn is: %s\n", c->debug_fn_map[i].name);
-                }
-        }
-}
-
 unsigned int HighByte(struct opcode *c) {
         return c->instruction >> 8;
 }
@@ -84,6 +67,7 @@ unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
 
 // Call: Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
 void Fn0NNN(struct opcode *c, struct system *s) {
+        // TODO: Don't increment PC?? WHAT? Is this literally a NOP?
         // Not implemented.
 }
 
@@ -97,22 +81,22 @@ void Fn00EE(struct opcode *c, struct system *s) {
         SystemPopStack(s);
 }
 
-// Flow control: goto NNNN;
+// Flow control: goto NNN;
 void Fn1NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
-        unsigned int address = ((nibble << 8) | address);
-        s->pc = (unsigned short)address;
+        unsigned int address = ((nibble << 8) | low_byte);
+        s->pc = address;
 }
 
 // Flow control: Call subroutine at NNN;
 void Fn2NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
-        unsigned int address = ((nibble << 3) | address);
+        unsigned int address = ((nibble << 8) | low_byte);
 
         SystemPushStack(s);
-        s->pc = s->memory[(unsigned short)address];
+        s->pc = address;
 }
 
 // Condition: Skip next instruction if VX equals NN.
@@ -488,6 +472,20 @@ void OpcodeFree(struct opcode *c) {
         DEALLOCATOR(c);
 }
 
+void OpcodeDebug(struct opcode *c) {
+        printf("struct opcode {\n");
+        printf("\tinstruction: 0x%04X\n", c->instruction);
+        printf("\tfn:_________ %p\n", c->fn);
+
+        for (int i=0; i<35; i++) {
+                if (c->fn == c->debug_fn_map[i].address) {
+                        printf("\tfn name:____ %s\n", c->debug_fn_map[i].name);
+                        printf("\tfn desc:____ %s\n", c->debug_fn_map[i].description);
+                }
+        }
+        printf("}\n");
+}
+
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
 void OpcodeFetch(struct opcode *c, struct system *s) {
         // NOTE: opcodes are stored as Big-Endian 16-bit values in memory.
@@ -505,7 +503,7 @@ void OpcodeFetch(struct opcode *c, struct system *s) {
         c->instruction = s->memory[s->pc] << 8 | s->memory[s->pc + 1];
 }
 
-void OpcodeDecode(struct opcode *c) {
+void OpcodeDecode(struct opcode *c, struct system *s) {
         unsigned int nibble = NibbleAt(c, 3);
 
         switch (nibble) {
@@ -522,6 +520,8 @@ void OpcodeDecode(struct opcode *c) {
 
                                 default: {
                                         c->fn = Fn0NNN;
+                                        SystemIncrementPC(s);
+                                        OpcodeDecode(c, s);
                                 } break;
                         }
                 } break;
@@ -669,36 +669,17 @@ void OpcodeDecode(struct opcode *c) {
                 } break;
                 default: {
                         printf("Unknown opcode: 0x%04X\n", c->instruction);
-                        Debug(c);
+                        OpcodeDebug(c);
                 }
         }
-        // printf("Known opcode: 0x%04X\n", c->instruction);
 }
 
 void OpcodeExecute(struct opcode *c, struct system *s) {
-        // Debug(c);
         if (c->fn == NULL) {
-                // TODO: How to properly handle this case? Abort loudly?
-                // printf("Unknown opcode instruction:\n");
-                // Debug(c);
+                printf("Unknown opcode instruction:\n");
                 return;
         }
 
         c->fn(c, s);
-
         SystemIncrementPC(s);
-}
-
-void OpcodePrint(struct opcode *c) {
-        printf("struct opcode {\n");
-        printf("\tinstruction: 0x%04X\n", c->instruction);
-        printf("\tfn:_________ %p\n", c->fn);
-
-        for (int i=0; i<35; i++) {
-                if (c->fn == c->debug_fn_map[i].address) {
-                        printf("\tfn name:____ %s\n", c->debug_fn_map[i].name);
-                        printf("\tfn desc:____ %s\n", c->debug_fn_map[i].description);
-                }
-        }
-        printf("}\n");
 }

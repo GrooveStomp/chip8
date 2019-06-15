@@ -95,15 +95,13 @@ int main(int argc, char **argv) {
                 clock_gettime(CLOCK_REALTIME, &start);
 
                 OpcodeFetch(opcode, system);
-                OpcodeDecode(opcode);
-
+                OpcodeDecode(opcode, system);
                 if (DEBUG_MODE) {
-                        OpcodePrint(opcode);
+                        OpcodeDebug(opcode);
                         SystemDebug(system);
                         char in[256];
                         fgets(in, 256, stdin);
                 }
-
                 OpcodeExecute(opcode, system);
 
                 SystemDecrementTimers(system);

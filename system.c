@@ -144,7 +144,7 @@ void SystemDecrementTimers(struct system *s) {
 }
 
 void SystemPushStack(struct system *s) {
-        if (s->sp > 0x0F) {
+        if (s->sp > 0xF) {
                 return;
                 // TODO: ERROR?!?
         }

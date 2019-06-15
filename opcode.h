@@ -20,12 +20,12 @@ void
 OpcodeFetch(struct opcode *c, struct system *s);
 
 void
-OpcodeDecode(struct opcode *c);
+OpcodeDecode(struct opcode *c, struct system *s);
 
 void
 OpcodeExecute(struct opcode *c, struct system *s);
 
 void
-OpcodePrint(struct opcode *c);
+OpcodeDebug(struct opcode *c);
 
 #endif // OPCODE_VERSION
