@@ -51,6 +51,10 @@ struct gs_stack *GSStackInit(unsigned int max) {
         return s;
 }
 
+void GSStackFree(struct gs_stack *s) {
+        DEALLOCATOR(s);
+}
+
 int GSStackPush(struct gs_stack *s, void *Val) {
         if (s->Items == NULL) {
                 s->Error = ERROR_NULL_POINTER;

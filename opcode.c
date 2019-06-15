@@ -5,8 +5,8 @@
 #include <limits.h> // UINT_MAX
 #include <stdlib.h> // rand, malloc, free
 #include <string.h> // memset
+#include <stdio.h>
 
-#include "gs_stack.h"
 #include "system.h"
 
 struct opcode;
@@ -17,6 +17,7 @@ typedef void (*deallocator)(void *);
 struct opcode_fn_map {
         char *name;
         opcode_fn address;
+        char *description;
 };
 
 // All instructions are 2 bytes store most-significant byte first. (Big Endian)
@@ -52,11 +53,11 @@ void Debug(struct opcode *c) {
 }
 
 unsigned int HighByte(struct opcode *c) {
-        return (c->instruction >> 8) & 0xFF;
+        return c->instruction >> 8;
 }
 
 unsigned int LowByte(struct opcode *c) {
-        return c->instruction & 0xFF;
+        return c->instruction & 0x00FF;
 }
 
 // pos: LSB first. 0 is LSB, 1 is next most significant byte, etc.
@@ -72,7 +73,7 @@ unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
                         return (c->instruction & 0x0F00) >> 8;
                         break;
                 case 3:
-                        return (c->instruction & 0xF000) >> 16;
+                        return (c->instruction & 0xF000) >> 12;
                         break;
         }
 
@@ -83,7 +84,7 @@ unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
 
 // Call: Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
 void Fn0NNN(struct opcode *c, struct system *s) {
-        // TODO
+        // Not implemented.
 }
 
 // Display: Clears the screen.
@@ -93,23 +94,14 @@ void Fn00E0(struct opcode *c, struct system *s) {
 
 // Flow control: Returns from a subroutine.
 void Fn00EE(struct opcode *c, struct system *s) {
-        void *address = GSStackPop(s->subroutine_callers);
-        if (address == NULL) {
-                printf("%s\n", GSStackErr(s->subroutine_callers));
-                // TODO: Error handling?
-        }
-
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-        s->pc = (unsigned short)address;
-        #pragma GCC diagnostic pop
+        SystemPopStack(s);
 }
 
 // Flow control: goto NNNN;
 void Fn1NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
-        unsigned int address = ((nibble << 3) | address);
+        unsigned int address = ((nibble << 8) | address);
         s->pc = (unsigned short)address;
 }
 
@@ -119,16 +111,8 @@ void Fn2NNN(struct opcode *c, struct system *s) {
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 3) | address);
 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-        int pushed = GSStackPush(s->subroutine_callers, (void *)s->pc);
-        #pragma GCC diagnostic pop
-
-        if (!pushed) {
-                printf("%s\n", GSStackErr(s->subroutine_callers));
-                // TODO: Error handling?
-        }
-        s->pc = (unsigned short)address;
+        SystemPushStack(s);
+        s->pc = s->memory[(unsigned short)address];
 }
 
 // Condition: Skip next instruction if VX equals NN.
@@ -461,43 +445,47 @@ struct opcode *OpcodeInit() {
         c->instruction = 0;
         c->fn = NULL;
 
-        c->debug_fn_map[0] = (struct opcode_fn_map){ "0NNN", Fn0NNN };
-        c->debug_fn_map[1] = (struct opcode_fn_map){ "00E0", Fn00E0 };
-        c->debug_fn_map[2] = (struct opcode_fn_map){ "00EE", Fn00EE };
-        c->debug_fn_map[3] = (struct opcode_fn_map){ "1NNN", Fn1NNN };
-        c->debug_fn_map[4] = (struct opcode_fn_map){ "2NNN", Fn2NNN };
-        c->debug_fn_map[5] = (struct opcode_fn_map){ "3XNN", Fn3XNN };
-        c->debug_fn_map[6] = (struct opcode_fn_map){ "4XNN", Fn4XNN };
-        c->debug_fn_map[7] = (struct opcode_fn_map){ "5XY0", Fn5XY0 };
-        c->debug_fn_map[8] = (struct opcode_fn_map){ "6XNN", Fn6XNN };
-        c->debug_fn_map[9] = (struct opcode_fn_map){ "7XNN", Fn7XNN };
-        c->debug_fn_map[10] = (struct opcode_fn_map){ "8XY0", Fn8XY0 };
-        c->debug_fn_map[11] = (struct opcode_fn_map){ "8XY1", Fn8XY1 };
-        c->debug_fn_map[12] = (struct opcode_fn_map){ "8XY2", Fn8XY2 };
-        c->debug_fn_map[13] = (struct opcode_fn_map){ "8XY3", Fn8XY3 };
-        c->debug_fn_map[14] = (struct opcode_fn_map){ "8XY4", Fn8XY4 };
-        c->debug_fn_map[15] = (struct opcode_fn_map){ "8XY5", Fn8XY5 };
-        c->debug_fn_map[16] = (struct opcode_fn_map){ "8XY6", Fn8XY6 };
-        c->debug_fn_map[17] = (struct opcode_fn_map){ "8XY7", Fn8XY7 };
-        c->debug_fn_map[18] = (struct opcode_fn_map){ "8XYE", Fn8XYE };
-        c->debug_fn_map[19] = (struct opcode_fn_map){ "9XY0", Fn9XY0 };
-        c->debug_fn_map[20] = (struct opcode_fn_map){ "ANNN", FnANNN };
-        c->debug_fn_map[21] = (struct opcode_fn_map){ "BNNN", FnBNNN };
-        c->debug_fn_map[22] = (struct opcode_fn_map){ "CXNN", FnCXNN };
-        c->debug_fn_map[23] = (struct opcode_fn_map){ "DXYN", FnDXYN };
-        c->debug_fn_map[24] = (struct opcode_fn_map){ "EX9E", FnEX9E };
-        c->debug_fn_map[25] = (struct opcode_fn_map){ "EXA1", FnEXA1 };
-        c->debug_fn_map[26] = (struct opcode_fn_map){ "FX07", FnFX07 };
-        c->debug_fn_map[27] = (struct opcode_fn_map){ "FX0A", FnFX0A };
-        c->debug_fn_map[28] = (struct opcode_fn_map){ "FX15", FnFX15 };
-        c->debug_fn_map[29] = (struct opcode_fn_map){ "FX18", FnFX18 };
-        c->debug_fn_map[30] = (struct opcode_fn_map){ "FX1E", FnFX1E };
-        c->debug_fn_map[31] = (struct opcode_fn_map){ "FX29", FnFX29 };
-        c->debug_fn_map[32] = (struct opcode_fn_map){ "FX33", FnFX33 };
-        c->debug_fn_map[33] = (struct opcode_fn_map){ "FX55", FnFX55 };
-        c->debug_fn_map[34] = (struct opcode_fn_map){ "FX65", FnFX65 };
+        c->debug_fn_map[0] = (struct opcode_fn_map){ "0NNN", Fn0NNN, "Call RCA 1802 program at address NNN. (NOP)" };
+        c->debug_fn_map[1] = (struct opcode_fn_map){ "00E0", Fn00E0, "Clear the screen" };
+        c->debug_fn_map[2] = (struct opcode_fn_map){ "00EE", Fn00EE, "Return from subroutine" };
+        c->debug_fn_map[3] = (struct opcode_fn_map){ "1NNN", Fn1NNN, "Goto NNN" };
+        c->debug_fn_map[4] = (struct opcode_fn_map){ "2NNN", Fn2NNN, "Call subroutine at NNN" };
+        c->debug_fn_map[5] = (struct opcode_fn_map){ "3XNN", Fn3XNN, "Skip next instruction if VX equals NN" };
+        c->debug_fn_map[6] = (struct opcode_fn_map){ "4XNN", Fn4XNN, "Skip next instruction if VX doesn't equal NN" };
+        c->debug_fn_map[7] = (struct opcode_fn_map){ "5XY0", Fn5XY0, "Skip next instruction if VX equals VY" };
+        c->debug_fn_map[8] = (struct opcode_fn_map){ "6XNN", Fn6XNN, "Set VX to NN" };
+        c->debug_fn_map[9] = (struct opcode_fn_map){ "7XNN", Fn7XNN, "Add NN to VX without changing carry flag" };
+        c->debug_fn_map[10] = (struct opcode_fn_map){ "8XY0", Fn8XY0, "Set VX to the value of VY" };
+        c->debug_fn_map[11] = (struct opcode_fn_map){ "8XY1", Fn8XY1, "Set VX to VX | VY" };
+        c->debug_fn_map[12] = (struct opcode_fn_map){ "8XY2", Fn8XY2, "Set VX to VX & VY" };
+        c->debug_fn_map[13] = (struct opcode_fn_map){ "8XY3", Fn8XY3, "Set VX to VX ^ VY" };
+        c->debug_fn_map[14] = (struct opcode_fn_map){ "8XY4", Fn8XY4, "Add VY to VX. FV is set to 1 on carry, otherwise 0" };
+        c->debug_fn_map[15] = (struct opcode_fn_map){ "8XY5", Fn8XY5, "Subtract VY from VX. VF is set to 0 on a borrow, otherwise 1" };
+        c->debug_fn_map[16] = (struct opcode_fn_map){ "8XY6", Fn8XY6, "Store the lsb of VX in VF then shift VX to the right by 1" };
+        c->debug_fn_map[17] = (struct opcode_fn_map){ "8XY7", Fn8XY7, "Set VX to VY minus VX. VF is set to 0 on a borrow, otherwise 1" };
+        c->debug_fn_map[18] = (struct opcode_fn_map){ "8XYE", Fn8XYE, "Store the msb of VX in VF then shift VX to the left by 1" };
+        c->debug_fn_map[19] = (struct opcode_fn_map){ "9XY0", Fn9XY0, "Skip next instruction if VX doesn't equal VY" };
+        c->debug_fn_map[20] = (struct opcode_fn_map){ "ANNN", FnANNN, "Set I to the addres NNN" };
+        c->debug_fn_map[21] = (struct opcode_fn_map){ "BNNN", FnBNNN, "Jump to the address NNN plus V0" };
+        c->debug_fn_map[22] = (struct opcode_fn_map){ "CXNN", FnCXNN, "Set VX to NN & R where R is a random number in [0-255]" };
+        c->debug_fn_map[23] = (struct opcode_fn_map){ "DXYN", FnDXYN, "Draw sprite at (VX, VY)" };
+        c->debug_fn_map[24] = (struct opcode_fn_map){ "EX9E", FnEX9E, "Skip next instruction if the key stored in VX is pressed" };
+        c->debug_fn_map[25] = (struct opcode_fn_map){ "EXA1", FnEXA1, "Skip next instruction if key stored in VX isn't pressed" };
+        c->debug_fn_map[26] = (struct opcode_fn_map){ "FX07", FnFX07, "Set VX to the value of the delay timer" };
+        c->debug_fn_map[27] = (struct opcode_fn_map){ "FX0A", FnFX0A, "Block until a key press occurs, storing it in VX" };
+        c->debug_fn_map[28] = (struct opcode_fn_map){ "FX15", FnFX15, "Set VX to the value of the sound timer" };
+        c->debug_fn_map[29] = (struct opcode_fn_map){ "FX18", FnFX18, "Set the sound timer to VX" };
+        c->debug_fn_map[30] = (struct opcode_fn_map){ "FX1E", FnFX1E, "Add VX to I" };
+        c->debug_fn_map[31] = (struct opcode_fn_map){ "FX29", FnFX29, "Set I to the location of the sprite for the character in VX" };
+        c->debug_fn_map[32] = (struct opcode_fn_map){ "FX33", FnFX33, "Store big-endian binary-coded decimal representation of VX in memory starting at I" };
+        c->debug_fn_map[33] = (struct opcode_fn_map){ "FX55", FnFX55, "Store V0 through VX in memory starting at I" };
+        c->debug_fn_map[34] = (struct opcode_fn_map){ "FX65", FnFX65, "Fill V0 through VX with values from memory starting at I" };
 
         return c;
+}
+
+void OpcodeFree(struct opcode *c) {
+        DEALLOCATOR(c);
 }
 
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
@@ -518,9 +506,9 @@ void OpcodeFetch(struct opcode *c, struct system *s) {
 }
 
 void OpcodeDecode(struct opcode *c) {
-        int msb = NibbleAt(c, 3);
+        unsigned int nibble = NibbleAt(c, 3);
 
-        switch (msb) {
+        switch (nibble) {
                 case 0: {
                         unsigned int low_byte = LowByte(c);
                         switch (low_byte) {
@@ -699,4 +687,18 @@ void OpcodeExecute(struct opcode *c, struct system *s) {
         c->fn(c, s);
 
         SystemIncrementPC(s);
+}
+
+void OpcodePrint(struct opcode *c) {
+        printf("struct opcode {\n");
+        printf("\tinstruction: 0x%04X\n", c->instruction);
+        printf("\tfn:_________ %p\n", c->fn);
+
+        for (int i=0; i<35; i++) {
+                if (c->fn == c->debug_fn_map[i].address) {
+                        printf("\tfn name:____ %s\n", c->debug_fn_map[i].name);
+                        printf("\tfn desc:____ %s\n", c->debug_fn_map[i].description);
+                }
+        }
+        printf("}\n");
 }

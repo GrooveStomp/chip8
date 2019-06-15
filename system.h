@@ -1,5 +1,5 @@
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef SYSTEM_VERSION
+#define SYSTEM_VERSION "0.1.0"
 
 struct gs_stack;
 
@@ -45,13 +45,35 @@ struct system {
         struct gs_stack *subroutine_callers;
 };
 
-void SystemMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
+void
+SystemMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
-struct system *SystemInit();
-void SystemIncrementPC(struct system *s);
-unsigned char *SystemFontSprite(struct system *s, unsigned int index);
+struct system *
+SystemInit();
+
+void
+SystemFree(struct system *s);
+
+void
+SystemIncrementPC(struct system *s);
+
+unsigned char *
+SystemFontSprite(struct system *s, unsigned int index);
 
 // Returns 0 if program could no be loaded, or non-zero otherwise.
-int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size);
+int
+SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size);
 
-#endif // SYSTEM_H
+void
+SystemDecrementTimers(struct system *s);
+
+void
+SystemDebug(struct system *s);
+
+void
+SystemPushStack(struct system *s);
+
+void
+SystemPopStack(struct system *s);
+
+#endif // SYSTEM_VERSION

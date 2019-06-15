@@ -11,6 +11,9 @@ GSStackMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 struct gs_stack *
 GSStackInit(unsigned int max);
 
+void
+GSStackFree(struct gs_stack *s);
+
 int
 GSStackPush(struct gs_stack *s, void *v);
 
