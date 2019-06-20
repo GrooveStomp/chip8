@@ -114,8 +114,8 @@ void SystemIncrementPC(struct system *s) {
         s->pc += 2;
 }
 
-unsigned char *SystemFontSprite(struct system *s, unsigned int index) {
-        return &s->memory[s->fontp + (index * 5)];
+unsigned short SystemFontSprite(struct system *s, unsigned int index) {
+        return s->fontp + (index * 5);
 }
 
 int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
@@ -138,7 +138,7 @@ void SystemDecrementTimers(struct system *s) {
                 s->delay_timer--;
         }
 
-        if (s->sound_timer > 0 ) {
+        if (s->sound_timer > 0) {
                 s->sound_timer--;
         }
 }
@@ -161,4 +161,45 @@ void SystemPopStack(struct system *s) {
 
         s->sp--;
         s->pc = s->stack[s->sp];
+}
+
+void SystemClearScreen(struct system *s) {
+        memset(s->gfx, 0, GRAPHICS_MEM_SIZE);
+}
+
+// Display: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels
+// and a height of N pixels. Each row of 8 pixels is read as bit-coded starting
+// from memory location I; I value doesn’t change after the execution of this
+// instruction. As described above, VF is set to 1 if any screen pixels are
+// flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t
+// happen.
+// I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
+void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, unsigned int height) {
+        s->v[15] = 0;
+
+        for (int y = 0; y < height; y++) {
+                // I contains a 1-byte bitmap representing a line of the sprite.
+                // [XXXX XXXX]
+                unsigned char pixel = s->memory[s->i + y];
+
+                for (int x = 0; x < 8; x++) {
+                        if ((pixel & (0x80 >> x)) == 0) { // This line taken from www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+                                continue;
+                        }
+
+                        int y_off = (y_pos + y) * 64;
+                        int x_off = (x_pos + x);
+                        int pos = y_off + x_off;
+
+                        if (s->gfx[pos] == 1) {
+                                s->v[15] = 1;
+                        }
+
+                        s->gfx[pos] ^= 1;
+                }
+        }
+}
+
+void SystemClearKeys(struct system *s) {
+        memset(s->key, 0, 16);
 }

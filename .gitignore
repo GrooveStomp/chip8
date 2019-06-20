@@ -2,4 +2,4 @@ a.out
 chip-8
 *.o
 .#*
-\#*
+\#*output

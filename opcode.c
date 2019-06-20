@@ -67,13 +67,12 @@ unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
 
 // Call: Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
 void Fn0NNN(struct opcode *c, struct system *s) {
-        // TODO: Don't increment PC?? WHAT? Is this literally a NOP?
-        // Not implemented.
+        // Not Implemented.
 }
 
 // Display: Clears the screen.
 void Fn00E0(struct opcode *c, struct system *s) {
-        memset(s->gfx, 0, 64 * 32);
+        SystemClearScreen(s);
 }
 
 // Flow control: Returns from a subroutine.
@@ -283,33 +282,11 @@ void FnCXNN(struct opcode *c, struct system *s) {
 // happen.
 // I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
 void FnDXYN(struct opcode *c, struct system *s) {
-        unsigned int x_pos = NibbleAt(c, 2);
-        unsigned int y_pos = NibbleAt(c, 1);
+        unsigned int x = NibbleAt(c, 2);
+        unsigned int y = NibbleAt(c, 1);
         unsigned int height = NibbleAt(c, 0);
 
-        s->v[15] = 0;
-
-        for (int y = 0; y < height; y++) {
-                // I contains a 1-byte bitmap representing a line of the sprite.
-                // [XXXX XXXX]
-                unsigned char pixel = s->memory[s->i + y];
-
-                for (int x = 0; x < 8; x++) {
-                        if ((pixel & (0x80 >> x)) == 0) { // This line taken from www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
-                                continue;
-                        }
-
-                        int y_off = (y_pos + y) * 64;
-                        int x_off = (x_pos + x);
-                        int pos = y_off + x_off;
-
-                        if (s->gfx[pos] == 1) {
-                                s->v[15] = 1;
-                        }
-
-                        s->gfx[pos] ^= 1;
-                }
-        }
+        SystemDrawSprite(s, x, y, height);
 }
 
 // Key operation: Skips the next instruction if the key stored in VX is pressed.
@@ -374,10 +351,7 @@ void FnFX29(struct opcode *c, struct system *s) {
 
         unsigned char sprite = s->v[x];
 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-        s->i = (unsigned short)SystemFontSprite(s, sprite);
-        #pragma GCC diagnostic pop
+        s->i = SystemFontSprite(s, sprite);
 }
 
 // Binary coded decimal: Stores the binary-coded decimal representation of VX,
@@ -519,9 +493,10 @@ void OpcodeDecode(struct opcode *c, struct system *s) {
                                 } break;
 
                                 default: {
+                                        // Just skip right over these...
                                         c->fn = Fn0NNN;
-                                        SystemIncrementPC(s);
-                                        OpcodeDecode(c, s);
+                                        // SystemIncrementPC(s);
+                                        // OpcodeDecode(c, s);
                                 } break;
                         }
                 } break;

@@ -1,10 +1,30 @@
-#!/bin/sh
+#!/bin/bash
+
+# sdl2-config --libs
+#LINKS="-L/usr/lib/x86_64-linux-gnu -llibSDL2 -llibSDL2main"
+L_OPTIONS="$(sdl2-config --libs)" #-L/usr/lib/x86_64-linux-gnu -lSDL2 -lSDL2main"
+CC="/usr/bin/gcc"
+CC_OPTIONS="-g -std=c11 $(sdl2-config --cflags) -c"
 
 VERSION=gnu11
 
-rm -rf *.o
-gcc -g -std=$VERSION -c opcode.c
-gcc -g -std=$VERSION -c system.c
-gcc -g -std=$VERSION -c gs_stack.c
-gcc -g -std=$VERSION -c main.c
-gcc -g -std=$VERSION -o chip-8 gs_stack.o system.o opcode.o main.o
+if [ ! -d output ]; then
+    mkdir -p output
+fi
+
+rm -rf output/*.o
+
+LINK_FILES=""
+FILES=(\
+       opcode \
+       system \
+       main \
+)
+for FILE in "${FILES[@]}"; do
+    $CC $CC_OPTIONS $FILE.c -o output/$FILE.o
+    LINK_FILES+=" output/$FILE.o"
+done
+
+CMD="$CC -o output/chip-8 $LINK_FILES -lSDL2main $L_OPTIONS"
+echo "$CMD"
+$CMD

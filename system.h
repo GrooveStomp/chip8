@@ -57,7 +57,7 @@ SystemFree(struct system *s);
 void
 SystemIncrementPC(struct system *s);
 
-unsigned char *
+unsigned short
 SystemFontSprite(struct system *s, unsigned int index);
 
 // Returns 0 if program could no be loaded, or non-zero otherwise.
@@ -75,5 +75,14 @@ SystemPushStack(struct system *s);
 
 void
 SystemPopStack(struct system *s);
+
+void
+SystemClearScreen(struct system *s);
+
+void
+SystemDrawSprite(struct system *s, unsigned int x, unsigned int y, unsigned int height);
+
+void
+SystemClearKeys(struct system *s);
 
 #endif // SYSTEM_VERSION
