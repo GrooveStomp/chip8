@@ -7,9 +7,11 @@
 
 #include "system.h"
 
+#define GRAPHICS_WIDTH 64
+#define GRAPHICS_HEIGHT 32
 #define MEMORY_SIZE 4096
 #define NUM_REGISTERS 16
-#define GRAPHICS_MEM_SIZE 64 * 32
+#define GRAPHICS_MEM_SIZE GRAPHICS_WIDTH*GRAPHICS_HEIGHT
 #define STACK_SIZE 16
 #define NUM_KEYS 16
 #define FONT_SIZE 80
@@ -43,13 +45,13 @@ static unsigned char fontset[FONT_SIZE] = {
 
 void SystemDebug(struct system *s) {
         printf("struct system {\n");
-        printf("\tdelay_t:____ %d\n", s->delay_timer);
+        printf("\tdelayTimer__ %d\n", s->delayTimer);
         printf("\tfontp:______ 0x%04X\n", s->fontp);
         printf("\tgfx:________ %p\n", s->gfx);
         printf("\ti:__________ 0x%04X\n", s->i);
         printf("\tmemory:_____ %p\n", s->memory);
         printf("\tpc:_________ 0x%04X\n", s->pc);
-        printf("\tsound_timer: %d\n", s->sound_timer);
+        printf("\tsoundTimer:_ %d\n", s->soundTimer);
         printf("\tsp:_________ %d\n", s->sp);
         printf("\n");
 
@@ -102,6 +104,8 @@ struct system *SystemInit() {
                 s->memory[i] = fontset[i];
         }
 
+        s->waitForKey = -1;
+
         return s;
 }
 
@@ -134,12 +138,12 @@ int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
 }
 
 void SystemDecrementTimers(struct system *s) {
-        if (s->delay_timer > 0) {
-                s->delay_timer--;
+        if (s->delayTimer > 0) {
+                s->delayTimer--;
         }
 
-        if (s->sound_timer > 0) {
-                s->sound_timer--;
+        if (s->soundTimer > 0) {
+                s->soundTimer--;
         }
 }
 
@@ -187,7 +191,7 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
                                 continue;
                         }
 
-                        int y_off = (y_pos + y) * 64;
+                        int y_off = (y_pos + y) * GRAPHICS_WIDTH;
                         int x_off = (x_pos + x);
                         int pos = y_off + x_off;
 
@@ -195,7 +199,7 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
                                 s->v[15] = 1;
                         }
 
-                        s->gfx[pos] ^= 1;
+                        s->gfx[pos] ^= 0xFF;
                 }
         }
 }

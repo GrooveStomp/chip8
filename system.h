@@ -30,8 +30,8 @@ struct system {
 
         // There are two timer registers that count at 60 Hz. When set above
         // zero they will count down to zero.
-        unsigned char delay_timer;
-        unsigned char sound_timer;
+        unsigned char delayTimer;
+        unsigned char soundTimer;
 
         unsigned short stack[16];
         unsigned short sp;
@@ -42,7 +42,9 @@ struct system {
 
         unsigned short fontp;
 
-        struct gs_stack *subroutine_callers;
+        struct gs_stack *subroutineCallers;
+
+        int waitForKey;
 };
 
 void

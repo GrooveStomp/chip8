@@ -313,28 +313,28 @@ void FnEXA1(struct opcode *c, struct system *s) {
 void FnFX07(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->v[x] = s->delay_timer;
+        s->v[x] = s->delayTimer;
 }
 
 // Key operation: Block until a key press occurs, then store it in VX.
 void FnFX0A(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        // TODO Wait for keypress.
+        s->waitForKey = x;
 }
 
 // Timer: Sets the delay timer to VX.
 void FnFX15(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->delay_timer = s->v[x];
+        s->delayTimer = s->v[x];
 }
 
 // Sound: Sets the sound timer to VX.
 void FnFX18(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->sound_timer = s->v[x];
+        s->soundTimer = s->v[x];
 }
 
 // Memory: Adds VX to I.

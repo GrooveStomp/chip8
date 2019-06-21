@@ -18,6 +18,7 @@ LINK_FILES=""
 FILES=(\
        opcode \
        system \
+       input \
        main \
 )
 for FILE in "${FILES[@]}"; do

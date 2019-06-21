@@ -12,12 +12,13 @@
 
 const unsigned int CHIP8_WIDTH = 64;
 const unsigned int CHIP8_HEIGHT = 32;
-const unsigned int DISPLAY_SCALE = 4;
+const unsigned int DISPLAY_SCALE = 16;
 const unsigned int DISPLAY_WIDTH = CHIP8_WIDTH * DISPLAY_SCALE;
 const unsigned int DISPLAY_HEIGHT = CHIP8_HEIGHT * DISPLAY_SCALE;
 
 #include "system.h"
 #include "opcode.h"
+#include "input.h"
 
 void Embiggen(unsigned int *buf, unsigned int x, unsigned int y, unsigned int pixel) {
         for (int sy = y; sy < y + DISPLAY_SCALE; sy++) {
@@ -89,6 +90,7 @@ void ArgParse(int argc, char **argv, int debug) {
 int main(int argc, char **argv) {
         struct opcode *opcode = OpcodeInit();
         struct system *system = SystemInit();
+        struct input *input = InputInit();
 
         ArgParse(argc, argv, 0);
 
@@ -126,7 +128,6 @@ int main(int argc, char **argv) {
                 printf("Couldn't load program into Chip-8\n");
         }
 
-        int running = 1;
         SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
 
         SDL_Window *window = SDL_CreateWindow(
@@ -156,115 +157,24 @@ int main(int argc, char **argv) {
                 running = 0;
         }
 
+        int running = 1;
         while (running) {
-                OpcodeFetch(opcode, system);
-                OpcodeDecode(opcode, system);
-                if (DEBUG_MODE) {
-                        OpcodeDebug(opcode);
-                        SystemDebug(system);
-                        char in[256];
-                        fgets(in, 256, stdin);
+                if (system->waitForKey == -1) {
+                        OpcodeFetch(opcode, system);
+                        OpcodeDecode(opcode, system);
+                        if (DEBUG_MODE) {
+                                OpcodeDebug(opcode);
+                                SystemDebug(system);
+                                char in[256];
+                                fgets(in, 256, stdin);
+                        }
+                        OpcodeExecute(opcode, system);
                 }
-                OpcodeExecute(opcode, system);
 
                 SystemDecrementTimers(system);
                 SystemClearKeys(system);
 
-                SDL_Event event;
-                while (SDL_PollEvent(&event)) {
-                        switch (event.type) {
-                                case SDL_QUIT: {
-                                        running = 0;
-                                } break;
-
-                                case SDL_KEYUP:
-                                        break;
-
-                                case SDL_KEYDOWN: {
-                                        SDL_Keycode keycode = event.key.keysym.sym;
-
-                                        switch (keycode) {
-                                                case SDLK_ESCAPE: {
-                                                        running = 0;
-                                                } break;
-
-                                                        // Left hand
-                                                case SDLK_q:
-                                                        printf("Pressed q\n");
-                                                        system->key[0] = 1;
-                                                        break;
-                                                case SDLK_w:
-                                                        printf("Pressed w\n");
-                                                        system->key[0] = 2;
-                                                        break;
-                                                case SDLK_e:
-                                                        printf("Pressed e\n");
-                                                        system->key[0] = 3;
-                                                        break;
-                                                case SDLK_r:
-                                                        printf("Pressed r\n");
-                                                        system->key[0] = 0xC;
-                                                        break;
-                                                case SDLK_a:
-                                                        printf("Pressed a\n");
-                                                        system->key[0] = 4;
-                                                        break;
-                                                case SDLK_s:
-                                                        printf("Pressed s\n");
-                                                        system->key[0] = 5;
-                                                        break;
-                                                case SDLK_d:
-                                                        printf("Pressed d\n");
-                                                        system->key[0] = 6;
-                                                        break;
-                                                case SDLK_f:
-                                                        printf("Pressed f\n");
-                                                        system->key[0] = 0xD;
-                                                        break;
-
-                                                        // Right hand
-                                                case SDLK_u:
-                                                        printf("Pressed u\n");
-                                                        system->key[0] = 7;
-                                                        break;
-                                                case SDLK_i:
-                                                        printf("Pressed i\n");
-                                                        system->key[0] = 8;
-                                                        break;
-                                                case SDLK_o:
-                                                        printf("Pressed o\n");
-                                                        system->key[0] = 9;
-                                                        break;
-                                                case SDLK_p:
-                                                        printf("Pressed p\n");
-                                                        system->key[0] = 0xE;
-                                                        break;
-                                                case SDLK_j:
-                                                        printf("Pressed j\n");
-                                                        system->key[0] = 0xA;
-                                                        break;
-                                                case SDLK_k:
-                                                        printf("Pressed k\n");
-                                                        system->key[0] = 0;
-                                                        break;
-                                                case SDLK_l:
-                                                        printf("Pressed l\n");
-                                                        system->key[0] = 0xB;
-                                                        break;
-                                                case SDLK_SEMICOLON:
-                                                        printf("Pressed ;\n");
-                                                        system->key[0] = 0xF;
-                                                        break;
-
-                                                default:
-                                                        break;
-                                        } // switch (keycode)
-                                } break;
-
-                                default: {
-                                } break;
-                        } // switch (event.type)
-                } // while (SDL_PollEvent(&event))
+                running = !InputCheck(input, system);
 
                 struct timespec start;
                 clock_gettime(CLOCK_REALTIME, &start);
