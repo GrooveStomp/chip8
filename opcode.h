@@ -28,4 +28,7 @@ OpcodeExecute(struct opcode *c, struct system *s);
 void
 OpcodeDebug(struct opcode *c);
 
+unsigned short
+OpcodeInstruction(struct opcode *c);
+
 #endif // OPCODE_VERSION

@@ -28,6 +28,8 @@ struct input *InputInit() {
         i->keycodeIndices[0] = SDLK_k;
         i->keycodeIndices[0xB] = SDLK_l;
         i->keycodeIndices[0xF] = SDLK_SEMICOLON;
+
+        return i;
 }
 
 void HandleKeyPress(struct input *input, struct system *s, SDL_Keycode k) {
@@ -43,22 +45,23 @@ void HandleKeyPress(struct input *input, struct system *s, SDL_Keycode k) {
         }
 }
 
-// Returns 0 if event normally processed. Non-zero indicates termination of program.
+// Returns non-zero if event normally processed. Zero indicates termination of program.
 int InputCheck(struct input *i, struct system *s) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                         case SDL_QUIT:
-                                return !0;
+                                return 0;
                                 break;
                         case SDL_KEYUP:
                                 break;
                         case SDL_KEYDOWN:
                                 if (event.key.keysym.sym == SDLK_ESCAPE) {
-                                        return !0;
+                                        return 0;
                                 }
                                 HandleKeyPress(i, s, event.key.keysym.sym);
                                 break;
                 }
         }
+        return !0;
 }

@@ -106,6 +106,9 @@ struct system *SystemInit() {
 
         s->waitForKey = -1;
 
+        s->displayWidth = 64;
+        s->displayHeight = 32;
+
         return s;
 }
 

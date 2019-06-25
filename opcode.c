@@ -35,6 +35,10 @@ void OpcodeMemControl(allocator Alloc, deallocator Dealloc) {
         DEALLOCATOR = Dealloc;
 }
 
+unsigned short OpcodeInstruction(struct opcode *c) {
+        return c->instruction;
+}
+
 unsigned int HighByte(struct opcode *c) {
         return c->instruction >> 8;
 }
@@ -206,11 +210,11 @@ void Fn8XY5(struct opcode *c, struct system *s) {
 // Bitwise operation: Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
 void Fn8XY6(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
-        unsigned int y = NibbleAt(c, 1);
+        // unsigned int y = NibbleAt(c, 1);
 
         unsigned char lsb = s->v[x] | 0x01;
         s->v[15] = lsb;
-        s->v[x] >> 1;
+        s->v[x] = (s->v[x] >> 1);
 }
 
 // Math: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -230,11 +234,11 @@ void Fn8XY7(struct opcode *c, struct system *s) {
 // Bitwise operation: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
 void Fn8XYE(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
-        unsigned int y = NibbleAt(c, 1);
+        // nsigned int y = NibbleAt(c, 1);
 
         unsigned char msb = s->v[x] | 0x80;
         s->v[15] = msb;
-        s->v[x] << 1;
+        s->v[x] = (s->v[x] << 1);
 }
 
 // Condition: Skips the next instruction if VX doesn't equal VY.
@@ -449,7 +453,12 @@ void OpcodeFree(struct opcode *c) {
 void OpcodeDebug(struct opcode *c) {
         printf("struct opcode {\n");
         printf("\tinstruction: 0x%04X\n", c->instruction);
-        printf("\tfn:_________ %p\n", c->fn);
+        printf("\tfn:_________ ");
+        unsigned char *ptr = (unsigned char *)&c->fn;
+        for (int i = 0; i < sizeof(opcode_fn); i++) {
+                printf("%02x", ptr[i]);
+        }
+        printf("\n");
 
         for (int i=0; i<35; i++) {
                 if (c->fn == c->debug_fn_map[i].address) {

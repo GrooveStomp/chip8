@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# sdl2-config --libs
-#LINKS="-L/usr/lib/x86_64-linux-gnu -llibSDL2 -llibSDL2main"
-L_OPTIONS="$(sdl2-config --libs)" #-L/usr/lib/x86_64-linux-gnu -lSDL2 -lSDL2main"
-CC="/usr/bin/gcc"
-CC_OPTIONS="-g -std=c11 $(sdl2-config --cflags) -c"
+CC=$(which gcc)
+CFLAGS+="-g -std=c11 -pedantic -Wall $(sdl2-config --cflags)"
+
+LD=$(which gcc)
+LFLAGS="$(sdl2-config --libs) -lSDL2main -lGL -lGLEW"
 
 VERSION=gnu11
 
@@ -14,18 +14,18 @@ fi
 
 rm -rf output/*.o
 
-LINK_FILES=""
-FILES=(\
+OBJS=""
+SRCS=(\
        opcode \
        system \
        input \
        main \
 )
-for FILE in "${FILES[@]}"; do
-    $CC $CC_OPTIONS $FILE.c -o output/$FILE.o
-    LINK_FILES+=" output/$FILE.o"
+for SRC in "${SRCS[@]}"; do
+    $CC $CFLAGS -c $SRC.c -o output/$SRC.o
+    OBJS+=" output/$SRC.o"
 done
 
-CMD="$CC -o output/chip-8 $LINK_FILES -lSDL2main $L_OPTIONS"
+CMD="$CC -o output/chip-8 $OBJS $LFLAGS"
 echo "$CMD"
 $CMD

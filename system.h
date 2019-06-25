@@ -45,6 +45,8 @@ struct system {
         struct gs_stack *subroutineCallers;
 
         int waitForKey;
+        unsigned int displayWidth;
+        unsigned int displayHeight;
 };
 
 void

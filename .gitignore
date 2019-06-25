@@ -3,3 +3,4 @@ chip-8
 *.o
 .#*
 \#*output
+core
