@@ -97,6 +97,10 @@ struct system *SystemInit() {
         s->gfx = GFX;
         memset(GFX, 0, GRAPHICS_MEM_SIZE);
 
+        /* for (int i = 0; i < 64 * 32; i++) { */
+        /*         s->gfx[i] = 0x0; */
+        /* } */
+
         s->pc = 0x200;
 
         s->fontp = 0;

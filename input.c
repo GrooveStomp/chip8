@@ -46,22 +46,20 @@ void HandleKeyPress(struct input *input, struct system *s, SDL_Keycode k) {
 }
 
 // Returns non-zero if event normally processed. Zero indicates termination of program.
-int InputCheck(struct input *i, struct system *s) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-                switch (event.type) {
-                        case SDL_QUIT:
+int InputCheck(struct input *i, struct system *s, SDL_Event *event) {
+        switch (event->type) {
+                case SDL_QUIT:
+                        return 0;
+                        break;
+                case SDL_KEYUP:
+                        break;
+                case SDL_KEYDOWN:
+                        if (event->key.keysym.sym == SDLK_ESCAPE) {
                                 return 0;
-                                break;
-                        case SDL_KEYUP:
-                                break;
-                        case SDL_KEYDOWN:
-                                if (event.key.keysym.sym == SDLK_ESCAPE) {
-                                        return 0;
-                                }
-                                HandleKeyPress(i, s, event.key.keysym.sym);
-                                break;
-                }
+                        }
+                        HandleKeyPress(i, s, event->key.keysym.sym);
+                        break;
         }
+
         return !0;
 }

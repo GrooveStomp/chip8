@@ -13,7 +13,7 @@ struct opcode *
 OpcodeInit();
 
 void
-OpcodeFree(struct opcode *c);
+OpcodeFree(void *c);
 
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
 void
@@ -30,5 +30,8 @@ OpcodeDebug(struct opcode *c);
 
 unsigned short
 OpcodeInstruction(struct opcode *c);
+
+char *
+OpcodeDescription(struct opcode *c);
 
 #endif // OPCODE_VERSION

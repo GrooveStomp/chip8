@@ -39,6 +39,23 @@ unsigned short OpcodeInstruction(struct opcode *c) {
         return c->instruction;
 }
 
+char *OpcodeDescription(struct opcode *c) {
+        char *desc = NULL;
+
+        for (int i=0; i<35; i++) {
+                if (c->fn == c->debug_fn_map[i].address) {
+                        struct opcode_fn_map data = c->debug_fn_map[i];
+
+                        unsigned int nameLen = strlen(data.name);
+                        unsigned int descLen = strlen(data.description);
+                        desc = (char *)ALLOCATOR(nameLen + descLen + 3);
+                        sprintf(desc, "%s: %s%c", data.name, data.description, '\0');
+                }
+        }
+
+        return desc;
+}
+
 unsigned int HighByte(struct opcode *c) {
         return c->instruction >> 8;
 }
@@ -255,7 +272,7 @@ void Fn9XY0(struct opcode *c, struct system *s) {
 void FnANNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
-        unsigned int address = ((nibble << 3) | low_byte);
+        unsigned int address = ((nibble << 8) | low_byte);
 
         s->i = address;
 }
@@ -264,7 +281,7 @@ void FnANNN(struct opcode *c, struct system *s) {
 void FnBNNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
-        unsigned int address = ((nibble << 3) | low_byte);
+        unsigned int address = ((nibble << 8) | low_byte);
 
         s->i = (s->v[0] + address);
 }
@@ -401,7 +418,7 @@ void FnFX65(struct opcode *c, struct system *s) {
 }
 
 struct opcode *OpcodeInit() {
-        struct opcode *c = (struct opcode *)malloc(sizeof(struct opcode));
+        struct opcode *c = (struct opcode *)ALLOCATOR(sizeof(struct opcode));
         memset(c, 0, sizeof(struct opcode));
 
         c->instruction = 0;
@@ -446,8 +463,10 @@ struct opcode *OpcodeInit() {
         return c;
 }
 
-void OpcodeFree(struct opcode *c) {
-        DEALLOCATOR(c);
+void OpcodeFree(void *c) {
+        if (c != NULL) {
+                DEALLOCATOR(c);
+        }
 }
 
 void OpcodeDebug(struct opcode *c) {

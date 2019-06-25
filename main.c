@@ -39,10 +39,10 @@ const unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE
 
 void Raster(struct system *s, GLubyte *texture) {
         for (int y = 0; y < CHIP8_DISPLAY_HEIGHT; y++) {
-                for (int x = 0; x < CHIP8_DISPLAY_WIDTH * 3; x+=3) {
+                for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
                         unsigned int pos = y * (CHIP8_DISPLAY_WIDTH * 3) + x;
 
-                        if (s->gfx[y * CHIP8_DISPLAY_WIDTH + x]) {
+                        if (s->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
                                 // Black (Foreground)
                                 texture[pos + 0] = 0;
                                 texture[pos + 1] = 0;
@@ -60,6 +60,8 @@ void Raster(struct system *s, GLubyte *texture) {
 // static const double MS_PER_FRAME = 0.03333333; // 30 FPS
 static const double MS_PER_FRAME = 0.01666666; // 60 FPS
 static int DEBUG_MODE = 0;
+static int DEBUG_CONTINUE = 0;
+static int DEBUG_WAIT_FOR_STEP = 0;
 
 void Usage() {
         printf("chip-8 [-d] PROGRAM\n");
@@ -176,47 +178,41 @@ int main(int argc, char **argv) {
         unsigned int widgetHeight = 240;
 
         while (running) {
-                if (system->waitForKey == -1) {
-                        OpcodeFetch(opcode, system);
-                        OpcodeDecode(opcode, system);
-                        if (DEBUG_MODE) {
-                                OpcodeDebug(opcode);
-                                SystemDebug(system);
-                                char in[256];
-                                fgets(in, 256, stdin);
+                if (!DEBUG_MODE || (DEBUG_MODE && !DEBUG_WAIT_FOR_STEP)) {
+                        if (system->waitForKey == -1) {
+                                OpcodeFetch(opcode, system);
+                                OpcodeDecode(opcode, system);
                         }
-                        OpcodeExecute(opcode, system);
+
+                        SystemDecrementTimers(system);
+                        SystemClearKeys(system);
+
                 }
 
-                SystemDecrementTimers(system);
-                SystemClearKeys(system);
+                if (DEBUG_MODE) {
+                        DEBUG_WAIT_FOR_STEP = 1;
+                }
 
                 nk_input_begin(ctx); {
                         SDL_Event event;
                         while (SDL_PollEvent(&event)) {
-                                if (event.type == SDL_QUIT) {
-                                        goto cleanup;
-                                }
+                                running = InputCheck(input, system, &event);
                                 nk_sdl_handle_event(&event);
                         }
                 }
                 nk_input_end(ctx);
 
-                running = InputCheck(input, system);
-
                 struct timespec start;
                 clock_gettime(CLOCK_REALTIME, &start);
 
-                if (!DEBUG_MODE) {
-                        struct timespec end;
-                        clock_gettime(CLOCK_REALTIME, &end);
+                struct timespec end;
+                clock_gettime(CLOCK_REALTIME, &end);
 
-                        double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                        elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
+                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
 
-                        struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
-                        nanosleep(&sleep, NULL);
-                }
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
+                nanosleep(&sleep, NULL);
 
                 if (nk_begin(ctx, "Registers", nk_rect(0, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
                         static char textHexInput[16][64];
@@ -404,6 +400,49 @@ int main(int argc, char **argv) {
                 }
                 nk_end(ctx);
 
+                if (nk_begin(ctx, "Debugger", nk_rect(widgetWidth * 3, 0, widgetWidth, widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+                        nk_layout_row_static(ctx, 20, widgetWidth - 40, 1);
+                        if (nk_button_label(ctx, "Step")) {
+                                if (DEBUG_MODE) {
+                                        DEBUG_CONTINUE = 1;
+                                        DEBUG_WAIT_FOR_STEP = 0;
+                                }
+                        }
+                        if (nk_button_label(ctx, "Continue")) {
+                                DEBUG_MODE = 0;
+                                DEBUG_CONTINUE = 1;
+                                DEBUG_WAIT_FOR_STEP = 1;
+                        }
+                        if (nk_button_label(ctx, "Break")) {
+                                DEBUG_MODE = 1;
+                                DEBUG_CONTINUE = 1;
+                                DEBUG_WAIT_FOR_STEP = 1;
+                        }
+                }
+                nk_end(ctx);
+
+                if (nk_begin(ctx, "Opcode", nk_rect(widgetWidth * 3, widgetHeight / 2.0, widgetWidth, widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+                        char *desc = OpcodeDescription(opcode);
+                        nk_layout_row_dynamic(ctx, 20, 1);
+                        nk_labelf(ctx, NK_TEXT_LEFT, "%04X", OpcodeInstruction(opcode));
+
+                        if (desc != NULL) {
+                                nk_layout_row_dynamic(ctx, 100, 1);
+                                nk_label_wrap(ctx, desc);
+                                OpcodeFree(desc);
+                        }
+                }
+                nk_end(ctx);
+
+                if (system->waitForKey == -1) {
+                        if (DEBUG_MODE && DEBUG_CONTINUE) {
+                                DEBUG_CONTINUE = 0;
+                                OpcodeExecute(opcode, system);
+                        } else if (!DEBUG_MODE) {
+                                OpcodeExecute(opcode, system);
+                        }
+                }
+
                 SDL_GetWindowSize(window, &glWindowWidth, &glWindowHeight);
                 glViewport(0, 0, glWindowWidth, glWindowHeight);
                 glClear(GL_COLOR_BUFFER_BIT);
@@ -422,26 +461,30 @@ int main(int argc, char **argv) {
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)textureData);
 
+                float top = 0.25;
+                float bottom = -0.75;
+                float left = 0;
+                float right = 1;
                 glBegin(GL_TRIANGLES); {
                         glTexCoord2f(0, 0);
-                        glVertex3f(0, -0.5, 0.5);
+                        glVertex3f(left, bottom, 0.5);
                         glTexCoord2f(0, 1);
-                        glVertex3f(0, 0.5, 0.5);
+                        glVertex3f(left, top, 0.5);
                         glTexCoord2f(1, 0);
-                        glVertex3f(1, -0.5, 0.5);
+                        glVertex3f(right, bottom, 0.5);
 
                         glTexCoord2f(0, 1);
-                        glVertex3f(0, 0.5, 0.5);
+                        glVertex3f(left, top, 0.5);
                         glTexCoord2f(1, 1);
-                        glVertex3f(1, 0.5, 0.5);
+                        glVertex3f(right, top, 0.5);
                         glTexCoord2f(1, 0);
-                        glVertex3f(1, -0.5, 0.5);
+                        glVertex3f(right, bottom, 0.5);
                 } glEnd();
 
                 SDL_GL_SwapWindow(window);
         } // while (running)
 
- cleanup:
+        //cleanup:
         nk_sdl_shutdown();
         SDL_GL_DeleteContext(glContext);
         SDL_DestroyWindow(window);
