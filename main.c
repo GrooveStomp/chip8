@@ -37,10 +37,12 @@ const unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE
 #include "opcode.h"
 #include "input.h"
 
+int DEBUG_VAR = 0;
+
 void Raster(struct system *s, GLubyte *texture) {
-        for (int y = 0; y < CHIP8_DISPLAY_HEIGHT; y++) {
+        for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
                 for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
-                        unsigned int pos = y * (CHIP8_DISPLAY_WIDTH * 3) + x;
+                        unsigned int pos = cy * (CHIP8_DISPLAY_WIDTH * 3) + x;
 
                         if (s->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
                                 // Black (Foreground)
@@ -98,6 +100,8 @@ int main(int argc, char **argv) {
         struct system *system = SystemInit();
         struct input *input = InputInit();
 
+        GLubyte textureData[CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3];
+
         ArgParse(argc, argv, 0);
 
         size_t fsize = 0;
@@ -132,34 +136,34 @@ int main(int argc, char **argv) {
         }
         if (!SystemLoadProgram(system, mem, fsize)) {
                 printf("Couldn't load program into Chip-8\n");
+                goto quit;
         }
 
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
 
         SDL_Window *window = SDL_CreateWindow(
-                "Window Title",
+                "AaronO's CHIP-8 Emulator",
                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                 DISPLAY_WIDTH, DISPLAY_HEIGHT,
                 SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
                 );
 
-        int running = 1;
         if (window == NULL) {
                 printf("Couldn't open window: %s\n", SDL_GetError());
-                running = 0;
+                goto quit;
         }
 
         SDL_GLContext glContext = SDL_GL_CreateContext(window);
+        // TODO: Verify glContext is OK.
         int glWindowWidth, glWindowHeight;
         SDL_GetWindowSize(window, &glWindowWidth, &glWindowHeight);
         glViewport(0, 0, glWindowWidth, glWindowHeight);
 
         if (glewInit() != GLEW_OK) {
                 fprintf(stderr, "Failed to setup GLEW\n");
-                exit(1);
+                goto sdl_quit;
         }
 
-        GLubyte textureData[CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3];
         glEnable(GL_TEXTURE_2D);
         GLuint glTextureName;
         glGenTextures(1, &glTextureName);
@@ -177,16 +181,19 @@ int main(int argc, char **argv) {
         unsigned int widgetWidth = 240;
         unsigned int widgetHeight = 240;
 
+        SDL_Event event;
+        int running = 1;
         while (running) {
                 if (!DEBUG_MODE || (DEBUG_MODE && !DEBUG_WAIT_FOR_STEP)) {
                         if (system->waitForKey == -1) {
                                 OpcodeFetch(opcode, system);
                                 OpcodeDecode(opcode, system);
+                                if (DEBUG_VAR) {
+                                        DEBUG_VAR = 0;
+                                }
                         }
-
                         SystemDecrementTimers(system);
                         SystemClearKeys(system);
-
                 }
 
                 if (DEBUG_MODE) {
@@ -194,8 +201,7 @@ int main(int argc, char **argv) {
                 }
 
                 nk_input_begin(ctx); {
-                        SDL_Event event;
-                        while (SDL_PollEvent(&event)) {
+                        while (SDL_PollEvent(&event)) { // TODO: Causes SIGABRT?
                                 running = InputCheck(input, system, &event);
                                 nk_sdl_handle_event(&event);
                         }
@@ -391,10 +397,10 @@ int main(int argc, char **argv) {
                                 nk_layout_row_push(ctx, 10);
                                 nk_labelf(ctx, NK_TEXT_LEFT, "| ");
                                 nk_layout_row_push(ctx, 100);
-                                char text[16];
+                                char text[17] = { 0 };
                                 int textLen = 16;
-                                snprintf(text, textLen + 1, "%s", (char *)&system->memory[i]);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, text, &textLen, 64, nk_filter_default);
+                                snprintf(text, textLen + 1, "%s", &system->memory[i]);
+                                nk_edit_string(ctx, NK_EDIT_SIMPLE, text, &textLen, 64, nk_filter_ascii);
                                 nk_layout_row_end(ctx);
                         }
                 }
@@ -434,7 +440,39 @@ int main(int argc, char **argv) {
                 }
                 nk_end(ctx);
 
-                if (system->waitForKey == -1) {
+                if (nk_begin(ctx, "Keys", nk_rect(widgetWidth * 4, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+                        static char textHexInput[16][64];
+                        static int textLength[16];
+
+                        for (int i = 0; i < 16; i++) {
+                                if (system->key[i]) {
+                                        sprintf(textHexInput[i], "PRESSED");
+                                        textLength[i] = 7;
+                                } else {
+                                        sprintf(textHexInput[i], "");
+                                        textLength[i] = 0;
+                                }
+
+                        }
+
+                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
+                        for (int i = 0; i < 8; i++) {
+                                // First 8
+                                nk_layout_row_push(ctx, 40);
+                                nk_labelf(ctx, NK_TEXT_RIGHT, "k%01X ", i);
+                                nk_layout_row_push(ctx, 60);
+                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i], &textLength[i], 64, nk_filter_hex);
+
+                                // Second 8
+                                nk_layout_row_push(ctx, 40);
+                                nk_labelf(ctx, NK_TEXT_RIGHT, "k%01X ", i+8);
+                                nk_layout_row_push(ctx, 60);
+                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i+8], &textLength[i+8], 64, nk_filter_hex);
+                        }
+                }
+                nk_end(ctx);
+
+                if (system->waitForKey == -1 && !DEBUG_VAR) {
                         if (DEBUG_MODE && DEBUG_CONTINUE) {
                                 DEBUG_CONTINUE = 0;
                                 OpcodeExecute(opcode, system);
@@ -484,11 +522,14 @@ int main(int argc, char **argv) {
                 SDL_GL_SwapWindow(window);
         } // while (running)
 
-        //cleanup:
+        // nk_quit:
         nk_sdl_shutdown();
-        SDL_GL_DeleteContext(glContext);
-        SDL_DestroyWindow(window);
+        // gl_quit:
+        SDL_GL_DeleteContext(glContext); // TODO: Causes SIGABRT?
+ sdl_quit:
+        SDL_DestroyWindow(window); // TODO: Causes SIGABRT?
         SDL_Quit();
+ quit:
 
         exit(0);
 }

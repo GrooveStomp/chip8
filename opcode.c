@@ -22,6 +22,8 @@ struct opcode_fn_map {
 
 // All instructions are 2 bytes store most-significant byte first. (Big Endian)
 struct opcode {
+        unsigned short jumpToInstruction;
+        int skipNextInstruction;
         unsigned short instruction;
         opcode_fn fn;
         struct opcode_fn_map debug_fn_map[35];
@@ -106,7 +108,7 @@ void Fn1NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
-        s->pc = address;
+        c->jumpToInstruction = address;
 }
 
 // Flow control: Call subroutine at NNN;
@@ -116,7 +118,7 @@ void Fn2NNN(struct opcode *c, struct system *s) {
         unsigned int address = ((nibble << 8) | low_byte);
 
         SystemPushStack(s);
-        s->pc = address;
+        c->jumpToInstruction = address;
 }
 
 // Condition: Skip next instruction if VX equals NN.
@@ -125,7 +127,7 @@ void Fn3XNN(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         if (s->v[x] == nn) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -135,7 +137,7 @@ void Fn4XNN(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         if (s->v[x] != nn) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -145,7 +147,7 @@ void Fn5XY0(struct opcode *c, struct system *s) {
         unsigned int y = NibbleAt(c, 1);
 
         if (s->v[x] == s->v[y]) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -251,7 +253,6 @@ void Fn8XY7(struct opcode *c, struct system *s) {
 // Bitwise operation: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
 void Fn8XYE(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
-        // nsigned int y = NibbleAt(c, 1);
 
         unsigned char msb = s->v[x] | 0x80;
         s->v[15] = msb;
@@ -264,7 +265,7 @@ void Fn9XY0(struct opcode *c, struct system *s) {
         unsigned int y = NibbleAt(c, 1);
 
         if (s->v[x] != s->v[y]) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -301,10 +302,10 @@ void FnCXNN(struct opcode *c, struct system *s) {
 // instruction. As described above, VF is set to 1 if any screen pixels are
 // flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t
 // happen.
-// I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
+// I'm assuming (VX, VY) is the lower-left corner of the sprite, not the center.
 void FnDXYN(struct opcode *c, struct system *s) {
-        unsigned int x = NibbleAt(c, 2);
-        unsigned int y = NibbleAt(c, 1);
+        unsigned int x = s->v[NibbleAt(c, 2)];
+        unsigned int y = s->v[NibbleAt(c, 1)];
         unsigned int height = NibbleAt(c, 0);
 
         SystemDrawSprite(s, x, y, height);
@@ -316,7 +317,7 @@ void FnEX9E(struct opcode *c, struct system *s) {
         unsigned char key = s->v[x];
 
         if (s->key[key]) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -326,7 +327,7 @@ void FnEXA1(struct opcode *c, struct system *s) {
         unsigned char key = s->v[x];
 
         if (!(s->key[key])) {
-                SystemIncrementPC(s);
+                c->skipNextInstruction = 1;
         }
 }
 
@@ -402,7 +403,7 @@ void FnFX33(struct opcode *c, struct system *s) {
 void FnFX55(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        for (int i=0; i < x; i++) {
+        for (int i=0; i <= x; i++) {
                 s->memory[s->i + i] = s->v[i];
         }
 }
@@ -412,7 +413,7 @@ void FnFX55(struct opcode *c, struct system *s) {
 void FnFX65(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        for (int i=0; i < x; i++) {
+        for (int i=0; i <= x; i++) {
                 s->v[i] = s->memory[s->i + i];
         }
 }
@@ -423,6 +424,8 @@ struct opcode *OpcodeInit() {
 
         c->instruction = 0;
         c->fn = NULL;
+        c->skipNextInstruction = 0;
+        c->jumpToInstruction = 0; // Can be zero for "off" because normal memory starts at 0x200
 
         c->debug_fn_map[0] = (struct opcode_fn_map){ "0NNN", Fn0NNN, "Call RCA 1802 program at address NNN. (NOP)" };
         c->debug_fn_map[1] = (struct opcode_fn_map){ "00E0", Fn00E0, "Clear the screen" };
@@ -521,10 +524,7 @@ void OpcodeDecode(struct opcode *c, struct system *s) {
                                 } break;
 
                                 default: {
-                                        // Just skip right over these...
                                         c->fn = Fn0NNN;
-                                        // SystemIncrementPC(s);
-                                        // OpcodeDecode(c, s);
                                 } break;
                         }
                 } break;
@@ -684,5 +684,15 @@ void OpcodeExecute(struct opcode *c, struct system *s) {
         }
 
         c->fn(c, s);
-        SystemIncrementPC(s);
+
+        if (c->jumpToInstruction) {
+                s->pc = c->jumpToInstruction;
+                c->jumpToInstruction = 0;
+        } else {
+                SystemIncrementPC(s);
+                if (c->skipNextInstruction) {
+                        c->skipNextInstruction = 0;
+                        SystemIncrementPC(s);
+                }
+        }
 }

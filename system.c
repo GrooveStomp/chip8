@@ -97,10 +97,6 @@ struct system *SystemInit() {
         s->gfx = GFX;
         memset(GFX, 0, GRAPHICS_MEM_SIZE);
 
-        /* for (int i = 0; i < 64 * 32; i++) { */
-        /*         s->gfx[i] = 0x0; */
-        /* } */
-
         s->pc = 0x200;
 
         s->fontp = 0;
@@ -170,6 +166,7 @@ void SystemPopStack(struct system *s) {
                 // TODO: ERROR?!?
         }
 
+        s->stack[s->sp] = 0; // Debug - set to zero after "free."
         s->sp--;
         s->pc = s->stack[s->sp];
 }
@@ -202,7 +199,7 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
                         int x_off = (x_pos + x);
                         int pos = y_off + x_off;
 
-                        if (s->gfx[pos] == 1) {
+                        if (s->gfx[pos] == 0xFF) {
                                 s->v[15] = 1;
                         }
 
