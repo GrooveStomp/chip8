@@ -1,2 +1,6 @@
-- Finish implementing opcodes.
-- Implement main loop properly.
+- Implement sound
+- Clean up implementation of system->waitForKey WRT global state
+- Run code/program analysis tools
+    - valgrind (not static analysis)
+    - uno (static)
+    - splint (static)
