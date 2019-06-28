@@ -11,32 +11,16 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_opengl.h"
 
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_SDL_GL3_IMPLEMENTATION
-#include "external/nuklear.h"
-#include "external/nuklear_sdl_gl3.h"
-
-#define MAX_VERTEX_MEMORY 512 * 1024 // ??
-#define MAX_ELEMENT_MEMORY 128 * 1024 // ??
-
 const unsigned int CHIP8_DISPLAY_WIDTH = 64;
 const unsigned int CHIP8_DISPLAY_HEIGHT = 32;
 const unsigned int DISPLAY_SCALE = 16;
 const unsigned int DISPLAY_WIDTH = 1445; // CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
 const unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
 
+#include "ui.h"
 #include "system.h"
 #include "opcode.h"
 #include "input.h"
-
-int DEBUG_VAR = 0;
 
 void Raster(struct system *s, GLubyte *texture) {
         for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
@@ -60,9 +44,7 @@ void Raster(struct system *s, GLubyte *texture) {
 
 // static const double MS_PER_FRAME = 0.03333333; // 30 FPS
 static const double MS_PER_FRAME = 0.01666666; // 60 FPS
-static int DEBUG_MODE = 0;
-static int DEBUG_CONTINUE = 0;
-static int DEBUG_WAIT_FOR_STEP = 0;
+static int isDebugEnabled = 0;
 
 void Usage() {
         printf("chip-8 [-d] PROGRAM\n");
@@ -85,9 +67,9 @@ void ArgParse(int argc, char **argv, int debug) {
 
         if (argc == 3 && strcmp(argv[1], "-d") == 0) {
                 argv[1] = argv[2];
-                DEBUG_MODE = 1;
+                isDebugEnabled = 1;
         } else if (argc == 3 && strcmp(argv[2], "-d") == 0) {
-                DEBUG_MODE = 1;
+                isDebugEnabled = 1;
         } else if (argc == 3) {
                 Usage();
                 exit(1);
@@ -169,43 +151,34 @@ int main(int argc, char **argv) {
         glBindTexture(GL_TEXTURE_2D, glTextureName);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)textureData);
 
-        struct nk_context *ctx = nk_sdl_init(window); {
-                struct nk_font_atlas *atlas;
-                nk_sdl_font_stash_begin(&atlas);
-                nk_sdl_font_stash_end();
-        }
-
-        struct nk_colorf bg = (struct nk_colorf){ .r = 0.10f, .g = 0.18f, .b = 0.24f, .a = 1.0f };
-
-        unsigned int widgetWidth = 240;
-        unsigned int widgetHeight = 240;
+        // TODO: First param is one for debugging UI, zero to disable it.
+        struct ui *ui = UIInit(0, 240, 240, window);
+        struct ui_debug *dbg = UIDebugInfo(ui);
+        dbg->enabled = isDebugEnabled;
 
         SDL_Event event;
         int running = 1;
         while (running) {
-                if (!DEBUG_MODE || (DEBUG_MODE && !DEBUG_WAIT_FOR_STEP)) {
+                if (!dbg->enabled || (dbg->enabled && !dbg->waitForStep)) {
                         if (system->waitForKey == -1) {
                                 OpcodeFetch(opcode, system);
                                 OpcodeDecode(opcode, system);
-                                if (DEBUG_VAR) {
-                                        DEBUG_VAR = 0;
-                                }
                         }
                         SystemDecrementTimers(system);
                         SystemClearKeys(system);
                 }
 
-                if (DEBUG_MODE) {
-                        DEBUG_WAIT_FOR_STEP = 1;
+                if (dbg->enabled) {
+                        dbg->waitForStep = 1;
                 }
 
-                nk_input_begin(ctx); {
+                UIInputBegin(ui); {
                         while (SDL_PollEvent(&event)) { // TODO: Causes SIGABRT?
                                 running = InputCheck(input, system, &event);
-                                nk_sdl_handle_event(&event);
+                                UIHandleEvent(ui, &event);
                         }
                 }
-                nk_input_end(ctx);
+                UIInputEnd(ui);
 
                 struct timespec start;
                 clock_gettime(CLOCK_REALTIME, &start);
@@ -219,263 +192,13 @@ int main(int argc, char **argv) {
                 struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
                 nanosleep(&sleep, NULL);
 
-                if (nk_begin(ctx, "Registers", nk_rect(0, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        static char textHexInput[16][64];
-                        static int textLength[16];
+                UIWidgets(ui, system, opcode);
 
-                        for (int i = 0; i < 16; i++) {
-                                sprintf(textHexInput[i], "0x%04X\n", system->v[i]);
-                                textLength[i] = 16;
-                        }
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        for (int i = 0; i < 8; i++) {
-                                // First 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "v%01X ", i);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i], &textLength[i], 64, nk_filter_hex);
-
-                                // Second 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "v%01X ", i+8);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i+8], &textLength[i+8], 64, nk_filter_hex);
-                        }
-                        nk_layout_row_end(ctx);
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "System", nk_rect(widgetWidth, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        int labelWidth = 80;
-                        int valueWidth = 60;
-
-                        char valIStr[64];
-                        sprintf(valIStr, "%04X", system->i);
-
-                        char valPcStr[64];
-                        sprintf(valPcStr, "%04X", system->pc);
-
-                        char valSpStr[64];
-                        sprintf(valSpStr, "%04X", system->sp);
-
-                        char valGfxStr[64];
-                        sprintf(valGfxStr, "%p", (void *)system->gfx);
-
-                        char valDelayStr[64];
-                        sprintf(valDelayStr, "%02X", system->delayTimer);
-                        int delayTimerLen = 2;
-
-                        char valSoundStr[64];
-                        sprintf(valSoundStr, "%02X", system->soundTimer);
-                        int soundTimerLen = 2;
-
-                        char valFontPStr[64];
-                        sprintf(valFontPStr, "%04X", system->fontp);
-
-                        char valOpcodeStr[64];
-                        sprintf(valOpcodeStr, "%04X", OpcodeInstruction(opcode));
-
-                        int strLen = 4;
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "i");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valIStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "pc");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valPcStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "sp");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valSpStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "gfx");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valGfxStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "font ptr");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valFontPStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "delay timer");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valDelayStr, &delayTimerLen, 64, nk_filter_decimal);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "sound timer");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valSoundStr, &soundTimerLen, 64, nk_filter_decimal);
-                        nk_layout_row_end(ctx);
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        nk_layout_row_push(ctx, labelWidth);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "opcode");
-                        nk_layout_row_push(ctx, valueWidth);
-                        nk_edit_string(ctx, NK_EDIT_SIMPLE, valOpcodeStr, &strLen, 64, nk_filter_hex);
-                        nk_layout_row_end(ctx);
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "Stack", nk_rect(widgetWidth * 2, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        static char textHexInput[16][64];
-                        static int textLength[16];
-
-                        for (int i = 0; i < 16; i++) {
-                                sprintf(textHexInput[i], "0x%04X\n", system->stack[i]);
-                                textLength[i] = 16;
-                        }
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        for (int i = 0; i < 8; i++) {
-                                // First 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "s%01X ", i);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i], &textLength[i], 64, nk_filter_hex);
-
-                                // Second 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "s%01X ", i+8);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i+8], &textLength[i+8], 64, nk_filter_hex);
-                        }
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "Memory", nk_rect(0, widgetHeight, widgetWidth * 3, widgetHeight * 2), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        /*
-                          | HEX | 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F | BYTES         |
-                          |-----+-------------------------------------------------+---------------|
-                          | 000 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | eR?NTFS    .. |
-                          | 010 | 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 | .....|..?.|.. |
-                         */
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 18);
-                        nk_layout_row_push(ctx, 40);
-                        nk_labelf(ctx, NK_TEXT_RIGHT, "HEX |");
-                        for (int i = 0; i < 16; i++) {
-                                nk_layout_row_push(ctx, 25);
-                                nk_labelf(ctx, NK_TEXT_CENTERED, "%02X", i);
-                        }
-                        nk_layout_row_push(ctx, 80);
-                        nk_labelf(ctx, NK_TEXT_LEFT, "| BYTES");
-                        nk_layout_row_end(ctx);
-
-                        for (int i = 0; i < 4096; i+=16) {
-                                nk_layout_row_begin(ctx, NK_STATIC, 20, 19);
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_CENTERED, "%04X |", i);
-
-                                for (int j = 0; j < 16; j++) {
-                                        char text[2];
-                                        int textLen = 2;
-                                        snprintf(text, textLen + 1, "%02X", system->memory[i + j]);
-                                        nk_layout_row_push(ctx, 25);
-                                        nk_edit_string(ctx, NK_EDIT_SIMPLE, text, &textLen, 64, nk_filter_hex);
-                                }
-
-                                nk_layout_row_push(ctx, 10);
-                                nk_labelf(ctx, NK_TEXT_LEFT, "| ");
-                                nk_layout_row_push(ctx, 100);
-                                char text[17] = { 0 };
-                                int textLen = 16;
-                                snprintf(text, textLen + 1, "%s", &system->memory[i]);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, text, &textLen, 64, nk_filter_ascii);
-                                nk_layout_row_end(ctx);
-                        }
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "Debugger", nk_rect(widgetWidth * 3, 0, widgetWidth, widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        nk_layout_row_static(ctx, 20, widgetWidth - 40, 1);
-                        if (nk_button_label(ctx, "Step")) {
-                                if (DEBUG_MODE) {
-                                        DEBUG_CONTINUE = 1;
-                                        DEBUG_WAIT_FOR_STEP = 0;
-                                }
-                        }
-                        if (nk_button_label(ctx, "Continue")) {
-                                DEBUG_MODE = 0;
-                                DEBUG_CONTINUE = 1;
-                                DEBUG_WAIT_FOR_STEP = 1;
-                        }
-                        if (nk_button_label(ctx, "Break")) {
-                                DEBUG_MODE = 1;
-                                DEBUG_CONTINUE = 1;
-                                DEBUG_WAIT_FOR_STEP = 1;
-                        }
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "Opcode", nk_rect(widgetWidth * 3, widgetHeight / 2.0, widgetWidth, widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        char *desc = OpcodeDescription(opcode);
-                        nk_layout_row_dynamic(ctx, 20, 1);
-                        nk_labelf(ctx, NK_TEXT_LEFT, "%04X", OpcodeInstruction(opcode));
-
-                        if (desc != NULL) {
-                                nk_layout_row_dynamic(ctx, 100, 1);
-                                nk_label_wrap(ctx, desc);
-                                OpcodeFree(desc);
-                        }
-                }
-                nk_end(ctx);
-
-                if (nk_begin(ctx, "Keys", nk_rect(widgetWidth * 4, 0, widgetWidth, widgetHeight), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                        static char textHexInput[16][64];
-                        static int textLength[16];
-
-                        for (int i = 0; i < 16; i++) {
-                                if (system->key[i]) {
-                                        sprintf(textHexInput[i], "PRESSED");
-                                        textLength[i] = 7;
-                                } else {
-                                        sprintf(textHexInput[i], "");
-                                        textLength[i] = 0;
-                                }
-
-                        }
-
-                        nk_layout_row_begin(ctx, NK_STATIC, 20, 4);
-                        for (int i = 0; i < 8; i++) {
-                                // First 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "k%01X ", i);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i], &textLength[i], 64, nk_filter_hex);
-
-                                // Second 8
-                                nk_layout_row_push(ctx, 40);
-                                nk_labelf(ctx, NK_TEXT_RIGHT, "k%01X ", i+8);
-                                nk_layout_row_push(ctx, 60);
-                                nk_edit_string(ctx, NK_EDIT_SIMPLE, textHexInput[i+8], &textLength[i+8], 64, nk_filter_hex);
-                        }
-                }
-                nk_end(ctx);
-
-                if (system->waitForKey == -1 && !DEBUG_VAR) {
-                        if (DEBUG_MODE && DEBUG_CONTINUE) {
-                                DEBUG_CONTINUE = 0;
+                if (system->waitForKey == -1) {
+                        if (dbg->enabled && dbg->resume) {
+                                dbg->resume = 0;
                                 OpcodeExecute(opcode, system);
-                        } else if (!DEBUG_MODE) {
+                        } else if (!dbg->enabled) {
                                 OpcodeExecute(opcode, system);
                         }
                 }
@@ -483,8 +206,8 @@ int main(int argc, char **argv) {
                 SDL_GetWindowSize(window, &glWindowWidth, &glWindowHeight);
                 glViewport(0, 0, glWindowWidth, glWindowHeight);
                 glClear(GL_COLOR_BUFFER_BIT);
-                glClearColor(bg.r, bg.g, bg.b, bg.a);
-                nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
+                glClearColor(0.10f, 0.18f, 0.24f, 1.0f);
+                UIRender(ui);
 
                 glOrtho(-1, 1, -1, 1, -1, 1);
                 glColor3f(1, 1, 1);
@@ -522,7 +245,7 @@ int main(int argc, char **argv) {
         } // while (running)
 
         // nk_quit:
-        nk_sdl_shutdown();
+        UIShutdown(ui);
         // gl_quit:
         SDL_GL_DeleteContext(glContext); // TODO: Causes SIGABRT?
  sdl_quit:

@@ -1,6 +1,3 @@
 - Implement sound
-- Clean up implementation of system->waitForKey WRT global state
-- Run code/program analysis tools
-    - valgrind (not static analysis)
-    - uno (static)
-    - splint (static)
+- more investigation into making splint/uno/valgrind give meanginful results
+- input doesn't seem to work properly with UI disabled (try games/CONNECT4)

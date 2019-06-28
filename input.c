@@ -32,8 +32,6 @@ struct input *InputInit() {
         return i;
 }
 
-extern int DEBUG_VAR;
-
 void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (k == input->keycodeIndices[i]) {
@@ -41,7 +39,6 @@ void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
                         if (s->waitForKey != -1) {
                                 s->v[s->waitForKey] = i;
                                 s->waitForKey = -1;
-                                DEBUG_VAR = 1;
                         }
                         break;
                 }

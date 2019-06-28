@@ -4,7 +4,7 @@ CFLAGS	+= -g -std=c11 -pedantic -Wall
 HEADERS	 = $(wildcard *.h) $(wildcard external/*.h)
 LIBS		+= $(shell sdl2-config --libs) -lSDL2main -lGL -lGLEW
 
-SRC			 = opcode.c system.c input.c main.c
+SRC			 = input.c main.c opcode.c system.c ui.c
 OBJFILES = $(patsubst %.c,%.o,$(SRC))
 OBJ			 = $(addprefix build/, $(OBJFILES))
 LINTFILES= $(patsubst %.c,__%.c,$(SRC)) $(patsubst %.c,_%.c,$(SRC))
