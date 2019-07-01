@@ -298,15 +298,13 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
         nk_end(ui->ctx);
 
         if (nk_begin(ui->ctx, "Opcode", nk_rect(ui->widgetWidth * 3, ui->widgetHeight / 2.0, ui->widgetWidth, ui->widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-                char *desc = OpcodeDescription(opcode);
+                char desc[256] = { 0 };
+                OpcodeDescription(opcode, desc, 256);
                 nk_layout_row_dynamic(ui->ctx, 20, 1);
                 nk_labelf(ui->ctx, NK_TEXT_LEFT, "%04X", OpcodeInstruction(opcode));
 
-                if (desc != NULL) {
-                        nk_layout_row_dynamic(ui->ctx, 100, 1);
-                        nk_label_wrap(ui->ctx, desc);
-                        OpcodeFree(desc);
-                }
+                nk_layout_row_dynamic(ui->ctx, 100, 1);
+                nk_label_wrap(ui->ctx, (const char *)desc);
         }
         nk_end(ui->ctx);
 
@@ -319,7 +317,7 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
                                 sprintf(textHexInput[i], "PRESSED");
                                 textLength[i] = 7;
                         } else {
-                                sprintf(textHexInput[i], "");
+                                textHexInput[i][0] = '\0';
                                 textLength[i] = 0;
                         }
 

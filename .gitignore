@@ -5,3 +5,5 @@ chip-8
 \#*output
 core
 build
+cachegrind.*
+callgrind.*

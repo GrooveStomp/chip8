@@ -3,6 +3,8 @@
 
 struct gs_stack;
 
+struct system_wfk;
+
 struct system {
         // 4k memory
         unsigned char *memory;
@@ -47,6 +49,8 @@ struct system {
         int waitForKey;
         unsigned int displayWidth;
         unsigned int displayHeight;
+
+        struct system_wfk *wfk;
 };
 
 void
@@ -87,6 +91,18 @@ void
 SystemDrawSprite(struct system *s, unsigned int x, unsigned int y, unsigned int height);
 
 void
-SystemClearKeys(struct system *s);
+SystemWFKSet(struct system *s, unsigned char key);
+
+int
+SystemWFKWaiting(struct system *s);
+
+void
+SystemWFKOccurred(struct system *s, unsigned char key);
+
+int
+SystemWFKChanged(struct system *s);
+
+void
+SystemWFKStop(struct system *s);
 
 #endif // SYSTEM_VERSION

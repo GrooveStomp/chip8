@@ -41,21 +41,20 @@ unsigned short OpcodeInstruction(struct opcode *c) {
         return c->instruction;
 }
 
-char *OpcodeDescription(struct opcode *c) {
-        char *desc = NULL;
+// Returns non-zero if successfully written.
+int OpcodeDescription(struct opcode *c, char *str, unsigned int maxLen) {
+        if (str == NULL) {
+                return 0;
+        }
 
         for (int i=0; i<35; i++) {
                 if (c->fn == c->debug_fn_map[i].address) {
                         struct opcode_fn_map data = c->debug_fn_map[i];
-
-                        unsigned int nameLen = strlen(data.name);
-                        unsigned int descLen = strlen(data.description);
-                        desc = (char *)ALLOCATOR(nameLen + descLen + 3);
-                        sprintf(desc, "%s: %s%c", data.name, data.description, '\0');
+                        snprintf(str, maxLen, "%s: %s%c", data.name, data.description, '\0');
                 }
         }
 
-        return desc;
+        return !0;
 }
 
 unsigned int HighByte(struct opcode *c) {
@@ -342,7 +341,7 @@ void FnFX07(struct opcode *c, struct system *s) {
 void FnFX0A(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->waitForKey = x;
+        SystemWFKSet(s, x);
 }
 
 // Timer: Sets the delay timer to VX.

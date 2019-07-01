@@ -16,6 +16,12 @@
 #define NUM_KEYS 16
 #define FONT_SIZE 80
 
+struct system_wfk { // wait for key
+        unsigned char key; // 0 - 16
+        int waiting; // bool
+        int justChanged; // bool
+};
+
 typedef void *(*allocator)(size_t);
 typedef void (*deallocator)(void *);
 
@@ -88,7 +94,10 @@ void SystemMemControl(allocator Alloc, deallocator Dealloc) {
 }
 
 struct system *SystemInit() {
-        struct system *s = (struct system *)malloc(sizeof(struct system));
+        struct system_wfk *wfk = (struct system_wfk *)ALLOCATOR(sizeof(struct system_wfk));
+        memset(wfk, 0, sizeof(struct system_wfk));
+
+        struct system *s = (struct system *)ALLOCATOR(sizeof(struct system));
         memset(s, 0, sizeof(struct system));
 
         s->memory = MEMORY;
@@ -104,8 +113,7 @@ struct system *SystemInit() {
                 s->memory[i] = fontset[i];
         }
 
-        s->waitForKey = -1;
-
+        s->wfk = wfk;
         s->displayWidth = 64;
         s->displayHeight = 32;
 
@@ -208,6 +216,26 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
         }
 }
 
-void SystemClearKeys(struct system *s) {
-        memset(s->key, 0, 16);
+void SystemWFKSet(struct system *s, unsigned char key) {
+        s->wfk->waiting = 1;
+        s->wfk->justChanged = 0;
+        s->wfk->key = key;
+}
+
+int SystemWFKWaiting(struct system *s) {
+        return s->wfk->waiting;
+}
+
+void SystemWFKOccurred(struct system *s, unsigned char key) {
+        s->wfk->waiting = 0;
+        s->wfk->justChanged = 1;
+        s->v[s->wfk->key] = key;
+}
+
+int SystemWFKChanged(struct system *s) {
+        return s->wfk->justChanged;
+}
+
+void SystemWFKStop(struct system *s) {
+        s->wfk->justChanged = 0;
 }

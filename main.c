@@ -11,11 +11,14 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_opengl.h"
 
+#define DISPLAY_WIDTH_WITH_DEBUGGER 1445
+#define DISPLAY_HEIGHT_WITH_DEBUGGER 720
+
 const unsigned int CHIP8_DISPLAY_WIDTH = 64;
 const unsigned int CHIP8_DISPLAY_HEIGHT = 32;
 const unsigned int DISPLAY_SCALE = 16;
-const unsigned int DISPLAY_WIDTH = 1445; // CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
-const unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
+unsigned int DISPLAY_WIDTH = 1445; // CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
+unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
 
 #include "ui.h"
 #include "system.h"
@@ -122,6 +125,14 @@ int main(int argc, char **argv) {
 
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
 
+        if (isDebugEnabled) {
+                DISPLAY_WIDTH = DISPLAY_WIDTH_WITH_DEBUGGER;
+                DISPLAY_HEIGHT = DISPLAY_HEIGHT_WITH_DEBUGGER;
+        } else {
+                DISPLAY_WIDTH = CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
+                DISPLAY_HEIGHT = CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
+        }
+
         SDL_Window *window = SDL_CreateWindow(
                 "AaronO's CHIP-8 Emulator",
                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -151,8 +162,7 @@ int main(int argc, char **argv) {
         glBindTexture(GL_TEXTURE_2D, glTextureName);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)textureData);
 
-        // TODO: First param is one for debugging UI, zero to disable it.
-        struct ui *ui = UIInit(0, 240, 240, window);
+        struct ui *ui = UIInit(isDebugEnabled, 240, 240, window);
         struct ui_debug *dbg = UIDebugInfo(ui);
         dbg->enabled = isDebugEnabled;
 
@@ -160,12 +170,11 @@ int main(int argc, char **argv) {
         int running = 1;
         while (running) {
                 if (!dbg->enabled || (dbg->enabled && !dbg->waitForStep)) {
-                        if (system->waitForKey == -1) {
+                        if (!SystemWFKWaiting(system)) {
                                 OpcodeFetch(opcode, system);
                                 OpcodeDecode(opcode, system);
                         }
                         SystemDecrementTimers(system);
-                        SystemClearKeys(system);
                 }
 
                 if (dbg->enabled) {
@@ -194,8 +203,12 @@ int main(int argc, char **argv) {
 
                 UIWidgets(ui, system, opcode);
 
-                if (system->waitForKey == -1) {
-                        if (dbg->enabled && dbg->resume) {
+                if (!SystemWFKWaiting(system)) {
+                        if (SystemWFKChanged(system)) {
+                                SystemIncrementPC(system);
+                                SystemWFKStop(system);
+                        }
+                        else if (dbg->enabled && dbg->resume) {
                                 dbg->resume = 0;
                                 OpcodeExecute(opcode, system);
                         } else if (!dbg->enabled) {
@@ -221,10 +234,18 @@ int main(int argc, char **argv) {
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)textureData);
 
-                float top = 0.25;
-                float bottom = -0.75;
-                float left = 0;
-                float right = 1;
+                float top, bottom, left, right;
+                if (isDebugEnabled) {
+                        top = 0.25;
+                        bottom = -0.75;
+                        left = 0;
+                        right = 1;
+                } else {
+                        top = 1;
+                        bottom = -1;
+                        left = -1;
+                        right = 1;
+                }
                 glBegin(GL_TRIANGLES); {
                         glTexCoord2f(0, 0);
                         glVertex3f(left, bottom, 0.5);

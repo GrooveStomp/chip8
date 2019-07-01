@@ -31,7 +31,8 @@ OpcodeDebug(struct opcode *c);
 unsigned short
 OpcodeInstruction(struct opcode *c);
 
-char *
-OpcodeDescription(struct opcode *c);
+// Returns non-zero if successfully written.
+int
+OpcodeDescription(struct opcode *c, char *str, unsigned int maxLen);
 
 #endif // OPCODE_VERSION

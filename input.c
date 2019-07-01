@@ -36,9 +36,8 @@ void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (k == input->keycodeIndices[i]) {
                         s->key[i] = 0xFF; // Pressed.
-                        if (s->waitForKey != -1) {
-                                s->v[s->waitForKey] = i;
-                                s->waitForKey = -1;
+                        if (SystemWFKWaiting(s)) {
+                                SystemWFKOccurred(s, i);
                         }
                         break;
                 }
