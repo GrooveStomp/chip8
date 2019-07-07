@@ -1,3 +1,10 @@
 - Implement sound
+    > Partially there
+    > Need proper callback fn
+    > Need to play for a set period of time?!?
 - more investigation into making splint/uno/valgrind give meanginful results
 - emulation is extremely slow. Profile!
+- Continue work splitting timer decrement into a separate thread.
+- Improve performance of drawing routines.
+- Unit tests!
+- Push to GitHub for Chris C

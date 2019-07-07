@@ -1,6 +1,8 @@
 #ifndef SYSTEM_VERSION
 #define SYSTEM_VERSION "0.1.0"
 
+#include <pthread.h>
+
 struct gs_stack;
 
 struct system_wfk;
@@ -34,6 +36,7 @@ struct system {
         // zero they will count down to zero.
         unsigned char delayTimer;
         unsigned char soundTimer;
+        pthread_mutex_t timerMutex;
 
         unsigned short stack[16];
         unsigned short sp;
@@ -43,8 +46,6 @@ struct system {
         unsigned char key[16];
 
         unsigned short fontp;
-
-        struct gs_stack *subroutineCallers;
 
         int waitForKey;
         unsigned int displayWidth;

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
@@ -20,10 +21,11 @@ const unsigned int DISPLAY_SCALE = 16;
 unsigned int DISPLAY_WIDTH = 1445; // CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
 unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
 
-#include "ui.h"
-#include "system.h"
-#include "opcode.h"
 #include "input.h"
+#include "opcode.h"
+#include "sound.h"
+#include "system.h"
+#include "ui.h"
 
 void Raster(struct system *s, GLubyte *texture) {
         for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
@@ -79,10 +81,17 @@ void ArgParse(int argc, char **argv, int debug) {
         }
 }
 
+void *timerTick(void *arguments) {
+        struct system *system = (struct system *)&arguments[0];
+        SystemDecrementTimers(system);
+        return NULL;
+}
+
 int main(int argc, char **argv) {
-        struct opcode *opcode = OpcodeInit();
-        struct system *system = SystemInit();
         struct input *input = InputInit();
+        struct opcode *opcode = OpcodeInit();
+        struct sound *sound = SoundInit();
+        struct system *system = SystemInit();
 
         GLubyte textureData[CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3];
 
@@ -199,7 +208,7 @@ int main(int argc, char **argv) {
                 elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
 
                 struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
-                nanosleep(&sleep, NULL);
+                //                nanosleep(&sleep, NULL);
 
                 UIWidgets(ui, system, opcode);
 
@@ -265,6 +274,7 @@ int main(int argc, char **argv) {
                 SDL_GL_SwapWindow(window);
         } // while (running)
 
+        SoundShutdown(sound);
         // nk_quit:
         UIShutdown(ui);
         // gl_quit:

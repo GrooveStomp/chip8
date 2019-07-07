@@ -4,6 +4,7 @@
 #include <string.h> // memset
 #include <stdlib.h> // malloc, free
 #include <stdio.h>
+#include <pthread.h>
 
 #include "system.h"
 
@@ -117,6 +118,11 @@ struct system *SystemInit() {
         s->displayWidth = 64;
         s->displayHeight = 32;
 
+        if (0 != pthread_mutex_init(&s->timerMutex, NULL)) {
+                fprintf(stderr, "Couldn't initialize mutex");
+                return NULL;
+        }
+
         return s;
 }
 
@@ -148,13 +154,23 @@ int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
         return !0;
 }
 
+// TODO: Need reader methods that also attempt to grab exclusion lock.
+// Currently the system only reads the value and I *think* this is safe....
 void SystemDecrementTimers(struct system *s) {
+        if (0 != pthread_mutex_lock(&s->timerMutex)) {
+                fprintf(stderr, "Failed to lock mutex");
+        }
+
         if (s->delayTimer > 0) {
                 s->delayTimer--;
         }
 
         if (s->soundTimer > 0) {
                 s->soundTimer--;
+        }
+
+        if (0 != pthread_mutex_unlock(&s->timerMutex)) {
+                fprintf(stderr, "Failed to unlock mutex");
         }
 }
 
