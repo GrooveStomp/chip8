@@ -1,3 +1,10 @@
+/******************************************************************************
+  File: sound.c
+  Date: 2019-07-07
+  Author: Aaron Oman
+  Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+          by Aaron Oman (See LICENSE)
+ ******************************************************************************/
 #include <math.h> // fmod, M_PI
 #include <pthread.h>
 #include <string.h> // memset

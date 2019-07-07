@@ -1,3 +1,10 @@
+/******************************************************************************
+  File: opcode.h
+  Date: 2019-07-07
+  Author: Aaron Oman
+  Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+          by Aaron Oman (See LICENSE)
+ ******************************************************************************/
 #ifndef OPCODE_VERSION
 #define OPCODE_VERSION "0.1.0"
 

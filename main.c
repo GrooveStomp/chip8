@@ -1,6 +1,10 @@
-/*
-  Chip-8 Emulator (First Emulation Project)
-*/
+/******************************************************************************
+  File: main.c
+  Date: 2019-07-07
+  Author: Aaron Oman
+  Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+          by Aaron Oman (See LICENSE)
+ ******************************************************************************/
 #include <stdio.h>
 #include <malloc.h>
 #include <stdlib.h>

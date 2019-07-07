@@ -1,5 +1,12 @@
+/******************************************************************************
+  File: ui.h
+  Date: 2019-07-07
+  Author: Aaron Oman
+  Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+          by Aaron Oman (See LICENSE)
+ ******************************************************************************/
 #ifndef UI_VERSION
-#define UI_VERISON 0.1.0
+#define UI_VERISON "0.1.0"
 
 #include "SDL2/SDL.h"
 

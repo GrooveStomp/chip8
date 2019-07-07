@@ -1,7 +1,10 @@
-/*
-  Chip-8 opcode
-*/
-
+/******************************************************************************
+  File: opcode.c
+  Date: 2019-07-07
+  Author: Aaron Oman
+  Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+          by Aaron Oman (See LICENSE)
+ ******************************************************************************/
 #include <limits.h> // UINT_MAX
 #include <stdlib.h> // rand, malloc, free
 #include <string.h> // memset
