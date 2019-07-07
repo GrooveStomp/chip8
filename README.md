@@ -23,3 +23,21 @@ Where `$FILE` is one of the premade games in the `games/` directory.
 ```
 ./build/chip8 games/$FILE
 ```
+
+# Test
+All tests are in `test/*_test.c` and each `_test.c` file is expected to have its own `main()`.
+
+When built, each `_test.c` file creates a correspondingly named `bin/*_test` executable that can be run at any time.
+For convenience, run them all with the `runtests` target.
+
+To build a specific test:
+```
+make bin/opcode_test
+```
+Then just run it by invoking that file directly.
+
+To build all tests and run them:
+```
+make tests
+make runtests
+```

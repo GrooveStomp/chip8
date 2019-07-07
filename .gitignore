@@ -7,3 +7,4 @@ core
 build
 cachegrind.*
 callgrind.*
+bin

@@ -8,17 +8,37 @@ SRC			 = input.c main.c opcode.c sound.c system.c ui.c
 OBJFILES = $(patsubst %.c,%.o,$(SRC))
 OBJ			 = $(addprefix build/, $(OBJFILES))
 LINTFILES= $(patsubst %.c,__%.c,$(SRC)) $(patsubst %.c,_%.c,$(SRC))
-BIN			 = build/chip8
+
+BINDIR   = bin
+BIN			 = $(BINDIR)/chip8
+
+TEST_SRC = $(wildcard test/*.c)
+TEST_BIN = $(patsubst test/%.c,bin/%,$(TEST_SRC))
+TEST_OBJ = $(filter-out build/main.o,$(OBJ))
 
 DEFAULT_GOAL := $(BIN)
-.PHONY: clean valgrind splint uno
+.PHONY: clean valgrind splint uno test $(BINDIR)
+
+bin/%_test: $(TEST_OBJ) build/%_test.o | $(BINDIR)
+	$(CC) -o $@ build/$*_test.o $(filter-out build/$*.o,$(TEST_OBJ)) $(LIBS)
+
+build/%_test.o: $(HEADERS) test/gstest.h test/%_test.c
+	$(CC) -c test/$*_test.c $(INC) $(CFLAGS) -o $@
 
 build/%.o: $(HEADERS) %.c
 	mkdir -p $(@D)
 	$(CC) -c $*.c $(INC) $(CFLAGS) -o $@
 
-$(BIN): $(OBJ)
+$(BIN): $(OBJ) | $(BINDIR)
 	$(CC) -o $@ $(OBJ) $(LIBS)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+tests: $(TEST_BIN) | $(BINDIR)
+
+runtests: tests
+	$(foreach bin,$(TEST_BIN),./$(bin);)
 
 clean:
 	rm -f build/* || true
