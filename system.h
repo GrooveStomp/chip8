@@ -1,18 +1,14 @@
 /******************************************************************************
   File: system.h
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #ifndef SYSTEM_VERSION
 #define SYSTEM_VERSION "0.1.0"
 
-#include <pthread.h>
-
-struct gs_stack;
-
-struct system_wfk;
+struct system_private;
 
 struct system {
         // 4k memory
@@ -39,12 +35,6 @@ struct system {
         // an array that hold the pixel state (1 or 0):
         unsigned char *gfx;
 
-        // There are two timer registers that count at 60 Hz. When set above
-        // zero they will count down to zero.
-        unsigned char delayTimer;
-        unsigned char soundTimer;
-        pthread_mutex_t timerMutex;
-
         unsigned short stack[16];
         unsigned short sp;
 
@@ -58,7 +48,7 @@ struct system {
         unsigned int displayWidth;
         unsigned int displayHeight;
 
-        struct system_wfk *wfk;
+        struct system_private *prv;
 };
 
 void
@@ -82,9 +72,6 @@ SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size);
 
 void
 SystemDecrementTimers(struct system *s);
-
-void
-SystemDebug(struct system *s);
 
 void
 SystemPushStack(struct system *s);
@@ -112,5 +99,23 @@ SystemWFKChanged(struct system *s);
 
 void
 SystemWFKStop(struct system *s);
+
+void
+SystemDecrementTimers(struct system *s);
+
+int
+SystemDelayTimer(struct system *s);
+
+int
+SystemSoundTimer(struct system *s);
+
+void
+SystemSetTimers(struct system *s, int dt, int st);
+
+int
+SystemSoundTriggered(struct system *s);
+
+void
+SystemSoundSetTrigger(struct system *s, int v);
 
 #endif // SYSTEM_VERSION

@@ -4,17 +4,13 @@
 
 #include "../opcode.h"
 #include "../opcode.c"
-#include "../system.h"
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[256];
 
-char errMsg[256];
-
 static char *FirstTest() {
         int bar = 1;
-        snprintf(errMsg, 256, "Expected bar(%d) to equal(%d)", bar, 2);
-        GSTestAssert(bar == 2, errMsg);
+        GSTestAssert(bar == 2, "Expected bar(%d) to equal(%d)", bar, 2);
         return NULL;
 }
 
@@ -25,12 +21,12 @@ static char *RunAllTests() {
 
 int main(int argC, char **argV) {
         char *result = RunAllTests();
-        if (result != 0) {
+        if (result != NULL) {
                 printf("%s\n", result);
         } else {
                 printf("ALL TESTS PASSED\n");
         }
         printf("opcode_test tests run: %d\n", GSTestNumTestsRun);
 
-        return result != 0;
+        return result != NULL;
 }

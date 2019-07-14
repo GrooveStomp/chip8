@@ -1,3 +1,10 @@
+#******************************************************************************
+# File: Makefile
+# Created: (No later than 2019-07-07)
+# Updated: 2019-07-14
+# Author: Aaron Oman
+# Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
+#******************************************************************************
 CC			 = /usr/bin/gcc
 INC			+= $(shell sdl2-config --cflags)
 CFLAGS	+= -g -std=c11 -pedantic -Wall -D_GNU_SOURCE

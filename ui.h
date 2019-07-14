@@ -1,9 +1,9 @@
 /******************************************************************************
   File: ui.h
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #ifndef UI_VERSION
 #define UI_VERISON "0.1.0"
@@ -17,11 +17,11 @@ struct ui;
 struct ui_debug {
         int enabled;
         int resume;
-        int waitForStep;
+        int waiting;
 };
 
-struct ui_debug *
-UIDebugInfo(struct ui *);
+struct ui_debug
+UIDebugInfo(struct ui *ui);
 
 void
 UIMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
@@ -46,5 +46,23 @@ UIRender(struct ui *u);
 
 void
 UIShutdown(struct ui *u);
+
+int
+UIDebugIsEnabled(struct ui *u);
+
+void
+UIDebugSetEnabled(struct ui *u, int);
+
+int
+UIDebugIsWaiting(struct ui *u);
+
+void
+UIDebugSetWaiting(struct ui*u, int);
+
+int
+UIDebugShouldResume(struct ui *u);
+
+void
+UIDebugSetResume(struct ui*u, int);
 
 #endif // UI_VERSION

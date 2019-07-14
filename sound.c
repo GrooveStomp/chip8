@@ -1,12 +1,11 @@
 /******************************************************************************
   File: sound.c
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #include <math.h> // fmod, M_PI
-#include <pthread.h>
 #include <string.h> // memset
 #include <stdio.h> // fprintf
 #include <stdlib.h> //malloc, free
@@ -86,6 +85,20 @@ static void WriteCallback(struct SoundIoOutStream *out, int frameCountMin, int f
         }
 }
 
+void SoundPlay(struct sound *s) {
+        int err;
+        if ((err = soundio_outstream_pause(s->stream, 0))) {
+                fprintf(stderr, "Unable to stop device: %s\n", soundio_strerror(err));
+        }
+}
+
+void SoundStop(struct sound *s) {
+        int err;
+        if ((err = soundio_outstream_pause(s->stream, 1))) {
+                fprintf(stderr, "Unable to stop device: %s\n", soundio_strerror(err));
+        }
+}
+
 struct sound *SoundInit() {
         int err;
 
@@ -143,6 +156,8 @@ struct sound *SoundInit() {
                 SoundShutdown(sound);
                 return NULL;
         }
+
+        SoundStop(sound);
 
         return sound;
 }

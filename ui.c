@@ -1,12 +1,13 @@
 /******************************************************************************
   File: ui.c
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #include <stdlib.h> // malloc, free
 #include <string.h> // memset
+#include <pthread.h>
 
 #include "ui.h"
 #include "system.h"
@@ -34,20 +35,37 @@
 typedef void *(*allocator)(size_t);
 typedef void (*deallocator)(void *);
 
+struct ui_debug_internal {
+        int enabled;
+        int resume;
+        int waiting;
+        pthread_rwlock_t rwlock;
+};
+
 struct ui {
         int enabled;
         struct nk_context *ctx;
         unsigned int widgetWidth;
         unsigned int widgetHeight;
         SDL_Window *window;
-        struct ui_debug debugInfo;
+        struct ui_debug_internal debugInfo;
 };
 
 static allocator ALLOCATOR = malloc;
 static deallocator DEALLOCATOR = free;
 
-struct ui_debug *UIDebugInfo(struct ui *ui) {
-        return &ui->debugInfo;
+struct ui_debug UIDebugInfo(struct ui *ui) {
+        struct ui_debug dbg;
+        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
+                dbg.enabled = ui->debugInfo.enabled;
+                dbg.resume = ui->debugInfo.resume;
+                dbg.waiting = ui->debugInfo.waiting;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        } else {
+                fprintf(stderr, "Couldn't get rwlock for UIDebugInfo!!!\n");
+        }
+
+        return dbg;
 }
 
 void UIMemControl(allocator Alloc, deallocator Dealloc) {
@@ -65,7 +83,16 @@ struct ui *UIInit(int shouldBeEnabled, unsigned int widgetWidth, unsigned int wi
         ui->window = window;
         ui->debugInfo.enabled = 0;
         ui->debugInfo.resume = 0;
-        ui->debugInfo.waitForStep = 0;
+        ui->debugInfo.waiting = 0;
+
+        pthread_rwlockattr_t attr;
+        pthread_rwlockattr_init(&attr);
+        pthread_rwlockattr_setpshared(&attr, 1);
+
+        if (0 != pthread_rwlock_init(&ui->debugInfo.rwlock, &attr)) {
+                fprintf(stderr, "Couldn't initialize ui rwlock");
+                return NULL;
+        }
 
         if (ui->enabled) {
                 ui->ctx = nk_sdl_init(ui->window); {
@@ -141,11 +168,11 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
                 sprintf(valGfxStr, "%p", (void *)system->gfx);
 
                 char valDelayStr[64];
-                sprintf(valDelayStr, "%02X", system->delayTimer);
+                sprintf(valDelayStr, "%02X", SystemDelayTimer(system));
                 int delayTimerLen = 2;
 
                 char valSoundStr[64];
-                sprintf(valSoundStr, "%02X", system->soundTimer);
+                sprintf(valSoundStr, "%02X", SystemSoundTimer(system));
                 int soundTimerLen = 2;
 
                 char valFontPStr[64];
@@ -286,20 +313,27 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
         if (nk_begin(ui->ctx, "Debugger", nk_rect(ui->widgetWidth * 3, 0, ui->widgetWidth, ui->widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
                 nk_layout_row_static(ui->ctx, 20, ui->widgetWidth - 40, 1);
                 if (nk_button_label(ui->ctx, "Step")) {
-                        if (ui->debugInfo.enabled) {
+                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
                                 ui->debugInfo.resume = 1;
-                                ui->debugInfo.waitForStep = 0;
+                                ui->debugInfo.waiting = 0;
+                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
                         }
                 }
                 if (nk_button_label(ui->ctx, "Continue")) {
-                        ui->debugInfo.enabled = 0;
-                        ui->debugInfo.resume = 1;
-                        ui->debugInfo.waitForStep = 1;
+                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
+                                ui->debugInfo.enabled = 0;
+                                ui->debugInfo.resume = 1;
+                                ui->debugInfo.waiting = 1;
+                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+                        }
                 }
                 if (nk_button_label(ui->ctx, "Break")) {
-                        ui->debugInfo.enabled = 1;
-                        ui->debugInfo.resume = 1;
-                        ui->debugInfo.waitForStep = 1;
+                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
+                                ui->debugInfo.enabled = 1;
+                                ui->debugInfo.resume = 1;
+                                ui->debugInfo.waiting = 1;
+                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+                        }
                 }
         }
         nk_end(ui->ctx);
@@ -358,4 +392,61 @@ void UIShutdown(struct ui *ui) {
         if (!ui->enabled) return;
 
         nk_sdl_shutdown();
+}
+
+int UIDebugIsEnabled(struct ui *ui) {
+        int result = 0;
+        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
+                result = ui->debugInfo.enabled;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        } else {
+                fprintf(stderr, "Couldn't grab debug mutex in UIDebugIsEnabled\n");
+        }
+
+        return result;
+}
+
+void UIDebugSetEnabled(struct ui *ui, int newStatus) {
+        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
+                ui->debugInfo.enabled = newStatus;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        }
+}
+
+int UIDebugIsWaiting(struct ui *ui) {
+        int result = 0;
+        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
+                result = ui->debugInfo.enabled;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        } else {
+                fprintf(stderr, "Couldn't grab debug mutex in UIDebugIsWaiting\n");
+        }
+
+        return result;
+}
+
+void UIDebugSetWaiting(struct ui *ui, int newStatus) {
+        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
+                ui->debugInfo.waiting = newStatus;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        }
+}
+
+int UIDebugShouldResume(struct ui *ui) {
+        int result = 0;
+        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
+                result = ui->debugInfo.resume;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        } else {
+                fprintf(stderr, "Couldn't grab debug mutex in UIDebugShouldResume\n");
+        }
+
+        return result;
+}
+
+void UIDebugSetResume(struct ui *ui, int newStatus) {
+        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
+                ui->debugInfo.resume = newStatus;
+                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
+        }
 }

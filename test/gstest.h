@@ -1,9 +1,9 @@
 /******************************************************************************
  * File: gstest.h
  * Created: 2016-08-19
- * Last Updated: 2016-08-22
- * Creator: Aaron Oman (a.k.a GrooveStomp)
- * Notice: (C) Copyright 2016 by Aaron Oman
+ * Updated: 2016-07-07
+ * Creator: Aaron Oman
+ * Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  *-----------------------------------------------------------------------------
  *
  * Library containing functions and macros to aid in testing other C code.
@@ -13,7 +13,7 @@
 #define GS_TEST_VERSION "0.1.0-dev"
 
 #include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE //
-#include <stdio.h> // fprintf
+#include <stdio.h> // fprintf, snprintf
 
 extern int GSTestNumTestsRun;
 extern char GSTestErrMsg[];
@@ -26,10 +26,13 @@ extern char GSTestErrMsg[];
                         return message; \
         } while (0)
 
-#define GSTestAssert(Expression, Description) \
+#define GSTestAssert(Expression, ...) \
         do { \
+                char msg[256]; \
+                int success = snprintf(msg, 256, __VA_ARGS__); \
+                if (!success) ; \
                 if (!(Expression)) { \
-                        int success = snprintf(GSTestErrMsg, 256, "%s:%d#%s() %s\n", __FILE__, __LINE__, __func__, (Description)); \
+                        success = snprintf(GSTestErrMsg, 256, "%s:%d#%s() %s\n", __FILE__, __LINE__, __func__, msg); \
                         if (!success) ; \
                         return GSTestErrMsg; \
                 } \

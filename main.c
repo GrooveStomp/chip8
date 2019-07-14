@@ -1,9 +1,9 @@
 /******************************************************************************
   File: main.c
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #include <stdio.h>
 #include <malloc.h>
@@ -30,6 +30,12 @@ unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
 #include "sound.h"
 #include "system.h"
 #include "ui.h"
+#include "timer.c"
+
+struct sound_thread_args {
+        struct sound *sound;
+        struct system *system;
+};
 
 void Raster(struct system *s, GLubyte *texture) {
         for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
@@ -54,6 +60,7 @@ void Raster(struct system *s, GLubyte *texture) {
 // static const double MS_PER_FRAME = 0.03333333; // 30 FPS
 static const double MS_PER_FRAME = 0.01666666; // 60 FPS
 static int isDebugEnabled = 0;
+static struct ui *ui;
 
 void Usage() {
         printf("chip-8 [-d] PROGRAM\n");
@@ -85,9 +92,56 @@ void ArgParse(int argc, char **argv, int debug) {
         }
 }
 
-void *timerTick(void *arguments) {
-        struct system *system = (struct system *)&arguments[0];
-        SystemDecrementTimers(system);
+void *timerTick(void *context) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+        struct system *system = (struct system *)context;
+#pragma GCC diagnostic pop
+        for (;;) {
+                if (UIDebugIsWaiting(ui)) {
+                        continue;
+                }
+
+                struct timespec start;
+                clock_gettime(CLOCK_REALTIME, &start);
+
+                SystemDecrementTimers(system);
+
+                struct timespec end;
+                clock_gettime(CLOCK_REALTIME, &end);
+
+                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
+
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
+                nanosleep(&sleep, NULL);
+        }
+
+        return NULL;
+}
+
+void *soundWork(void *ctx) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+        struct sound_thread_args *context = (struct sound_thread_args *)ctx;
+#pragma GCC diagnostic pop
+
+        struct timer *timer = TimerInit(200);
+        int playing = 0;
+        for (;;) {
+                if (SystemSoundTriggered(context->system)) {
+                        TimerReset(timer);
+                        SystemSoundSetTrigger(context->system, 0);
+                        playing = 1;
+                        SoundPlay(context->sound);
+                }
+
+                if (playing && TimerHasElapsed(timer)) {
+                        SoundStop(context->sound);
+                        playing = 0;
+                }
+        }
+
         return NULL;
 }
 
@@ -175,23 +229,42 @@ int main(int argc, char **argv) {
         glBindTexture(GL_TEXTURE_2D, glTextureName);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)textureData);
 
-        struct ui *ui = UIInit(isDebugEnabled, 240, 240, window);
-        struct ui_debug *dbg = UIDebugInfo(ui);
-        dbg->enabled = isDebugEnabled;
+        ui = UIInit(isDebugEnabled, 240, 240, window);
+        if (ui == NULL) {
+                fprintf(stderr, "Couldn't initialize ui\n");
+                goto nk_quit;
+        }
+        UIDebugSetEnabled(ui, isDebugEnabled);
+
+        int err;
+        pthread_t timersThread;
+        if (0 != (err = pthread_create(&timersThread, NULL, timerTick, system))) {
+                fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
+        }
+
+        pthread_t soundThread;
+        struct sound_thread_args args = { .sound = sound, .system = system };
+        if (0 != (err = pthread_create(&soundThread, NULL, soundWork, (void *)&args))) {
+                fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
+        }
 
         SDL_Event event;
         int running = 1;
         while (running) {
-                if (!dbg->enabled || (dbg->enabled && !dbg->waitForStep)) {
+                struct timespec start;
+                clock_gettime(CLOCK_REALTIME, &start);
+
+                struct ui_debug uiDbg = UIDebugInfo(ui);
+                if (!uiDbg.enabled || (uiDbg.enabled && !uiDbg.waiting)) {
                         if (!SystemWFKWaiting(system)) {
                                 OpcodeFetch(opcode, system);
                                 OpcodeDecode(opcode, system);
+                                SystemDecrementTimers(system);
                         }
-                        SystemDecrementTimers(system);
                 }
 
-                if (dbg->enabled) {
-                        dbg->waitForStep = 1;
+                if (uiDbg.enabled) {
+                        UIDebugSetWaiting(ui, 1);
                 }
 
                 UIInputBegin(ui); {
@@ -202,29 +275,17 @@ int main(int argc, char **argv) {
                 }
                 UIInputEnd(ui);
 
-                struct timespec start;
-                clock_gettime(CLOCK_REALTIME, &start);
-
-                struct timespec end;
-                clock_gettime(CLOCK_REALTIME, &end);
-
-                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
-
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
-                //                nanosleep(&sleep, NULL);
-
                 UIWidgets(ui, system, opcode);
 
                 if (!SystemWFKWaiting(system)) {
+                        struct ui_debug uiDbg = UIDebugInfo(ui);
                         if (SystemWFKChanged(system)) {
                                 SystemIncrementPC(system);
                                 SystemWFKStop(system);
-                        }
-                        else if (dbg->enabled && dbg->resume) {
-                                dbg->resume = 0;
+                        } else if (uiDbg.enabled && uiDbg.resume) {
+                                UIDebugSetResume(ui, 0);
                                 OpcodeExecute(opcode, system);
-                        } else if (!dbg->enabled) {
+                        } else if (!uiDbg.enabled) {
                                 OpcodeExecute(opcode, system);
                         }
                 }
@@ -276,10 +337,19 @@ int main(int argc, char **argv) {
                 } glEnd();
 
                 SDL_GL_SwapWindow(window);
+
+                struct timespec end;
+                clock_gettime(CLOCK_REALTIME, &end);
+
+                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
+
+                /* struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 }; */
+                //                nanosleep(&sleep, NULL);
         } // while (running)
 
         SoundShutdown(sound);
-        // nk_quit:
+ nk_quit:
         UIShutdown(ui);
         // gl_quit:
         SDL_GL_DeleteContext(glContext); // TODO: Causes SIGABRT?

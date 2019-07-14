@@ -1,9 +1,9 @@
 /******************************************************************************
   File: system.c
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #include <string.h> // memset
 #include <stdlib.h> // malloc, free
@@ -25,6 +25,18 @@ struct system_wfk { // wait for key
         unsigned char key; // 0 - 16
         int waiting; // bool
         int justChanged; // bool
+};
+
+struct system_private {
+        struct system_wfk wfk;
+        pthread_rwlock_t timerRwLock;
+        pthread_rwlock_t soundRwLock;
+        // There are two timer registers that count at 60 Hz. When set above
+        // zero they will count down to zero.
+        unsigned char delayTimer;
+        unsigned char soundTimer;
+
+        int soundTimerTriggered;
 };
 
 typedef void *(*allocator)(size_t);
@@ -54,53 +66,14 @@ static unsigned char fontset[FONT_SIZE] = {
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void SystemDebug(struct system *s) {
-        printf("struct system {\n");
-        printf("\tdelayTimer__ %d\n", s->delayTimer);
-        printf("\tfontp:______ 0x%04X\n", s->fontp);
-        printf("\tgfx:________ %p\n", s->gfx);
-        printf("\ti:__________ 0x%04X\n", s->i);
-        printf("\tmemory:_____ %p\n", s->memory);
-        printf("\tpc:_________ 0x%04X\n", s->pc);
-        printf("\tsoundTimer:_ %d\n", s->soundTimer);
-        printf("\tsp:_________ %d\n", s->sp);
-        printf("\n");
-
-        for (int i=0; i<8; i++) {
-                printf("\tv[%X]:____ 0x%04X\tv[%X]:____ 0x%04X\n", i, s->v[i], i+8, s->v[i+8]);
-        }
-        printf("\n");
-
-        for (int i=0; i<8; i++) {
-                printf("\tstack[%X]: 0x%04X\tstack[%X]: 0x%04X\n", i, s->stack[i], i+8, s->stack[i+8]);
-        }
-        printf("\n");
-
-        for (int i=0; i<8; i++) {
-                char bool1 = 'F';
-                if (s->key[i]) {
-                        bool1 = 'T';
-                }
-
-                char bool2 = 'F';
-                if (s->key[i+8]) {
-                        bool2 = 'T';
-                }
-
-                printf("\tkey[0x%X]:__ %c\tkey[0x%X]:__ %c\n", i, bool1, i+8, bool2);
-        }
-
-        printf("}\n");
-}
-
 void SystemMemControl(allocator Alloc, deallocator Dealloc) {
         ALLOCATOR = Alloc;
         DEALLOCATOR = Dealloc;
 }
 
 struct system *SystemInit() {
-        struct system_wfk *wfk = (struct system_wfk *)ALLOCATOR(sizeof(struct system_wfk));
-        memset(wfk, 0, sizeof(struct system_wfk));
+        struct system_private *prv = (struct system_private *)ALLOCATOR(sizeof(struct system_private));
+        memset(prv, 0, sizeof(struct system_private));
 
         struct system *s = (struct system *)ALLOCATOR(sizeof(struct system));
         memset(s, 0, sizeof(struct system));
@@ -118,12 +91,21 @@ struct system *SystemInit() {
                 s->memory[i] = fontset[i];
         }
 
-        s->wfk = wfk;
         s->displayWidth = 64;
         s->displayHeight = 32;
 
-        if (0 != pthread_mutex_init(&s->timerMutex, NULL)) {
-                fprintf(stderr, "Couldn't initialize mutex");
+        s->prv = prv;
+        pthread_rwlockattr_t attr;
+        pthread_rwlockattr_init(&attr);
+        pthread_rwlockattr_setpshared(&attr, 1);
+
+        if (0 != pthread_rwlock_init(&s->prv->timerRwLock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system timer rwlock");
+                return NULL;
+        }
+
+        if (0 != pthread_rwlock_init(&s->prv->soundRwLock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system sound rwlock");
                 return NULL;
         }
 
@@ -156,26 +138,6 @@ int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
         }
 
         return !0;
-}
-
-// TODO: Need reader methods that also attempt to grab exclusion lock.
-// Currently the system only reads the value and I *think* this is safe....
-void SystemDecrementTimers(struct system *s) {
-        if (0 != pthread_mutex_lock(&s->timerMutex)) {
-                fprintf(stderr, "Failed to lock mutex");
-        }
-
-        if (s->delayTimer > 0) {
-                s->delayTimer--;
-        }
-
-        if (s->soundTimer > 0) {
-                s->soundTimer--;
-        }
-
-        if (0 != pthread_mutex_unlock(&s->timerMutex)) {
-                fprintf(stderr, "Failed to unlock mutex");
-        }
 }
 
 void SystemPushStack(struct system *s) {
@@ -237,25 +199,101 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
 }
 
 void SystemWFKSet(struct system *s, unsigned char key) {
-        s->wfk->waiting = 1;
-        s->wfk->justChanged = 0;
-        s->wfk->key = key;
+        s->prv->wfk.waiting = 1;
+        s->prv->wfk.justChanged = 0;
+        s->prv->wfk.key = key;
 }
 
 int SystemWFKWaiting(struct system *s) {
-        return s->wfk->waiting;
+        return s->prv->wfk.waiting;
 }
 
 void SystemWFKOccurred(struct system *s, unsigned char key) {
-        s->wfk->waiting = 0;
-        s->wfk->justChanged = 1;
-        s->v[s->wfk->key] = key;
+        s->prv->wfk.waiting = 0;
+        s->prv->wfk.justChanged = 1;
+        s->v[s->prv->wfk.key] = key;
 }
 
 int SystemWFKChanged(struct system *s) {
-        return s->wfk->justChanged;
+        return s->prv->wfk.justChanged;
 }
 
 void SystemWFKStop(struct system *s) {
-        s->wfk->justChanged = 0;
+        s->prv->wfk.justChanged = 0;
+}
+
+
+void SystemDecrementTimers(struct system *s) {
+        if (0 == pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
+                if (s->prv->delayTimer > 0) {
+                        s->prv->delayTimer--;
+                }
+
+                if (s->prv->soundTimer > 0) {
+                        s->prv->soundTimer--;
+                }
+
+                pthread_rwlock_unlock(&s->prv->timerRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
+}
+
+int SystemDelayTimer(struct system *s) {
+        int result;
+        if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
+                result = s->prv->delayTimer;
+                pthread_rwlock_unlock(&s->prv->timerRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
+
+        return result;
+}
+
+int SystemSoundTimer(struct system *s) {
+        int result;
+        if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
+                result = s->prv->soundTimer;
+                pthread_rwlock_unlock(&s->prv->timerRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
+
+        return result;
+}
+
+void SystemSetTimers(struct system *s, int dt, int st) {
+        if (0 == pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
+                if (dt != -1) {
+                        s->prv->delayTimer = dt;
+                }
+                if (st != -1) {
+                        s->prv->soundTimer = st;
+                }
+                pthread_rwlock_unlock(&s->prv->timerRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
+}
+
+int SystemSoundTriggered(struct system *s) {
+        int result;
+        if (0 == pthread_rwlock_rdlock(&s->prv->soundRwLock)) {
+                result = (s->prv->soundTimerTriggered && s->prv->soundTimer == 0);
+                pthread_rwlock_unlock(&s->prv->soundRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
+
+        return result;
+}
+
+void SystemSoundSetTrigger(struct system *s, int v) {
+        if (0 == pthread_rwlock_wrlock(&s->prv->soundRwLock)) {
+                s->prv->soundTimerTriggered = v;
+                pthread_rwlock_unlock(&s->prv->soundRwLock);
+        } else {
+                fprintf(stderr, "Failed to lock system timer rw lock");
+        }
 }

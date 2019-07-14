@@ -8,3 +8,4 @@ build
 cachegrind.*
 callgrind.*
 bin
+.ccws

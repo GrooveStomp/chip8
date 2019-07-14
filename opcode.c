@@ -1,9 +1,9 @@
 /******************************************************************************
   File: opcode.c
-  Date: 2019-07-07
+  Created: (No later than 2019-07-07)
+  Updated: 2019-07-14
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #include <limits.h> // UINT_MAX
 #include <stdlib.h> // rand, malloc, free
@@ -337,7 +337,7 @@ void FnEXA1(struct opcode *c, struct system *s) {
 void FnFX07(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->v[x] = s->delayTimer;
+        s->v[x] = SystemDelayTimer(s);
 }
 
 // Key operation: Block until a key press occurs, then store it in VX.
@@ -351,14 +351,15 @@ void FnFX0A(struct opcode *c, struct system *s) {
 void FnFX15(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->delayTimer = s->v[x];
+        SystemSetTimers(s, s->v[x], -1);
 }
 
 // Sound: Sets the sound timer to VX.
 void FnFX18(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
-        s->soundTimer = s->v[x];
+        SystemSetTimers(s, -1, s->v[x]);
+        SystemSoundSetTrigger(s, 1);
 }
 
 // Memory: Adds VX to I.
@@ -457,7 +458,7 @@ struct opcode *OpcodeInit() {
         c->debug_fn_map[25] = (struct opcode_fn_map){ "EXA1", FnEXA1, "Skip next instruction if key stored in VX isn't pressed" };
         c->debug_fn_map[26] = (struct opcode_fn_map){ "FX07", FnFX07, "Set VX to the value of the delay timer" };
         c->debug_fn_map[27] = (struct opcode_fn_map){ "FX0A", FnFX0A, "Block until a key press occurs, storing it in VX" };
-        c->debug_fn_map[28] = (struct opcode_fn_map){ "FX15", FnFX15, "Set VX to the value of the sound timer" };
+        c->debug_fn_map[28] = (struct opcode_fn_map){ "FX15", FnFX15, "Set the delay timer to VX" };
         c->debug_fn_map[29] = (struct opcode_fn_map){ "FX18", FnFX18, "Set the sound timer to VX" };
         c->debug_fn_map[30] = (struct opcode_fn_map){ "FX1E", FnFX1E, "Add VX to I" };
         c->debug_fn_map[31] = (struct opcode_fn_map){ "FX29", FnFX29, "Set I to the location of the sprite for the character in VX" };
