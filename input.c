@@ -1,11 +1,11 @@
 /******************************************************************************
   File: input.c
-  Date: 2019-07-07
+  Created: 2019-06-21
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "system.h"
 
 #define NUM_KEYS 16
@@ -14,10 +14,22 @@ struct input {
         SDL_Keycode keycodeIndices[NUM_KEYS];
 };
 
+typedef void *(*allocator)(size_t);
+typedef void (*deallocator)(void *);
+
+static allocator ALLOCATOR = malloc;
+static deallocator DEALLOCATOR = free;
+
+void InputMemControl(allocator Alloc, deallocator Dealloc) {
+        ALLOCATOR = Alloc;
+        DEALLOCATOR = Dealloc;
+}
+
 struct input *InputInit() {
-        struct input *i = (struct input *)malloc(sizeof(struct input));
+        struct input *i = (struct input *)ALLOCATOR(sizeof(struct input));
         memset(i, 0, sizeof(struct input));
 
+        // TODO: Support remapping of keys.
         i->keycodeIndices[1] = SDLK_q;
         i->keycodeIndices[2] = SDLK_w;
         i->keycodeIndices[3] = SDLK_e;
@@ -38,7 +50,17 @@ struct input *InputInit() {
         return i;
 }
 
+void InputDeinit(struct input *i) {
+        if (NULL == i)
+                return;
+
+        DEALLOCATOR(i);
+}
+
 void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
+        if (NULL == input)
+                return;
+
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (k == input->keycodeIndices[i]) {
                         s->key[i] = 0xFF; // Pressed.
@@ -51,6 +73,9 @@ void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
 }
 
 void HandleKeyUp(struct input *input, struct system *s, SDL_Keycode k) {
+        if (NULL == input)
+                return;
+
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (k == input->keycodeIndices[i]) {
                         s->key[i] = 0x00; // Un-Pressed.
@@ -61,6 +86,9 @@ void HandleKeyUp(struct input *input, struct system *s, SDL_Keycode k) {
 
 // Returns non-zero if event normally processed. Zero indicates termination of program.
 int InputCheck(struct input *i, struct system *s, SDL_Event *event) {
+        if (NULL == i)
+                return 0;
+
         switch (event->type) {
                 case SDL_QUIT:
                         return 0;

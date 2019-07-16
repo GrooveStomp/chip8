@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound.c
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-07-07
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -31,7 +31,20 @@ void SoundMemControl(allocator Alloc, deallocator Dealloc) {
         DEALLOCATOR = Dealloc;
 }
 
-void SoundShutdown(struct sound *sound) {
+void SoundStop(struct sound *s) {
+        int err;
+        if ((err = soundio_outstream_pause(s->stream, 1))) {
+                fprintf(stderr, "Unable to stop device: %s\n", soundio_strerror(err));
+        }
+}
+
+void SoundDeinit(struct sound *sound) {
+        if (NULL == sound)
+                return;
+
+        if (NULL != sound)
+                SoundStop(sound);
+
         if (NULL != sound->stream)
                 soundio_outstream_destroy(sound->stream);
 
@@ -40,6 +53,8 @@ void SoundShutdown(struct sound *sound) {
 
         if (NULL != sound->lib)
                 soundio_destroy(sound->lib);
+
+        DEALLOCATOR(sound);
 }
 
 static void WriteCallback(struct SoundIoOutStream *out, int frameCountMin, int frameCountMax) {
@@ -92,13 +107,6 @@ void SoundPlay(struct sound *s) {
         }
 }
 
-void SoundStop(struct sound *s) {
-        int err;
-        if ((err = soundio_outstream_pause(s->stream, 1))) {
-                fprintf(stderr, "Unable to stop device: %s\n", soundio_strerror(err));
-        }
-}
-
 struct sound *SoundInit() {
         int err;
 
@@ -113,7 +121,7 @@ struct sound *SoundInit() {
 
         if ((err = soundio_connect(sound->lib))) {
                 fprintf(stderr, "Error connecting to soundio: %s\n", soundio_strerror(err));
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
         soundio_flush_events(sound->lib);
@@ -121,14 +129,14 @@ struct sound *SoundInit() {
         int defaultOutDevIndex = soundio_default_output_device_index(sound->lib);
         if (defaultOutDevIndex < 0) {
                 fprintf(stderr, "No output device found\n");
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
 
         sound->dev = soundio_get_output_device(sound->lib, defaultOutDevIndex);
         if (!sound->dev) {
                 fprintf(stderr, "Out of memory\n");
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
         fprintf(stdout, "Output device: %s\n", sound->dev->name);
@@ -136,7 +144,7 @@ struct sound *SoundInit() {
         sound->stream = soundio_outstream_create(sound->dev);
         if (!sound->stream) {
                 fprintf(stderr, "Couldn't create outstream device\n");
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
         sound->stream->format = SoundIoFormatFloat32NE;
@@ -144,7 +152,7 @@ struct sound *SoundInit() {
 
         if ((err = soundio_outstream_open(sound->stream))) {
                 fprintf(stderr, "Unable to open device: %s", soundio_strerror(err));
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
 
@@ -153,7 +161,7 @@ struct sound *SoundInit() {
 
         if ((err = soundio_outstream_start(sound->stream))) {
                 fprintf(stderr, "Unable to start device: %s\n", soundio_strerror(err));
-                SoundShutdown(sound);
+                SoundDeinit(sound);
                 return NULL;
         }
 

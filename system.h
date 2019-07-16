@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-13
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -45,9 +45,6 @@ struct system {
         unsigned short fontp;
 
         int waitForKey;
-        unsigned int displayWidth;
-        unsigned int displayHeight;
-
         struct system_private *prv;
 };
 
@@ -58,7 +55,7 @@ struct system *
 SystemInit();
 
 void
-SystemFree(struct system *s);
+SystemDeinit(struct system *s);
 
 void
 SystemIncrementPC(struct system *s);

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: main.c
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-04
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -16,51 +16,111 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_opengl.h"
 
-#define DISPLAY_WIDTH_WITH_DEBUGGER 1445
-#define DISPLAY_HEIGHT_WITH_DEBUGGER 720
-
-const unsigned int CHIP8_DISPLAY_WIDTH = 64;
-const unsigned int CHIP8_DISPLAY_HEIGHT = 32;
-const unsigned int DISPLAY_SCALE = 16;
-unsigned int DISPLAY_WIDTH = 1445; // CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
-unsigned int DISPLAY_HEIGHT = 720; // CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
-
 #include "input.h"
+#include "graphics.h"
 #include "opcode.h"
 #include "sound.h"
 #include "system.h"
-#include "ui.h"
 #include "timer.c"
+#include "ui.h"
 
 struct sound_thread_args {
         struct sound *sound;
-        struct system *system;
+        struct system *sys;
 };
 
-void Raster(struct system *s, GLubyte *texture) {
-        for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
-                for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
-                        unsigned int pos = cy * (CHIP8_DISPLAY_WIDTH * 3) + x;
+static int isDebugEnabled = 0;
 
-                        if (s->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
-                                // Black (Foreground)
-                                texture[pos + 0] = 0;
-                                texture[pos + 1] = 0;
-                                texture[pos + 2] = 0;
-                        } else {
-                                // White (Background)
-                                texture[pos + 0] = 0xFF;
-                                texture[pos + 1] = 0xFF;
-                                texture[pos + 2] = 0xFF;
-                        }
+static struct graphics *graphics;
+static struct input *input;
+static struct opcode *opcode;
+static struct sound *sound;
+static struct system *sys;
+static struct ui *ui;
+
+// TODO: Need to terminate this thread so pthread_join works.
+void *timerTick(void *context) {
+        static const double msPerFrame = 0.01666666; // 60 FPS
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+        struct system *sys = (struct system *)context;
+#pragma GCC diagnostic pop
+        for (;;) {
+                if (UIDebugIsWaiting(ui)) {
+                        continue;
                 }
+
+                struct timespec start;
+                clock_gettime(CLOCK_REALTIME, &start);
+
+                SystemDecrementTimers(sys);
+
+                struct timespec end;
+                clock_gettime(CLOCK_REALTIME, &end);
+
+                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
+
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (msPerFrame - elapsed_time) * 1000 };
+                nanosleep(&sleep, NULL);
         }
+
+        return NULL;
 }
 
-// static const double MS_PER_FRAME = 0.03333333; // 30 FPS
-static const double MS_PER_FRAME = 0.01666666; // 60 FPS
-static int isDebugEnabled = 0;
-static struct ui *ui;
+// TODO: Need to terminate this thread so pthread_join works.
+void *soundWork(void *ctx) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+        struct sound_thread_args *context = (struct sound_thread_args *)ctx;
+#pragma GCC diagnostic pop
+
+        struct timer *timer = TimerInit(200);
+        int playing = 0;
+        for (;;) {
+                if (SystemSoundTriggered(context->sys)) {
+                        TimerReset(timer);
+                        SystemSoundSetTrigger(context->sys, 0);
+                        playing = 1;
+                        SoundPlay(context->sound);
+                }
+
+                if (playing && TimerHasElapsed(timer)) {
+                        SoundStop(context->sound);
+                        playing = 0;
+                }
+        }
+
+        return NULL;
+}
+
+void UIRenderFn() {
+        UIRender(ui);
+}
+
+void Shutdown(int status) {
+        if (NULL != ui)
+                UIDeinit(ui);
+
+        if (NULL != graphics)
+                GraphicsDeinit(graphics);
+
+        if (NULL != sound)
+                SoundDeinit(sound);
+
+        if (NULL != input)
+                InputDeinit(input);
+
+        if (NULL != opcode)
+                OpcodeDeinit(opcode);
+
+        if (NULL != sys)
+                SystemDeinit(sys);
+
+        exit(status);
+}
+
 
 void Usage() {
         printf("chip-8 [-d] PROGRAM\n");
@@ -92,67 +152,7 @@ void ArgParse(int argc, char **argv, int debug) {
         }
 }
 
-void *timerTick(void *context) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-arith"
-        struct system *system = (struct system *)context;
-#pragma GCC diagnostic pop
-        for (;;) {
-                if (UIDebugIsWaiting(ui)) {
-                        continue;
-                }
-
-                struct timespec start;
-                clock_gettime(CLOCK_REALTIME, &start);
-
-                SystemDecrementTimers(system);
-
-                struct timespec end;
-                clock_gettime(CLOCK_REALTIME, &end);
-
-                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
-
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 };
-                nanosleep(&sleep, NULL);
-        }
-
-        return NULL;
-}
-
-void *soundWork(void *ctx) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-arith"
-        struct sound_thread_args *context = (struct sound_thread_args *)ctx;
-#pragma GCC diagnostic pop
-
-        struct timer *timer = TimerInit(200);
-        int playing = 0;
-        for (;;) {
-                if (SystemSoundTriggered(context->system)) {
-                        TimerReset(timer);
-                        SystemSoundSetTrigger(context->system, 0);
-                        playing = 1;
-                        SoundPlay(context->sound);
-                }
-
-                if (playing && TimerHasElapsed(timer)) {
-                        SoundStop(context->sound);
-                        playing = 0;
-                }
-        }
-
-        return NULL;
-}
-
 int main(int argc, char **argv) {
-        struct input *input = InputInit();
-        struct opcode *opcode = OpcodeInit();
-        struct sound *sound = SoundInit();
-        struct system *system = SystemInit();
-
-        GLubyte textureData[CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3];
-
         ArgParse(argc, argv, 0);
 
         size_t fsize = 0;
@@ -185,65 +185,33 @@ int main(int argc, char **argv) {
 
                 fclose(f);
         }
-        if (!SystemLoadProgram(system, mem, fsize)) {
-                printf("Couldn't load program into Chip-8\n");
-                goto quit;
+
+        sys = SystemInit();
+        if (!SystemLoadProgram(sys, mem, fsize)) {
+                fprintf(stderr, "Couldn't load program into Chip-8\n");
+                Shutdown(1);
         }
 
-        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
+        opcode = OpcodeInit();
+        input = InputInit();
+        sound = SoundInit();
+        graphics = GraphicsInit(isDebugEnabled);
 
-        if (isDebugEnabled) {
-                DISPLAY_WIDTH = DISPLAY_WIDTH_WITH_DEBUGGER;
-                DISPLAY_HEIGHT = DISPLAY_HEIGHT_WITH_DEBUGGER;
-        } else {
-                DISPLAY_WIDTH = CHIP8_DISPLAY_WIDTH * DISPLAY_SCALE;
-                DISPLAY_HEIGHT = CHIP8_DISPLAY_HEIGHT * DISPLAY_SCALE;
-        }
-
-        SDL_Window *window = SDL_CreateWindow(
-                "AaronO's CHIP-8 Emulator",
-                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                DISPLAY_WIDTH, DISPLAY_HEIGHT,
-                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
-                );
-
-        if (window == NULL) {
-                printf("Couldn't open window: %s\n", SDL_GetError());
-                goto quit;
-        }
-
-        SDL_GLContext glContext = SDL_GL_CreateContext(window);
-        // TODO: Verify glContext is OK.
-        int glWindowWidth, glWindowHeight;
-        SDL_GetWindowSize(window, &glWindowWidth, &glWindowHeight);
-        glViewport(0, 0, glWindowWidth, glWindowHeight);
-
-        if (glewInit() != GLEW_OK) {
-                fprintf(stderr, "Failed to setup GLEW\n");
-                goto sdl_quit;
-        }
-
-        glEnable(GL_TEXTURE_2D);
-        GLuint glTextureName;
-        glGenTextures(1, &glTextureName);
-        glBindTexture(GL_TEXTURE_2D, glTextureName);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)textureData);
-
-        ui = UIInit(isDebugEnabled, 240, 240, window);
+        ui = UIInit(isDebugEnabled, 240, 240, GraphicsSDLWindow(graphics));
         if (ui == NULL) {
                 fprintf(stderr, "Couldn't initialize ui\n");
-                goto nk_quit;
+                Shutdown(1);
         }
         UIDebugSetEnabled(ui, isDebugEnabled);
 
         int err;
         pthread_t timersThread;
-        if (0 != (err = pthread_create(&timersThread, NULL, timerTick, system))) {
+        if (0 != (err = pthread_create(&timersThread, NULL, timerTick, sys))) {
                 fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
         }
 
         pthread_t soundThread;
-        struct sound_thread_args args = { .sound = sound, .system = system };
+        struct sound_thread_args args = { .sound = sound, .sys = sys };
         if (0 != (err = pthread_create(&soundThread, NULL, soundWork, (void *)&args))) {
                 fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
         }
@@ -256,10 +224,10 @@ int main(int argc, char **argv) {
 
                 struct ui_debug uiDbg = UIDebugInfo(ui);
                 if (!uiDbg.enabled || (uiDbg.enabled && !uiDbg.waiting)) {
-                        if (!SystemWFKWaiting(system)) {
-                                OpcodeFetch(opcode, system);
-                                OpcodeDecode(opcode, system);
-                                SystemDecrementTimers(system);
+                        if (!SystemWFKWaiting(sys)) {
+                                OpcodeFetch(opcode, sys);
+                                OpcodeDecode(opcode, sys);
+                                SystemDecrementTimers(sys);
                         }
                 }
 
@@ -269,94 +237,35 @@ int main(int argc, char **argv) {
 
                 UIInputBegin(ui); {
                         while (SDL_PollEvent(&event)) { // TODO: Causes SIGABRT?
-                                running = InputCheck(input, system, &event);
+                                running = InputCheck(input, sys, &event);
                                 UIHandleEvent(ui, &event);
                         }
                 }
                 UIInputEnd(ui);
 
-                UIWidgets(ui, system, opcode);
+                UIWidgets(ui, sys, opcode);
 
-                if (!SystemWFKWaiting(system)) {
+                if (!SystemWFKWaiting(sys)) {
                         struct ui_debug uiDbg = UIDebugInfo(ui);
-                        if (SystemWFKChanged(system)) {
-                                SystemIncrementPC(system);
-                                SystemWFKStop(system);
+                        if (SystemWFKChanged(sys)) {
+                                SystemIncrementPC(sys);
+                                SystemWFKStop(sys);
                         } else if (uiDbg.enabled && uiDbg.resume) {
                                 UIDebugSetResume(ui, 0);
-                                OpcodeExecute(opcode, system);
+                                OpcodeExecute(opcode, sys);
                         } else if (!uiDbg.enabled) {
-                                OpcodeExecute(opcode, system);
+                                OpcodeExecute(opcode, sys);
                         }
                 }
 
-                SDL_GetWindowSize(window, &glWindowWidth, &glWindowHeight);
-                glViewport(0, 0, glWindowWidth, glWindowHeight);
-                glClear(GL_COLOR_BUFFER_BIT);
-                glClearColor(0.10f, 0.18f, 0.24f, 1.0f);
-                UIRender(ui);
-
-                glOrtho(-1, 1, -1, 1, -1, 1);
-                glColor3f(1, 1, 1);
-                glEnable(GL_TEXTURE_2D);
-
-                glBindTexture(GL_TEXTURE_2D, glTextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
- 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-                Raster(system, textureData);
-
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CHIP8_DISPLAY_WIDTH, CHIP8_DISPLAY_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)textureData);
-
-                float top, bottom, left, right;
-                if (isDebugEnabled) {
-                        top = 0.25;
-                        bottom = -0.75;
-                        left = 0;
-                        right = 1;
-                } else {
-                        top = 1;
-                        bottom = -1;
-                        left = -1;
-                        right = 1;
-                }
-                glBegin(GL_TRIANGLES); {
-                        glTexCoord2f(0, 0);
-                        glVertex3f(left, bottom, 0.5);
-                        glTexCoord2f(0, 1);
-                        glVertex3f(left, top, 0.5);
-                        glTexCoord2f(1, 0);
-                        glVertex3f(right, bottom, 0.5);
-
-                        glTexCoord2f(0, 1);
-                        glVertex3f(left, top, 0.5);
-                        glTexCoord2f(1, 1);
-                        glVertex3f(right, top, 0.5);
-                        glTexCoord2f(1, 0);
-                        glVertex3f(right, bottom, 0.5);
-                } glEnd();
-
-                SDL_GL_SwapWindow(window);
+                GraphicsPresent(graphics, sys, UIRenderFn);
 
                 struct timespec end;
                 clock_gettime(CLOCK_REALTIME, &end);
 
                 double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
                 elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
-
-                /* struct timespec sleep = { .tv_sec = 0, .tv_nsec = (MS_PER_FRAME - elapsed_time) * 1000 }; */
-                //                nanosleep(&sleep, NULL);
         } // while (running)
 
-        SoundShutdown(sound);
- nk_quit:
-        UIShutdown(ui);
-        // gl_quit:
-        SDL_GL_DeleteContext(glContext); // TODO: Causes SIGABRT?
- sdl_quit:
-        SDL_DestroyWindow(window); // TODO: Causes SIGABRT?
-        SDL_Quit();
- quit:
-
-        exit(0);
+        Shutdown(0);
 }

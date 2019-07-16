@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound.h
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-07-07
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -14,7 +14,7 @@ void
 SoundMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
 void
-SoundShutdown(struct sound *sound);
+SoundDeinit(struct sound *sound);
 
 struct sound *
 SoundInit();

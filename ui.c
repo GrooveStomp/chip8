@@ -1,7 +1,7 @@
 /******************************************************************************
   File: ui.c
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-27
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -85,16 +85,16 @@ struct ui *UIInit(int shouldBeEnabled, unsigned int widgetWidth, unsigned int wi
         ui->debugInfo.resume = 0;
         ui->debugInfo.waiting = 0;
 
-        pthread_rwlockattr_t attr;
-        pthread_rwlockattr_init(&attr);
-        pthread_rwlockattr_setpshared(&attr, 1);
-
-        if (0 != pthread_rwlock_init(&ui->debugInfo.rwlock, &attr)) {
-                fprintf(stderr, "Couldn't initialize ui rwlock");
-                return NULL;
-        }
-
         if (ui->enabled) {
+                pthread_rwlockattr_t attr;
+                pthread_rwlockattr_init(&attr);
+                pthread_rwlockattr_setpshared(&attr, 1);
+
+                if (0 != pthread_rwlock_init(&ui->debugInfo.rwlock, &attr)) {
+                        fprintf(stderr, "Couldn't initialize ui rwlock");
+                        return NULL;
+                }
+
                 ui->ctx = nk_sdl_init(ui->window); {
                         struct nk_font_atlas *atlas;
                         nk_sdl_font_stash_begin(&atlas);
@@ -388,10 +388,19 @@ void UIRender(struct ui *ui) {
         nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERTEX_MEMORY, MAX_ELEMENT_MEMORY);
 }
 
-void UIShutdown(struct ui *ui) {
-        if (!ui->enabled) return;
+void UIDeinit(struct ui *ui) {
+        if (NULL == ui)
+                return;
 
-        nk_sdl_shutdown();
+        if (ui->enabled) {
+                nk_sdl_shutdown();
+
+                if (0 != pthread_rwlock_destroy(&ui->debugInfo.rwlock)) {
+                        fprintf(stderr, "Couldn't destroy UI debugInfo rwlock\n");
+                }
+        }
+
+        DEALLOCATOR(ui);
 }
 
 int UIDebugIsEnabled(struct ui *ui) {

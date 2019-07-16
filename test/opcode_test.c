@@ -15,7 +15,7 @@ static char *FirstTest() {
 }
 
 static char *RunAllTests() {
-        GSRunTest(FirstTest);
+        GSTestRun(FirstTest);
         return NULL;
 }
 

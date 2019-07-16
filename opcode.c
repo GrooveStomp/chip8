@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.c
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-04
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -469,10 +469,11 @@ struct opcode *OpcodeInit() {
         return c;
 }
 
-void OpcodeFree(void *c) {
-        if (c != NULL) {
-                DEALLOCATOR(c);
-        }
+void OpcodeDeinit(struct opcode *c) {
+        if (NULL == c)
+                return;
+
+        DEALLOCATOR(c);
 }
 
 void OpcodeDebug(struct opcode *c) {

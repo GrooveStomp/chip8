@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-04
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -91,9 +91,6 @@ struct system *SystemInit() {
                 s->memory[i] = fontset[i];
         }
 
-        s->displayWidth = 64;
-        s->displayHeight = 32;
-
         s->prv = prv;
         pthread_rwlockattr_t attr;
         pthread_rwlockattr_init(&attr);
@@ -112,7 +109,18 @@ struct system *SystemInit() {
         return s;
 }
 
-void SystemFree(struct system *s) {
+void SystemDeinit(struct system *s) {
+        if (NULL == s)
+                return;
+
+        if (0 != pthread_rwlock_destroy(&s->prv->timerRwLock)) {
+                fprintf(stderr, "Couldn't destroy system timer rwlock\n");
+        }
+
+        if (0 != pthread_rwlock_destroy(&s->prv->soundRwLock)) {
+                fprintf(stderr, "Couldn't destroy system sound rwlock\n");
+        }
+
         DEALLOCATOR(s);
 }
 

@@ -1,9 +1,9 @@
 /******************************************************************************
   File: opcode.h
-  Date: 2019-07-07
+  Created: 2019-06-14
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
-          by Aaron Oman (See LICENSE)
  ******************************************************************************/
 #ifndef OPCODE_VERSION
 #define OPCODE_VERSION "0.1.0"
@@ -20,7 +20,7 @@ struct opcode *
 OpcodeInit();
 
 void
-OpcodeFree(void *c);
+OpcodeDeinit(struct opcode *c);
 
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
 void

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: ui.h
-  Created: (No later than 2019-07-07)
-  Updated: 2019-07-14
+  Created: 2019-06-27
+  Updated: 2019-07-16
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -45,7 +45,7 @@ void
 UIRender(struct ui *u);
 
 void
-UIShutdown(struct ui *u);
+UIDeinit(struct ui *u);
 
 int
 UIDebugIsEnabled(struct ui *u);

@@ -1,7 +1,7 @@
 /******************************************************************************
  * File: gstest.h
  * Created: 2016-08-19
- * Updated: 2016-07-07
+ * Updated: 2016-07-14
  * Creator: Aaron Oman
  * Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  *-----------------------------------------------------------------------------
@@ -18,7 +18,7 @@
 extern int GSTestNumTestsRun;
 extern char GSTestErrMsg[];
 
-#define GSRunTest(Test) \
+#define GSTestRun(Test) \
         do { \
                 char *message = Test(); \
                 GSTestNumTestsRun++; \

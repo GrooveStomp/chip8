@@ -1,7 +1,7 @@
 /******************************************************************************
- * File: gstest.h
- * Created: (No later than 2019-07-07)
- * Updated: 2016-07-07
+ * File: timer.c
+ * Created: 2019-07-14
+ * Updated: 2016-07-16
  * Creator: Aaron Oman
  * Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
