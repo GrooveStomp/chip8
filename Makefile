@@ -62,8 +62,8 @@ $(TSTDIR)/%_test.o: $(HEADERS) $(TSTDIR)/gstest.h $(TSTDIR)/%_test.c
 $(TSTDIR)/%.o: %.c $(HEADERS)
 	$(CC) -c $*.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
 
-runtests: tests
-	$(foreach bin,$(TSTEXE),./$(bin);)
+runtests: test
+	$(foreach exe,$(TSTEXE),./$(exe);)
 
 clean:
 	rm -rf core debug release ${LINTFILES} ${TSTOBJ} ${TSTEXE}
