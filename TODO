@@ -1,7 +1,5 @@
-- more investigation into making splint/uno/valgrind give meanginful results
-- emulation is extremely slow. Profile!
-- Improve performance of drawing routines
+- Running with debug UI coredumps. Fix this.
 - Unit tests!
+- Improve performance of drawing routines
+- more investigation into making splint/uno/valgrind give meanginful results
 - Support key remapping
-- Build mechanism to stop timer and sound threads properly.
-  Currently they result in a coredump when the program quits.
