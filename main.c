@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <signal.h>
 #include <pthread.h>
 
 #include "GL/glew.h"
@@ -38,7 +39,9 @@ static struct sound *sound;
 static struct system *sys;
 static struct ui *ui;
 
-// TODO: Need to terminate this thread so pthread_join works.
+static pthread_t timersThread;
+static pthread_t soundThread;
+
 void *timerTick(void *context) {
         static const double msPerFrame = 0.01666666; // 60 FPS
 
@@ -69,7 +72,6 @@ void *timerTick(void *context) {
         return NULL;
 }
 
-// TODO: Need to terminate this thread so pthread_join works.
 void *soundWork(void *ctx) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-arith"
@@ -100,6 +102,14 @@ void UIRenderFn() {
 }
 
 void Shutdown(int status) {
+
+        if (0 != pthread_kill(timersThread, SIGKILL)) {
+                fprintf(stderr, "Couldn't terminate timersThread!\n");
+        }
+        if (0 != pthread_kill(soundThread, SIGKILL)) {
+                fprintf(stderr, "Couldn't terminate soundThread!\n");
+        }
+
         if (NULL != ui)
                 UIDeinit(ui);
 
@@ -205,15 +215,13 @@ int main(int argc, char **argv) {
         UIDebugSetEnabled(ui, isDebugEnabled);
 
         int err;
-        pthread_t timersThread;
         if (0 != (err = pthread_create(&timersThread, NULL, timerTick, sys))) {
                 fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
         }
 
-        pthread_t soundThread;
         struct sound_thread_args args = { .sound = sound, .sys = sys };
         if (0 != (err = pthread_create(&soundThread, NULL, soundWork, (void *)&args))) {
-                fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
+                fprintf(stderr, "Couldn't create sound thread: errno(%d)\n", err);
         }
 
         SDL_Event event;
