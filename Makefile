@@ -5,52 +5,68 @@
 # Author: Aaron Oman
 # Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
 #******************************************************************************
-CC			 = /usr/bin/gcc
-INC			+= $(shell sdl2-config --cflags)
-CFLAGS	+= -g -std=c11 -pedantic -Wall -D_GNU_SOURCE
-HEADERS	 = $(wildcard *.h) $(wildcard external/*.h)
-LIBS		+= $(shell sdl2-config --libs) -lSDL2main -lGL -lGLEW -lm -lpthread -lsoundio
+CC			= /usr/bin/gcc
+INC     += $(shell sdl2-config --cflags)
+HEADERS = $(wildcard *.h) $(wildcard external/*.h)
+LIBS    += $(shell sdl2-config --libs) -lSDL2main -lGL -lGLEW -lm -lpthread -lsoundio
+CFLAGS  += -std=c11 -pedantic -Wall -D_GNU_SOURCE
 
 SRC			 = input.c main.c opcode.c sound.c system.c ui.c graphics.c
 OBJFILES = $(patsubst %.c,%.o,$(SRC))
-OBJ			 = $(addprefix build/, $(OBJFILES))
 LINTFILES= $(patsubst %.c,__%.c,$(SRC)) $(patsubst %.c,_%.c,$(SRC))
 
-BINDIR   = bin
-BIN			 = $(BINDIR)/chip8
+RELDIR = release
+RELOBJ = $(addprefix $(RELDIR)/,$(OBJFILES))
+RELEXE = $(RELDIR)/chip8
+RELFLG = -O3
 
-TEST_SRC = $(wildcard test/*.c)
-TEST_BIN = $(patsubst test/%.c,bin/%,$(TEST_SRC))
-TEST_OBJ = $(filter-out build/main.o,$(OBJ))
+DBGDIR = debug
+DBGOBJ = $(addprefix $(DBGDIR)/,$(OBJFILES))
+DBGEXE = $(DBGDIR)/chip8
+DBGFLG = -g -Og
 
-DEFAULT_GOAL := $(BIN)
-.PHONY: clean valgrind splint uno test $(BINDIR)
+TSTDIR = test
+TSTSRC = $(wildcard $(TSTDIR)/*.c)
+TSTEXE = $(patsubst $(TSTDIR)/%.c,$(TSTDIR)/%,$(TSTSRC))
+TSTOBJ = $(filter-out $(TSTDIR)/main.o,$(addprefix $(TSTDIR)/,$(OBJFILES)))
 
-bin/%_test: $(TEST_OBJ) build/%_test.o | $(BINDIR)
-	$(CC) -o $@ build/$*_test.o $(filter-out build/$*.o,$(TEST_OBJ)) $(LIBS)
+DEFAULT_GOAL := $(release)
+.PHONY: clean debug release splint test uno valgrind
 
-build/%_test.o: $(HEADERS) test/gstest.h test/%_test.c
-	$(CC) -c test/$*_test.c $(INC) $(CFLAGS) -o $@
+release: $(RELEXE)
 
-build/%.o: $(HEADERS) %.c
-	mkdir -p $(@D)
-	$(CC) -c $*.c $(INC) $(CFLAGS) -o $@
+$(RELEXE): $(RELOBJ)
+	$(CC) -o $@ $^ $(LIBS)
 
-$(BIN): $(OBJ) | $(BINDIR)
-	$(CC) -o $@ $(OBJ) $(LIBS)
+$(RELDIR)/%.o: %.c $(HEADERS)
+	@mkdir -p $(@D)
+	$(CC) -c $*.c $(INC) $(CFLAGS) $(RELFLG) -o $@
 
-$(BINDIR):
-	mkdir -p $(BINDIR)
+debug: $(DBGEXE)
 
-tests: $(TEST_BIN) | $(BINDIR)
+$(DBGEXE): $(DBGOBJ)
+	$(CC) -o $@ $^ $(LIBS)
+
+$(DBGDIR)/%.o: %.c $(HEADERS)
+	@mkdir -p $(@D)
+	$(CC) -c $*.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
+
+test: $(TSTEXE)
+
+$(TSTDIR)/%_test: $(TSTOBJ) $(TSTDIR)/%_test.o
+	$(CC) -o $@ $(TSTDIR)/$*_test.o $(filter-out $(TSTDIR)/$*.o,$(TSTOBJ)) $(LIBS)
+
+$(TSTDIR)/%_test.o: $(HEADERS) $(TSTDIR)/gstest.h $(TSTDIR)/%_test.c
+	$(CC) -c $(TSTDIR)/$*_test.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
+
+$(TSTDIR)/%.o: %.c $(HEADERS)
+	$(CC) -c $*.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
 
 runtests: tests
-	$(foreach bin,$(TEST_BIN),./$(bin);)
+	$(foreach bin,$(TSTEXE),./$(bin);)
 
 clean:
-	rm -f build/* || true
-	rm -f core || true
-	rm -rf ${LINTFILES} || true
+	rm -rf core debug release ${LINTFILES} ${TSTOBJ} ${TSTEXE}
 
 valgrind:
 	echo "valgrind"

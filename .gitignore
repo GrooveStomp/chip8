@@ -9,3 +9,6 @@ cachegrind.*
 callgrind.*
 bin
 .ccws
+debug
+release
+test/*_test
