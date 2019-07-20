@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-07-16
+  Updated: 2019-07-20
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -248,7 +248,7 @@ void SystemDecrementTimers(struct system *s) {
 }
 
 int SystemDelayTimer(struct system *s) {
-        int result;
+        int result = -1;
         if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
                 result = s->prv->delayTimer;
                 pthread_rwlock_unlock(&s->prv->timerRwLock);
@@ -260,7 +260,7 @@ int SystemDelayTimer(struct system *s) {
 }
 
 int SystemSoundTimer(struct system *s) {
-        int result;
+        int result = -1;
         if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
                 result = s->prv->soundTimer;
                 pthread_rwlock_unlock(&s->prv->timerRwLock);
@@ -286,7 +286,7 @@ void SystemSetTimers(struct system *s, int dt, int st) {
 }
 
 int SystemSoundTriggered(struct system *s) {
-        int result;
+        int result = 0;
         if (0 == pthread_rwlock_rdlock(&s->prv->soundRwLock)) {
                 result = (s->prv->soundTimerTriggered && s->prv->soundTimer == 0);
                 pthread_rwlock_unlock(&s->prv->soundRwLock);

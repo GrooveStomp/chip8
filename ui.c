@@ -1,7 +1,7 @@
 /******************************************************************************
   File: ui.c
   Created: 2019-06-27
-  Updated: 2019-07-16
+  Updated: 2019-07-20
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -291,7 +291,7 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
                         nk_labelf(ui->ctx, NK_TEXT_CENTERED, "%04X |", i);
 
                         for (int j = 0; j < 16; j++) {
-                                char text[2];
+                                char text[4];
                                 int textLen = 2;
                                 snprintf(text, textLen + 1, "%02X", system->memory[i + j]);
                                 nk_layout_row_push(ui->ctx, 25);

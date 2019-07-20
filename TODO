@@ -1,4 +1,3 @@
-- Running with debug UI coredumps. Fix this.
 - Unit tests!
 - Improve performance of drawing routines
 - more investigation into making splint/uno/valgrind give meanginful results
