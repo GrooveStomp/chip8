@@ -1,17 +1,17 @@
 #******************************************************************************
 # File: Makefile
 # Created: 2019-06-27
-# Updated: 2019-07-20
+# Updated: 2019-07-21
 # Author: Aaron Oman
 # Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
 #******************************************************************************
-CC			= /usr/bin/gcc
+CC       = /usr/bin/gcc
 INC     += $(shell sdl2-config --cflags)
-HEADERS = $(wildcard *.h) $(wildcard external/*.h)
+HEADERS  = $(wildcard *.h) $(wildcard external/*.h)
 LIBS    += $(shell sdl2-config --libs) -lSDL2main -lGL -lGLEW -lm -lpthread -lsoundio
 CFLAGS  += -std=c11 -pedantic -Wall -D_GNU_SOURCE
 
-SRC			 = input.c main.c opcode.c sound.c system.c ui.c graphics.c
+SRC      = input.c main.c opcode.c sound.c system.c ui.c graphics.c
 OBJFILES = $(patsubst %.c,%.o,$(SRC))
 LINTFILES= $(patsubst %.c,__%.c,$(SRC)) $(patsubst %.c,_%.c,$(SRC))
 
