@@ -1,7 +1,7 @@
 /******************************************************************************
   File: main.c
   Created: 2019-06-04
-  Updated: 2019-07-20
+  Updated: 2019-07-21
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -45,10 +45,10 @@ static pthread_t soundThread;
 void *timerTick(void *context) {
         static const double msPerFrame = 0.01666666; // 60 FPS
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-arith"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wpointer-arith"
         struct system *sys = (struct system *)context;
-#pragma GCC diagnostic pop
+        #pragma GCC diagnostic pop
         for (;;) {
                 if (UIDebugIsWaiting(ui)) {
                         continue;
@@ -73,10 +73,10 @@ void *timerTick(void *context) {
 }
 
 void *soundWork(void *ctx) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-arith"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wpointer-arith"
         struct sound_thread_args *context = (struct sound_thread_args *)ctx;
-#pragma GCC diagnostic pop
+        #pragma GCC diagnostic pop
 
         struct timer *timer = TimerInit(200);
         int playing = 0;
@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
                 if (!uiDbg.enabled || (uiDbg.enabled && !uiDbg.waiting)) {
                         if (!SystemWFKWaiting(sys)) {
                                 OpcodeFetch(opcode, sys);
-                                OpcodeDecode(opcode, sys);
+                                OpcodeDecode(opcode);
                                 SystemDecrementTimers(sys);
                         }
                 }

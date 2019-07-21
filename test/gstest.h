@@ -1,7 +1,7 @@
 /******************************************************************************
  * File: gstest.h
  * Created: 2016-08-19
- * Updated: 2016-07-14
+ * Updated: 2019-07-21
  * Creator: Aaron Oman
  * Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  *-----------------------------------------------------------------------------
@@ -15,27 +15,38 @@
 #include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE //
 #include <stdio.h> // fprintf, snprintf
 
+#define GSTestErrMsgSize 1024
 extern int GSTestNumTestsRun;
 extern char GSTestErrMsg[];
 
-#define GSTestRun(Test) \
-        do { \
-                char *message = Test(); \
-                GSTestNumTestsRun++; \
-                if (message) \
-                        return message; \
+// NOTE: This disabled diagnostic pragma should be put in the GSTestAssert
+// macro, but GCC (as of version 8.3.0) appears to have a bug that doesn't allow
+// this to work properly.
+// To work around a plethora of warnings, I'm just disabling this diagnostic
+// globally for any programs including this header.
+#pragma GCC diagnostic ignored "-Wformat-truncation="
+
+#define GSTestRun(Test)                         \
+        do {                                    \
+                char *message = Test();         \
+                GSTestNumTestsRun++;            \
+                if (message)                    \
+                        return message;         \
         } while (0)
 
-#define GSTestAssert(Expression, ...) \
-        do { \
-                char msg[256]; \
-                int success = snprintf(msg, 256, __VA_ARGS__); \
-                if (!success) ; \
-                if (!(Expression)) { \
-                        success = snprintf(GSTestErrMsg, 256, "%s:%d#%s() %s\n", __FILE__, __LINE__, __func__, msg); \
-                        if (!success) ; \
-                        return GSTestErrMsg; \
-                } \
+#define GSTestAssert(Expression, ...)                                   \
+        do {                                                            \
+                _Pragma("GCC diagnostic push");                         \
+                _Pragma("GCC diagnostic ignored \"-Wformat-truncation=\""); \
+                char msg[GSTestErrMsgSize];                             \
+                int written = snprintf(msg, GSTestErrMsgSize, __VA_ARGS__); \
+                if (!written) ;                                         \
+                if (!(Expression)) {                                    \
+                        written = snprintf(GSTestErrMsg, GSTestErrMsgSize, "%s:%d#%s() %s\n", __FILE__, __LINE__, __func__, msg); \
+                        if (!written) ;                                 \
+                        return GSTestErrMsg;                            \
+                }                                                       \
+                _Pragma("GCC diagnostic pop");                          \
         } while (0)
 
 unsigned int /* Memory should be MaxLength size, at least. */

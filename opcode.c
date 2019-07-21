@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.c
   Created: 2019-06-04
-  Updated: 2019-07-16
+  Updated: 2019-07-21
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -512,7 +512,7 @@ void OpcodeFetch(struct opcode *c, struct system *s) {
         c->instruction = s->memory[s->pc] << 8 | s->memory[s->pc + 1];
 }
 
-void OpcodeDecode(struct opcode *c, struct system *s) {
+void OpcodeDecode(struct opcode *c) {
         unsigned int nibble = NibbleAt(c, 3);
 
         switch (nibble) {
