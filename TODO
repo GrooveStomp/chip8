@@ -1,8 +1,5 @@
-- Improve performance of drawing routines
-  (Now in progress)
-    - Separate rendering frequency from internal simulation frequency.
-    - Lots of synchronization needed across packages!
-
+- Code cleanup (remove dead code, remove unnecessary synchronization primitives)
 - more investigation into making splint/uno/valgrind give meanginful results
 - Unit tests!
 - Support key remapping
+- Documentation
