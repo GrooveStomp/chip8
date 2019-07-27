@@ -1,7 +1,7 @@
 /******************************************************************************
   File: input.h
   Created: 2019-07-21
-  Updated: 2019-07-16
+  Updated: 2019-07-25
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -22,7 +22,7 @@ InputInit();
 void
 InputDeinit(struct input *);
 
-int
+void
 InputCheck(struct input *i, struct system *s, SDL_Event *e);
 
 #endif // INPUT_VERSION

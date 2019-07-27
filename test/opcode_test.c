@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode_test.c
   Created: 2019-07-07
-  Updated: 2019-07-21
+  Updated: 2019-07-23
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -11,6 +11,10 @@
 
 #include "../opcode.h"
 #include "../opcode.c"
+
+// Disables warnings on some sloppy string formatting usage. ie., function
+// pointer instead of void pointer.
+#pragma GCC diagnostic ignored "-Wformat="
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[GSTestErrMsgSize];
@@ -228,13 +232,26 @@ char *TestOpcodeFetch() {
 
 char *TestOpcodeDecode() {
         struct opcode *c = OpcodeInit();
+
+        c->instruction = 0x00E0;
+        OpcodeDecode(c);
+        GSTestAssert(c->fn == Fn00E0, "Expected c->fn(%p) to be Fn00E0(%p)", c->fn, Fn00E0);
+
+        c->instruction = 0x7010;
+        OpcodeDecode(c);
+        GSTestAssert(c->fn == Fn7XNN, "Expected c->fn(%p) to be Fn7XNN(%p)", c->fn, Fn7XNN);
+
+
+        c->instruction = 0xF018;
+        OpcodeDecode(c);
+        GSTestAssert(c->fn == FnFX18, "Expected c->fn(%p) to be FnFX18(%p)", c->fn, FnFX18);
+
         OpcodeDeinit(c);
         return NULL;
 }
 
 char *TestOpcodeExecute() {
-        struct opcode *c = OpcodeInit();
-        OpcodeDeinit(c);
+        // TODO Implement me.
         return NULL;
 }
 

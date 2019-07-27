@@ -1,4 +1,8 @@
-- Unit tests!
 - Improve performance of drawing routines
+  (Now in progress)
+    - Separate rendering frequency from internal simulation frequency.
+    - Lots of synchronization needed across packages!
+
 - more investigation into making splint/uno/valgrind give meanginful results
+- Unit tests!
 - Support key remapping

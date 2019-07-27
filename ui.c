@@ -1,7 +1,7 @@
 /******************************************************************************
   File: ui.c
   Created: 2019-06-27
-  Updated: 2019-07-20
+  Updated: 2019-07-27
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -81,7 +81,7 @@ struct ui *UIInit(int shouldBeEnabled, unsigned int widgetWidth, unsigned int wi
         ui->widgetWidth = widgetWidth;
         ui->widgetHeight = widgetHeight;
         ui->window = window;
-        ui->debugInfo.enabled = 0;
+        ui->debugInfo.enabled = shouldBeEnabled;
         ui->debugInfo.resume = 0;
         ui->debugInfo.waiting = 0;
 
@@ -313,27 +313,15 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
         if (nk_begin(ui->ctx, "Debugger", nk_rect(ui->widgetWidth * 3, 0, ui->widgetWidth, ui->widgetHeight / 2.0), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
                 nk_layout_row_static(ui->ctx, 20, ui->widgetWidth - 40, 1);
                 if (nk_button_label(ui->ctx, "Step")) {
-                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                                ui->debugInfo.resume = 1;
-                                ui->debugInfo.waiting = 0;
-                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-                        }
+                        SystemDebugSetFetchAndDecode(system, 0);
+                        SystemDebugSetExecute(system, 1);
                 }
                 if (nk_button_label(ui->ctx, "Continue")) {
-                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                                ui->debugInfo.enabled = 0;
-                                ui->debugInfo.resume = 1;
-                                ui->debugInfo.waiting = 1;
-                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-                        }
+                        SystemDebugSetEnabled(system, 0);
                 }
                 if (nk_button_label(ui->ctx, "Break")) {
-                        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                                ui->debugInfo.enabled = 1;
-                                ui->debugInfo.resume = 1;
-                                ui->debugInfo.waiting = 1;
-                                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-                        }
+                        SystemDebugSetFetchAndDecode(system, 1);
+                        SystemDebugSetEnabled(system, 1);
                 }
         }
         nk_end(ui->ctx);
