@@ -33,6 +33,11 @@ struct thread_args {
         struct thread_sync *threadSync;
 };
 
+#define S_TO_MS(x) (x) * 1000.0
+#define NS_TO_MS(x) (x) / 1000000.0
+#define MS_TO_NS(x) (x) * 1000000.0
+#define HZ_TO_MS(x) (1.0 / (x)) * 1000.0
+
 #include "gfxinputthread.c"
 #include "soundthread.c"
 #include "timerthread.c"
@@ -161,7 +166,7 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Couldn't create gfxInputThread: errno(%d)\n", err);
         }
 
-        const double frequency = (1 / 500) * 1000; // 500 FPS in MS per frame.
+        const double msPerFrame = HZ_TO_MS(500);
 
         while (!SystemShouldQuit(sys)) {
                 struct timespec start;
@@ -204,11 +209,10 @@ int main(int argc, char **argv) {
                 struct timespec end;
                 clock_gettime(CLOCK_REALTIME, &end);
 
-                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000000.0; // us to ms
+                double elapsed_time = S_TO_MS(end.tv_sec - start.tv_sec);
+                elapsed_time += NS_TO_MS(end.tv_nsec - start.tv_nsec);
 
-                // struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000000 };
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (5000000) };
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = MS_TO_NS(msPerFrame - elapsed_time) };
                 nanosleep(&sleep, NULL);
         } // while (!SystemShouldQuit(sys))
 

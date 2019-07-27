@@ -20,7 +20,7 @@ void *gfxInputWork(void *context) {
         struct thread_args *ctx = (struct thread_args *)context;
         #pragma GCC diagnostic pop
 
-        static const double frequency = (1 / 30) * 1000; // 30 FPS in MS per frame.
+        static const double msPerFrame = HZ_TO_MS(30);
 
         struct graphics *graphics = GraphicsInit(ctx->isDebugEnabled);
         if (graphics == NULL) {
@@ -61,10 +61,10 @@ void *gfxInputWork(void *context) {
                 struct timespec end;
                 clock_gettime(CLOCK_REALTIME, &end);
 
-                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000000.0; // us to ms
+                double elapsed_time = S_TO_MS(end.tv_sec - start.tv_sec);
+                elapsed_time += NS_TO_MS(end.tv_nsec - start.tv_nsec);
 
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000000 };
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = MS_TO_NS(msPerFrame - elapsed_time) };
                 nanosleep(&sleep, NULL);
         }
 

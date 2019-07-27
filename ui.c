@@ -7,7 +7,6 @@
  ******************************************************************************/
 #include <stdlib.h> // malloc, free
 #include <string.h> // memset
-#include <pthread.h>
 
 #include "ui.h"
 #include "system.h"
@@ -35,38 +34,16 @@
 typedef void *(*allocator)(size_t);
 typedef void (*deallocator)(void *);
 
-struct ui_debug_internal {
-        int enabled;
-        int resume;
-        int waiting;
-        pthread_rwlock_t rwlock;
-};
-
 struct ui {
         int enabled;
         struct nk_context *ctx;
         unsigned int widgetWidth;
         unsigned int widgetHeight;
         SDL_Window *window;
-        struct ui_debug_internal debugInfo;
 };
 
 static allocator ALLOCATOR = malloc;
 static deallocator DEALLOCATOR = free;
-
-struct ui_debug UIDebugInfo(struct ui *ui) {
-        struct ui_debug dbg;
-        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
-                dbg.enabled = ui->debugInfo.enabled;
-                dbg.resume = ui->debugInfo.resume;
-                dbg.waiting = ui->debugInfo.waiting;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        } else {
-                fprintf(stderr, "Couldn't get rwlock for UIDebugInfo!!!\n");
-        }
-
-        return dbg;
-}
 
 void UIMemControl(allocator Alloc, deallocator Dealloc) {
         ALLOCATOR = Alloc;
@@ -81,20 +58,8 @@ struct ui *UIInit(int shouldBeEnabled, unsigned int widgetWidth, unsigned int wi
         ui->widgetWidth = widgetWidth;
         ui->widgetHeight = widgetHeight;
         ui->window = window;
-        ui->debugInfo.enabled = shouldBeEnabled;
-        ui->debugInfo.resume = 0;
-        ui->debugInfo.waiting = 0;
 
         if (ui->enabled) {
-                pthread_rwlockattr_t attr;
-                pthread_rwlockattr_init(&attr);
-                pthread_rwlockattr_setpshared(&attr, 1);
-
-                if (0 != pthread_rwlock_init(&ui->debugInfo.rwlock, &attr)) {
-                        fprintf(stderr, "Couldn't initialize ui rwlock");
-                        return NULL;
-                }
-
                 ui->ctx = nk_sdl_init(ui->window); {
                         struct nk_font_atlas *atlas;
                         nk_sdl_font_stash_begin(&atlas);
@@ -382,68 +347,7 @@ void UIDeinit(struct ui *ui) {
 
         if (ui->enabled) {
                 nk_sdl_shutdown();
-
-                if (0 != pthread_rwlock_destroy(&ui->debugInfo.rwlock)) {
-                        fprintf(stderr, "Couldn't destroy UI debugInfo rwlock\n");
-                }
         }
 
         DEALLOCATOR(ui);
-}
-
-int UIDebugIsEnabled(struct ui *ui) {
-        int result = 0;
-        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
-                result = ui->debugInfo.enabled;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        } else {
-                fprintf(stderr, "Couldn't grab debug mutex in UIDebugIsEnabled\n");
-        }
-
-        return result;
-}
-
-void UIDebugSetEnabled(struct ui *ui, int newStatus) {
-        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                ui->debugInfo.enabled = newStatus;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        }
-}
-
-int UIDebugIsWaiting(struct ui *ui) {
-        int result = 0;
-        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
-                result = ui->debugInfo.enabled;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        } else {
-                fprintf(stderr, "Couldn't grab debug mutex in UIDebugIsWaiting\n");
-        }
-
-        return result;
-}
-
-void UIDebugSetWaiting(struct ui *ui, int newStatus) {
-        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                ui->debugInfo.waiting = newStatus;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        }
-}
-
-int UIDebugShouldResume(struct ui *ui) {
-        int result = 0;
-        if (0 == pthread_rwlock_rdlock(&ui->debugInfo.rwlock)) {
-                result = ui->debugInfo.resume;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        } else {
-                fprintf(stderr, "Couldn't grab debug mutex in UIDebugShouldResume\n");
-        }
-
-        return result;
-}
-
-void UIDebugSetResume(struct ui *ui, int newStatus) {
-        if (0 == pthread_rwlock_wrlock(&ui->debugInfo.rwlock)) {
-                ui->debugInfo.resume = newStatus;
-                pthread_rwlock_unlock(&ui->debugInfo.rwlock);
-        }
 }
