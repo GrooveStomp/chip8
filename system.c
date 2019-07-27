@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-07-20
+  Updated: 2019-07-23
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -23,20 +23,45 @@
 
 struct system_wfk { // wait for key
         unsigned char key; // 0 - 16
-        int waiting; // bool
-        int justChanged; // bool
+        int waiting;
+        int justChanged;
+        pthread_rwlock_t lock;
+};
+
+struct system_debug {
+        int enabled;
+        int fetchAndDecode;
+        int execute;
+        pthread_rwlock_t lock;
+};
+
+struct rect {
+        unsigned int x1;
+        unsigned int y1;
+        unsigned int x2;
+        unsigned int y2;
 };
 
 struct system_private {
         struct system_wfk wfk;
-        pthread_rwlock_t timerRwLock;
-        pthread_rwlock_t soundRwLock;
+        struct system_debug debug;
+
         // There are two timer registers that count at 60 Hz. When set above
         // zero they will count down to zero.
         unsigned char delayTimer;
         unsigned char soundTimer;
 
         int soundTimerTriggered;
+
+        int shouldQuit; // Inidicates if program is closed or otherwise quit.
+
+        int isGfxDirty;
+        struct rect gfxDirtyRegion;
+
+        pthread_rwlock_t timerRwLock;
+        pthread_rwlock_t soundRwLock;
+        pthread_rwlock_t gfxRwLock;
+        pthread_rwlock_t shouldQuitLock;
 };
 
 typedef void *(*allocator)(size_t);
@@ -71,7 +96,7 @@ void SystemMemControl(allocator Alloc, deallocator Dealloc) {
         DEALLOCATOR = Dealloc;
 }
 
-struct system *SystemInit() {
+struct system *SystemInit(int isDebugEnabled) {
         struct system_private *prv = (struct system_private *)ALLOCATOR(sizeof(struct system_private));
         memset(prv, 0, sizeof(struct system_private));
 
@@ -92,9 +117,29 @@ struct system *SystemInit() {
         }
 
         s->prv = prv;
+
+        s->prv->debug.enabled = isDebugEnabled;
+        s->prv->debug.fetchAndDecode = 1;
+        s->prv->debug.execute = 0;
+
         pthread_rwlockattr_t attr;
         pthread_rwlockattr_init(&attr);
         pthread_rwlockattr_setpshared(&attr, 1);
+
+        if (0 != pthread_rwlock_init(&s->prv->debug.lock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system debugUi rwlock");
+                return NULL;
+        }
+
+        if (0 != pthread_rwlock_init(&s->prv->shouldQuitLock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system shouldQuit rwlock");
+                return NULL;
+        }
+
+        if (0 != pthread_rwlock_init(&s->prv->wfk.lock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system wfk rwlock");
+                return NULL;
+        }
 
         if (0 != pthread_rwlock_init(&s->prv->timerRwLock, &attr)) {
                 fprintf(stderr, "Couldn't initialize system timer rwlock");
@@ -106,6 +151,11 @@ struct system *SystemInit() {
                 return NULL;
         }
 
+        if (0 != pthread_rwlock_init(&s->prv->gfxRwLock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system gfx rwlock");
+                return NULL;
+        }
+
         return s;
 }
 
@@ -113,12 +163,28 @@ void SystemDeinit(struct system *s) {
         if (NULL == s)
                 return;
 
+        if (0 != pthread_rwlock_destroy(&s->prv->debug.lock)) {
+                fprintf(stderr, "Couldn't destroy system debugUi rwlock");
+        }
+
+        if (0 != pthread_rwlock_destroy(&s->prv->shouldQuitLock)) {
+                fprintf(stderr, "Couldn't destroy system shouldQuit rwlock");
+        }
+
+        if (0 != pthread_rwlock_destroy(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Couldn't destroy system wfk rwlock");
+        }
+
         if (0 != pthread_rwlock_destroy(&s->prv->timerRwLock)) {
-                fprintf(stderr, "Couldn't destroy system timer rwlock\n");
+                fprintf(stderr, "Couldn't destroy system timer rwlock");
         }
 
         if (0 != pthread_rwlock_destroy(&s->prv->soundRwLock)) {
-                fprintf(stderr, "Couldn't destroy system sound rwlock\n");
+                fprintf(stderr, "Couldn't destroy system sound rwlock");
+        }
+
+        if (0 != pthread_rwlock_destroy(&s->prv->gfxRwLock)) {
+                fprintf(stderr, "Couldn't destroy system gfx rwlock");
         }
 
         DEALLOCATOR(s);
@@ -151,7 +217,7 @@ int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
 void SystemPushStack(struct system *s) {
         if (s->sp > 0xF) {
                 return;
-                // TODO: ERROR?!?
+                fprintf(stderr, "SystemPushStack() Tried to push full stack\n");
         }
 
         s->stack[s->sp] = s->pc;
@@ -161,16 +227,42 @@ void SystemPushStack(struct system *s) {
 void SystemPopStack(struct system *s) {
         if (s->sp < 1) {
                 return;
-                // TODO: ERROR?!?
+                fprintf(stderr, "SystemPopStack() Tried to pop empty stack\n");
         }
 
-        s->stack[s->sp] = 0; // Debug - set to zero after "free."
+        s->stack[s->sp] = 0; // Unset "previous" stack head.
         s->sp--;
         s->pc = s->stack[s->sp];
 }
 
+int SystemGfxLock(struct system *s) {
+        return pthread_rwlock_rdlock(&s->prv->gfxRwLock);
+}
+
+int SystemGfxUnlock(struct system *s) {
+        return pthread_rwlock_unlock(&s->prv->gfxRwLock);
+}
+
+void SystemGfxPresent(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
+                fprintf(stderr, "Failed to lock system gfx rw lock");
+                return;
+        }
+
+        s->prv->isGfxDirty = 0;
+        pthread_rwlock_unlock(&s->prv->gfxRwLock);
+}
+
 void SystemClearScreen(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
+                fprintf(stderr, "Failed to lock system gfx rw lock");
+                return;
+        }
+
+        s->prv->isGfxDirty = 1;
+        s->prv->gfxDirtyRegion = (struct rect){ .x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0 };
         memset(s->gfx, 0, GRAPHICS_MEM_SIZE);
+        pthread_rwlock_unlock(&s->prv->gfxRwLock);
 }
 
 // Display: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels
@@ -181,6 +273,13 @@ void SystemClearScreen(struct system *s) {
 // happen.
 // I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
 void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, unsigned int height) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
+                fprintf(stderr, "Failed to lock system gfx rw lock");
+                return;
+        }
+
+        s->prv->isGfxDirty = 1;
+        s->prv->gfxDirtyRegion = (struct rect){ .x1 = x_pos, .y1 = y_pos, .x2 = x_pos + 8, .y2 = y_pos + height };
         s->v[15] = 0;
 
         for (int y = 0; y < height; y++) {
@@ -204,104 +303,224 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
                         s->gfx[pos] ^= 0xFF;
                 }
         }
+        pthread_rwlock_unlock(&s->prv->gfxRwLock);
 }
 
 void SystemWFKSet(struct system *s, unsigned char key) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Failed to lock system wfk rwlock");
+                return;
+        }
         s->prv->wfk.waiting = 1;
         s->prv->wfk.justChanged = 0;
         s->prv->wfk.key = key;
+        pthread_rwlock_unlock(&s->prv->wfk.lock);
 }
 
 int SystemWFKWaiting(struct system *s) {
-        return s->prv->wfk.waiting;
+        if (0 != pthread_rwlock_rdlock(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Failed to lock system wfk rwlock");
+                return 0;
+        }
+        int result = s->prv->wfk.waiting;
+        pthread_rwlock_unlock(&s->prv->wfk.lock);
+
+        return result;
 }
 
 void SystemWFKOccurred(struct system *s, unsigned char key) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Failed to lock system wfk rwlock");
+                return;
+        }
         s->prv->wfk.waiting = 0;
         s->prv->wfk.justChanged = 1;
         s->v[s->prv->wfk.key] = key;
+        pthread_rwlock_unlock(&s->prv->wfk.lock);
 }
 
 int SystemWFKChanged(struct system *s) {
-        return s->prv->wfk.justChanged;
+        if (0 != pthread_rwlock_rdlock(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Failed to lock system wfk rwlock");
+                return 0;
+        }
+        int result = s->prv->wfk.justChanged;
+        pthread_rwlock_unlock(&s->prv->wfk.lock);
+
+        return result;
 }
 
 void SystemWFKStop(struct system *s) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->wfk.lock)) {
+                fprintf(stderr, "Failed to lock system wfk rwlock");
+                return;
+        }
         s->prv->wfk.justChanged = 0;
+        pthread_rwlock_unlock(&s->prv->wfk.lock);
 }
 
-
 void SystemDecrementTimers(struct system *s) {
-        if (0 == pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
-                if (s->prv->delayTimer > 0) {
-                        s->prv->delayTimer--;
-                }
-
-                if (s->prv->soundTimer > 0) {
-                        s->prv->soundTimer--;
-                }
-
-                pthread_rwlock_unlock(&s->prv->timerRwLock);
-        } else {
+        if (0 != pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return;
         }
+
+        if (s->prv->delayTimer > 0) {
+                s->prv->delayTimer--;
+        }
+
+        if (s->prv->soundTimer > 0) {
+                s->prv->soundTimer--;
+        }
+
+        pthread_rwlock_unlock(&s->prv->timerRwLock);
 }
 
 int SystemDelayTimer(struct system *s) {
-        int result = -1;
-        if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
-                result = s->prv->delayTimer;
-                pthread_rwlock_unlock(&s->prv->timerRwLock);
-        } else {
+        if (0 != pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return -1;
         }
+
+        int result = s->prv->delayTimer;
+        pthread_rwlock_unlock(&s->prv->timerRwLock);
 
         return result;
 }
 
 int SystemSoundTimer(struct system *s) {
-        int result = -1;
-        if (0 == pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
-                result = s->prv->soundTimer;
-                pthread_rwlock_unlock(&s->prv->timerRwLock);
-        } else {
+        if (0 != pthread_rwlock_rdlock(&s->prv->timerRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return -1;
         }
+
+        int result = s->prv->soundTimer;
+        pthread_rwlock_unlock(&s->prv->timerRwLock);
 
         return result;
 }
 
 void SystemSetTimers(struct system *s, int dt, int st) {
-        if (0 == pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
-                if (dt != -1) {
-                        s->prv->delayTimer = dt;
-                }
-                if (st != -1) {
-                        s->prv->soundTimer = st;
-                }
-                pthread_rwlock_unlock(&s->prv->timerRwLock);
-        } else {
+        if (0 != pthread_rwlock_wrlock(&s->prv->timerRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return;
         }
+
+        if (dt != -1) {
+                s->prv->delayTimer = dt;
+        }
+        if (st != -1) {
+                s->prv->soundTimer = st;
+        }
+        pthread_rwlock_unlock(&s->prv->timerRwLock);
 }
 
 int SystemSoundTriggered(struct system *s) {
-        int result = 0;
-        if (0 == pthread_rwlock_rdlock(&s->prv->soundRwLock)) {
-                result = (s->prv->soundTimerTriggered && s->prv->soundTimer == 0);
-                pthread_rwlock_unlock(&s->prv->soundRwLock);
-        } else {
+        if (0 != pthread_rwlock_rdlock(&s->prv->soundRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return 0;
         }
+
+        int result = (s->prv->soundTimerTriggered && s->prv->soundTimer == 0);
+        pthread_rwlock_unlock(&s->prv->soundRwLock);
 
         return result;
 }
 
 void SystemSoundSetTrigger(struct system *s, int v) {
-        if (0 == pthread_rwlock_wrlock(&s->prv->soundRwLock)) {
-                s->prv->soundTimerTriggered = v;
-                pthread_rwlock_unlock(&s->prv->soundRwLock);
-        } else {
+        if (0 != pthread_rwlock_wrlock(&s->prv->soundRwLock)) {
                 fprintf(stderr, "Failed to lock system timer rw lock");
+                return;
         }
+
+        s->prv->soundTimerTriggered = v;
+        pthread_rwlock_unlock(&s->prv->soundRwLock);
+}
+
+int SystemShouldQuit(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->shouldQuitLock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return 0;
+        }
+
+        int result = s->prv->shouldQuit;
+        pthread_rwlock_unlock(&s->prv->shouldQuitLock);
+
+        return result;
+}
+
+void SystemSignalQuit(struct system *s) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->shouldQuitLock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return;
+        }
+
+        s->prv->shouldQuit = 1;
+        pthread_rwlock_unlock(&s->prv->shouldQuitLock);
+}
+
+int SystemDebugIsEnabled(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return 0;
+        }
+
+        int result = s->prv->debug.enabled;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
+
+        return result;
+}
+
+int SystemDebugShouldFetchAndDecode(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return 0;
+        }
+
+        int result = s->prv->debug.fetchAndDecode;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
+
+        return result;
+}
+
+int SystemDebugShouldExecute(struct system *s) {
+        if (0 != pthread_rwlock_rdlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return 0;
+        }
+
+        int result = s->prv->debug.execute;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
+
+        return result;
+}
+
+void SystemDebugSetEnabled(struct system *s, int onOrOff) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return;
+        }
+
+        s->prv->debug.enabled = onOrOff;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
+}
+
+void SystemDebugSetFetchAndDecode(struct system *s, int onOrOff) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return;
+        }
+
+        s->prv->debug.fetchAndDecode = onOrOff;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
+}
+
+void SystemDebugSetExecute(struct system *s, int onOrOff) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->debug.lock)) {
+                fprintf(stderr, "Failed to lock system shouldQuit rwlock");
+                return;
+        }
+
+        s->prv->debug.execute = onOrOff;
+        pthread_rwlock_unlock(&s->prv->debug.lock);
 }

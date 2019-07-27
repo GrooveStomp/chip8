@@ -1,7 +1,7 @@
 /******************************************************************************
   File: main.c
   Created: 2019-06-04
-  Updated: 2019-07-21
+  Updated: 2019-07-27
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -25,102 +25,32 @@
 #include "timer.c"
 #include "ui.h"
 
-struct sound_thread_args {
-        struct sound *sound;
+#include "threadsync.c"
+struct thread_args {
         struct system *sys;
+        struct opcode *opcode;
+        int isDebugEnabled;
+        struct thread_sync *threadSync;
 };
 
-static int isDebugEnabled = 0;
+#include "gfxinputthread.c"
+#include "soundthread.c"
+#include "timerthread.c"
 
-static struct graphics *graphics;
-static struct input *input;
-static struct opcode *opcode;
-static struct sound *sound;
 static struct system *sys;
-static struct ui *ui;
+static struct opcode *opcode;
+static struct thread_sync *threadSync;
 
-static pthread_t timersThread;
+static pthread_t timerThread;
 static pthread_t soundThread;
-
-void *timerTick(void *context) {
-        static const double msPerFrame = 0.01666666; // 60 FPS
-
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wpointer-arith"
-        struct system *sys = (struct system *)context;
-        #pragma GCC diagnostic pop
-        for (;;) {
-                if (UIDebugIsWaiting(ui)) {
-                        continue;
-                }
-
-                struct timespec start;
-                clock_gettime(CLOCK_REALTIME, &start);
-
-                SystemDecrementTimers(sys);
-
-                struct timespec end;
-                clock_gettime(CLOCK_REALTIME, &end);
-
-                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
-
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (msPerFrame - elapsed_time) * 1000 };
-                nanosleep(&sleep, NULL);
-        }
-
-        return NULL;
-}
-
-void *soundWork(void *ctx) {
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wpointer-arith"
-        struct sound_thread_args *context = (struct sound_thread_args *)ctx;
-        #pragma GCC diagnostic pop
-
-        struct timer *timer = TimerInit(200);
-        int playing = 0;
-        for (;;) {
-                if (SystemSoundTriggered(context->sys)) {
-                        TimerReset(timer);
-                        SystemSoundSetTrigger(context->sys, 0);
-                        playing = 1;
-                        SoundPlay(context->sound);
-                }
-
-                if (playing && TimerHasElapsed(timer)) {
-                        SoundStop(context->sound);
-                        playing = 0;
-                }
-        }
-
-        return NULL;
-}
-
-void UIRenderFn() {
-        UIRender(ui);
-}
+static pthread_t gfxInputThread;
 
 void Shutdown(int status) {
-
-        if (0 != pthread_kill(timersThread, SIGKILL)) {
-                fprintf(stderr, "Couldn't terminate timersThread!\n");
-        }
-        if (0 != pthread_kill(soundThread, SIGKILL)) {
-                fprintf(stderr, "Couldn't terminate soundThread!\n");
-        }
-
-        if (NULL != ui)
-                UIDeinit(ui);
-
-        if (NULL != graphics)
-                GraphicsDeinit(graphics);
-
-        if (NULL != sound)
-                SoundDeinit(sound);
-
-        if (NULL != input)
-                InputDeinit(input);
+        void *threadStatus;
+        ThreadSyncSignalShutdown(threadSync);
+        pthread_join(timerThread, &threadStatus);
+        pthread_join(soundThread, &threadStatus);
+        pthread_join(gfxInputThread, &threadStatus);
 
         if (NULL != opcode)
                 OpcodeDeinit(opcode);
@@ -137,14 +67,9 @@ void Usage() {
         printf("\t-d: interactive debug mode\n");
 }
 
-void ArgParse(int argc, char **argv, int debug) {
-        if (debug) {
-                printf("argc: %d, argv: ", argc);
-                for (int i=0; i< argc; i++) {
-                        printf("%s ", argv[i]);
-                }
-                printf("\n");
-        }
+// Returns whether debug is enabled.
+int ArgParse(int argc, char **argv) {
+        int debugEnabled = 0;
 
         if (argc < 2 || argc > 3) {
                 Usage();
@@ -153,17 +78,19 @@ void ArgParse(int argc, char **argv, int debug) {
 
         if (argc == 3 && strcmp(argv[1], "-d") == 0) {
                 argv[1] = argv[2];
-                isDebugEnabled = 1;
+                debugEnabled = 1;
         } else if (argc == 3 && strcmp(argv[2], "-d") == 0) {
-                isDebugEnabled = 1;
+                debugEnabled = 1;
         } else if (argc == 3) {
                 Usage();
                 exit(1);
         }
+
+        return debugEnabled;
 }
 
 int main(int argc, char **argv) {
-        ArgParse(argc, argv, 0);
+        int debugEnabled = ArgParse(argc, argv);
 
         size_t fsize = 0;
         unsigned char *mem;
@@ -196,84 +123,95 @@ int main(int argc, char **argv) {
                 fclose(f);
         }
 
-        sys = SystemInit();
+        threadSync = ThreadSyncInit();
+        if (NULL == threadSync) {
+                fprintf(stderr, "Couldn't initialize threadsync");
+                exit(1);
+        }
+
+        sys = SystemInit(debugEnabled);
         if (!SystemLoadProgram(sys, mem, fsize)) {
-                fprintf(stderr, "Couldn't load program into Chip-8\n");
+                fprintf(stderr, "Couldn't load program into Chip-8");
                 Shutdown(1);
         }
 
         opcode = OpcodeInit();
-        input = InputInit();
-        sound = SoundInit();
-        graphics = GraphicsInit(isDebugEnabled);
-
-        ui = UIInit(isDebugEnabled, 240, 240, GraphicsSDLWindow(graphics));
-        if (ui == NULL) {
-                fprintf(stderr, "Couldn't initialize ui\n");
+        if (NULL == opcode) {
+                fprintf(stderr, "Couldn't initialize opcode");
                 Shutdown(1);
         }
-        UIDebugSetEnabled(ui, isDebugEnabled);
 
         int err;
-        if (0 != (err = pthread_create(&timersThread, NULL, timerTick, sys))) {
-                fprintf(stderr, "Couldn't create timer thread: errno(%d)\n", err);
+        struct thread_args threadArgs = (struct thread_args){
+                .sys = sys,
+                .opcode = opcode,
+                .isDebugEnabled = debugEnabled,
+                .threadSync = threadSync
+        };
+
+        if (0 != (err = pthread_create(&timerThread, NULL, timerTick, &threadArgs))) {
+                fprintf(stderr, "Couldn't create timerThread: errno(%d)\n", err);
         }
 
-        struct sound_thread_args args = { .sound = sound, .sys = sys };
-        if (0 != (err = pthread_create(&soundThread, NULL, soundWork, (void *)&args))) {
-                fprintf(stderr, "Couldn't create sound thread: errno(%d)\n", err);
+        if (0 != (err = pthread_create(&soundThread, NULL, soundWork, &threadArgs))) {
+                fprintf(stderr, "Couldn't create soundThread: errno(%d)\n", err);
         }
 
-        SDL_Event event;
-        int running = 1;
-        while (running) {
+        if (0 != (err = pthread_create(&gfxInputThread, NULL, gfxInputWork, &threadArgs))) {
+                fprintf(stderr, "Couldn't create gfxInputThread: errno(%d)\n", err);
+        }
+
+        const double frequency = 1 / 500; // 500 FPS in MS per frame.
+
+        while (!SystemShouldQuit(sys)) {
                 struct timespec start;
                 clock_gettime(CLOCK_REALTIME, &start);
 
-                struct ui_debug uiDbg = UIDebugInfo(ui);
-                if (!uiDbg.enabled || (uiDbg.enabled && !uiDbg.waiting)) {
+                if (SystemDebugIsEnabled(sys)) {
+                        // debug ui
+                        if (SystemDebugShouldFetchAndDecode(sys) && !SystemWFKWaiting(sys)) {
+                                OpcodeFetch(opcode, sys);
+                                OpcodeDecode(opcode);
+                                SystemDecrementTimers(sys);
+                                // Configure debug settings so UI input is required to proceed.
+                                SystemDebugSetExecute(sys, 0);
+                                SystemDebugSetFetchAndDecode(sys, 0);
+                        }
+                        else if (SystemWFKChanged(sys)) {
+                                SystemIncrementPC(sys);
+                                SystemWFKStop(sys);
+                        }
+                        else if (SystemDebugShouldExecute(sys)) {
+                                OpcodeExecute(opcode, sys);
+                                // Configure debug settings so we fetch the next instruction automatically.
+                                SystemDebugSetExecute(sys, 0);
+                                SystemDebugSetFetchAndDecode(sys, 1);
+                        }
+                } else {
+                        // no debug ui
                         if (!SystemWFKWaiting(sys)) {
                                 OpcodeFetch(opcode, sys);
                                 OpcodeDecode(opcode);
                                 SystemDecrementTimers(sys);
                         }
-                }
-
-                if (uiDbg.enabled) {
-                        UIDebugSetWaiting(ui, 1);
-                }
-
-                UIInputBegin(ui); {
-                        while (SDL_PollEvent(&event)) { // TODO: Causes SIGABRT?
-                                running = InputCheck(input, sys, &event);
-                                UIHandleEvent(ui, &event);
-                        }
-                }
-                UIInputEnd(ui);
-
-                UIWidgets(ui, sys, opcode);
-
-                if (!SystemWFKWaiting(sys)) {
-                        struct ui_debug uiDbg = UIDebugInfo(ui);
-                        if (SystemWFKChanged(sys)) {
+                        else if (SystemWFKChanged(sys)) {
                                 SystemIncrementPC(sys);
                                 SystemWFKStop(sys);
-                        } else if (uiDbg.enabled && uiDbg.resume) {
-                                UIDebugSetResume(ui, 0);
-                                OpcodeExecute(opcode, sys);
-                        } else if (!uiDbg.enabled) {
+                        }
+                        else {
                                 OpcodeExecute(opcode, sys);
                         }
                 }
-
-                GraphicsPresent(graphics, sys, UIRenderFn);
 
                 struct timespec end;
                 clock_gettime(CLOCK_REALTIME, &end);
 
                 double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
                 elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
-        } // while (running)
+
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000 };
+                nanosleep(&sleep, NULL);
+        } // while (!SystemShouldQuit(sys))
 
         Shutdown(0);
 }

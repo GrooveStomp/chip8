@@ -1,7 +1,7 @@
 #******************************************************************************
 # File: Makefile
 # Created: 2019-06-27
-# Updated: 2019-07-21
+# Updated: 2019-07-27
 # Author: Aaron Oman
 # Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
 #******************************************************************************
@@ -11,6 +11,7 @@ HEADERS  = $(wildcard *.h) $(wildcard external/*.h)
 LIBS    += $(shell sdl2-config --libs) -lSDL2main -lGL -lGLEW -lm -lpthread -lsoundio
 CFLAGS  += -std=c11 -pedantic -Wall -D_GNU_SOURCE
 
+SRC_DEP  = gfxinputthread.c threadsync.c timerthread.c
 SRC      = input.c main.c opcode.c sound.c system.c ui.c graphics.c
 OBJFILES = $(patsubst %.c,%.o,$(SRC))
 LINTFILES= $(patsubst %.c,__%.c,$(SRC)) $(patsubst %.c,_%.c,$(SRC))
@@ -38,7 +39,7 @@ release: $(RELEXE)
 $(RELEXE): $(RELOBJ)
 	$(CC) -o $@ $^ $(LIBS)
 
-$(RELDIR)/%.o: %.c $(HEADERS)
+$(RELDIR)/%.o: %.c $(HEADERS) $(SRC_DEP)
 	@mkdir -p $(@D)
 	$(CC) -c $*.c $(INC) $(CFLAGS) $(RELFLG) -o $@
 
@@ -47,7 +48,7 @@ debug: $(DBGEXE)
 $(DBGEXE): $(DBGOBJ)
 	$(CC) -o $@ $^ $(LIBS)
 
-$(DBGDIR)/%.o: %.c $(HEADERS)
+$(DBGDIR)/%.o: %.c $(HEADERS) $(SRC_DEP)
 	@mkdir -p $(@D)
 	$(CC) -c $*.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
 

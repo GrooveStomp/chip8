@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-07-16
+  Updated: 2019-07-27
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -11,7 +11,10 @@
 struct system_private;
 
 struct system {
-        // 4k memory
+        // 4k System memory map:
+        // 0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
+        // 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
+        // 0x200-0xFFF - Program ROM and work RAM
         unsigned char *memory;
 
         // CPU registers: The Chip 8 has 15 8-bit general purpose registers
@@ -24,11 +27,6 @@ struct system {
         // have a value from 0x000 to 0xFFF
         unsigned short i;
         unsigned short pc;
-
-        // System memory map:
-        // 0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
-        // 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
-        // 0x200-0xFFF - Program ROM and work RAM
 
         // The graphics of the Chip 8 are black and white and the screen has a
         // total of 2048 pixels (64 x 32). This can easily be implemented using
@@ -44,7 +42,6 @@ struct system {
 
         unsigned short fontp;
 
-        int waitForKey;
         struct system_private *prv;
 };
 
@@ -52,7 +49,7 @@ void
 SystemMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
 struct system *
-SystemInit();
+SystemInit(int isDebugEnabled);
 
 void
 SystemDeinit(struct system *s);
@@ -75,6 +72,15 @@ SystemPushStack(struct system *s);
 
 void
 SystemPopStack(struct system *s);
+
+int
+SystemGfxLock(struct system *s);
+
+int
+SystemGfxUnlock(struct system *s);
+
+void
+SystemGfxPresent(struct system *s);
 
 void
 SystemClearScreen(struct system *s);
@@ -114,5 +120,29 @@ SystemSoundTriggered(struct system *s);
 
 void
 SystemSoundSetTrigger(struct system *s, int v);
+
+int
+SystemShouldQuit(struct system *s);
+
+void
+SystemSignalQuit(struct system *s);
+
+int
+SystemDebugIsEnabled(struct system *s);
+
+int
+SystemDebugShouldFetchAndDecode(struct system *s);
+
+int
+SystemDebugShouldExecute(struct system *s);
+
+void
+SystemDebugSetEnabled(struct system *s, int onOrOff);
+
+void
+SystemDebugSetFetchAndDecode(struct system *s, int onOrOff);
+
+void
+SystemDebugSetExecute(struct system *s, int onOrOff);
 
 #endif // SYSTEM_VERSION

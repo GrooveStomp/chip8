@@ -1,7 +1,7 @@
 /******************************************************************************
   File: graphics.c
   Created: 2019-06-25
-  Updated: 2019-07-16
+  Updated: 2019-07-27
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -106,6 +106,13 @@ void GraphicsDeinit(struct graphics *g) {
 }
 
 void Raster(struct graphics *g, struct system *s) {
+        if (0 != SystemGfxLock(s)) {
+                fprintf(stderr, "Failed to lock system gfx rwlock");
+                return;
+        }
+
+        memset(g->textureData, 0xFF, CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3);
+
         for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
                 for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
                         unsigned int pos = cy * (CHIP8_DISPLAY_WIDTH * 3) + x;
@@ -115,14 +122,10 @@ void Raster(struct graphics *g, struct system *s) {
                                 g->textureData[pos + 0] = 0;
                                 g->textureData[pos + 1] = 0;
                                 g->textureData[pos + 2] = 0;
-                        } else {
-                                // White (Background)
-                                g->textureData[pos + 0] = 0xFF;
-                                g->textureData[pos + 1] = 0xFF;
-                                g->textureData[pos + 2] = 0xFF;
                         }
                 }
         }
+        SystemGfxUnlock(s);
 }
 
 void GraphicsPresent(struct graphics *g, struct system *s, void (*ui_render_fn)()) {
@@ -172,14 +175,6 @@ void GraphicsPresent(struct graphics *g, struct system *s, void (*ui_render_fn)(
         } glEnd();
 
         SDL_GL_SwapWindow(g->sdlWindow);
-}
-
-void Embiggen(struct graphics *g, unsigned int *buf, unsigned int x, unsigned int y, unsigned int pixel) {
-        for (int sy = y; sy < y + DISPLAY_SCALE; sy++) {
-                for (int sx = x; sx < x + DISPLAY_SCALE; sx++) {
-                        buf[sy * g->displayWidth + sx] = pixel;
-                }
-        }
 }
 
 SDL_Window *GraphicsSDLWindow(struct graphics *g) {

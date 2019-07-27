@@ -1,7 +1,7 @@
 /******************************************************************************
   File: graphics.h
   Created: 2019-07-16
-  Updated: 2019-07-16
+  Updated: 2019-07-27
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -12,7 +12,6 @@
 
 struct system;
 struct ui;
-typedef void (*graphics_ui_render_fn)(struct ui *u);
 
 void
 GraphicsMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
@@ -27,6 +26,6 @@ SDL_Window *
 GraphicsSDLWindow(struct graphics *g);
 
 void
-GraphicsPresent(struct graphics *g, struct system *s, graphics_ui_render_fn);
+GraphicsPresent(struct graphics *g, struct system *s, void (*ui_render_fn)());
 
 #endif // GRAPHICS_VERSION

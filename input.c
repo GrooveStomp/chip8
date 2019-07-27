@@ -1,7 +1,7 @@
 /******************************************************************************
   File: input.c
   Created: 2019-06-21
-  Updated: 2019-07-16
+  Updated: 2019-07-25
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -84,25 +84,25 @@ void HandleKeyUp(struct input *input, struct system *s, SDL_Keycode k) {
         }
 }
 
-// Returns non-zero if event normally processed. Zero indicates termination of program.
-int InputCheck(struct input *i, struct system *s, SDL_Event *event) {
+void InputCheck(struct input *i, struct system *s, SDL_Event *event) {
         if (NULL == i)
-                return 0;
+                return;
 
         switch (event->type) {
                 case SDL_QUIT:
-                        return 0;
+                        SystemSignalQuit(s);
                         break;
+
                 case SDL_KEYUP:
                         HandleKeyUp(i, s, event->key.keysym.sym);
                         break;
+
                 case SDL_KEYDOWN:
                         if (event->key.keysym.sym == SDLK_ESCAPE) {
-                                return 0;
+                                SystemSignalQuit(s);
+                                break;
                         }
                         HandleKeyDown(i, s, event->key.keysym.sym);
                         break;
         }
-
-        return !0;
 }
