@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Couldn't create gfxInputThread: errno(%d)\n", err);
         }
 
-        const double frequency = 1 / 500; // 500 FPS in MS per frame.
+        const double frequency = (1 / 500) * 1000; // 500 FPS in MS per frame.
 
         while (!SystemShouldQuit(sys)) {
                 struct timespec start;
@@ -193,13 +193,11 @@ int main(int argc, char **argv) {
                                 OpcodeFetch(opcode, sys);
                                 OpcodeDecode(opcode);
                                 SystemDecrementTimers(sys);
+                                OpcodeExecute(opcode, sys);
                         }
                         else if (SystemWFKChanged(sys)) {
                                 SystemIncrementPC(sys);
                                 SystemWFKStop(sys);
-                        }
-                        else {
-                                OpcodeExecute(opcode, sys);
                         }
                 }
 
@@ -207,9 +205,10 @@ int main(int argc, char **argv) {
                 clock_gettime(CLOCK_REALTIME, &end);
 
                 double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
-                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000000.0; // us to ms
 
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000 };
+                // struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000000 };
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (5000000) };
                 nanosleep(&sleep, NULL);
         } // while (!SystemShouldQuit(sys))
 

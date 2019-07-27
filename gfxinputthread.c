@@ -20,7 +20,7 @@ void *gfxInputWork(void *context) {
         struct thread_args *ctx = (struct thread_args *)context;
         #pragma GCC diagnostic pop
 
-        static const double frequency = 1 / 30; // 30 FPS in MS per frame.
+        static const double frequency = (1 / 30) * 1000; // 30 FPS in MS per frame.
 
         struct graphics *graphics = GraphicsInit(ctx->isDebugEnabled);
         if (graphics == NULL) {
@@ -45,8 +45,8 @@ void *gfxInputWork(void *context) {
 
         SDL_Event event;
         while (!ThreadSyncShouldShutdown(ctx->threadSync)) {
-                /* struct timespec start; */
-                /* clock_gettime(CLOCK_REALTIME, &start); */
+                struct timespec start;
+                clock_gettime(CLOCK_REALTIME, &start);
 
                 UIInputBegin(ui);
                 while (SDL_PollEvent(&event)) {
@@ -58,14 +58,14 @@ void *gfxInputWork(void *context) {
                 UIWidgets(ui, ctx->sys, ctx->opcode);
                 GraphicsPresent(graphics, ctx->sys, UIRenderFn);
 
-                /* struct timespec end; */
-                /* clock_gettime(CLOCK_REALTIME, &end); */
+                struct timespec end;
+                clock_gettime(CLOCK_REALTIME, &end);
 
-                /* double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms */
-                /* elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000.0; // us to ms */
+                double elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+                elapsed_time += (end.tv_nsec - start.tv_nsec) / 1000000.0; // us to ms
 
-                /* struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000 }; */
-                /* nanosleep(&sleep, NULL); */
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = (frequency - elapsed_time) * 1000000 };
+                nanosleep(&sleep, NULL);
         }
 
         UIDeinit(ui);
