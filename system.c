@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-07-23
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -64,13 +64,8 @@ struct system_private {
         pthread_rwlock_t shouldQuitLock;
 };
 
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
-
 static unsigned char MEMORY[MEMORY_SIZE];
 static unsigned char GFX[GRAPHICS_MEM_SIZE];
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
 
 static unsigned char fontset[FONT_SIZE] = {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -91,16 +86,11 @@ static unsigned char fontset[FONT_SIZE] = {
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void SystemMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
-
 struct system *SystemInit(int isDebugEnabled) {
-        struct system_private *prv = (struct system_private *)ALLOCATOR(sizeof(struct system_private));
+        struct system_private *prv = (struct system_private *)malloc(sizeof(struct system_private));
         memset(prv, 0, sizeof(struct system_private));
 
-        struct system *s = (struct system *)ALLOCATOR(sizeof(struct system));
+        struct system *s = (struct system *)malloc(sizeof(struct system));
         memset(s, 0, sizeof(struct system));
 
         s->memory = MEMORY;
@@ -187,7 +177,7 @@ void SystemDeinit(struct system *s) {
                 fprintf(stderr, "Couldn't destroy system gfx rwlock");
         }
 
-        DEALLOCATOR(s);
+        free(s);
 }
 
 // Each opcode is a two-byte instruction, so we have to double increment each time.

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound.h
   Created: 2019-07-07
-  Updated: 2019-07-16
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -9,9 +9,6 @@
 #define SOUND_VERSION "0.1.0"
 
 struct sound;
-
-void
-SoundMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
 void
 SoundDeinit(struct sound *sound);

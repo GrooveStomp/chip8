@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-07-27
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -44,9 +44,6 @@ struct system {
 
         struct system_private *prv;
 };
-
-void
-SystemMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
 struct system *
 SystemInit(int isDebugEnabled);

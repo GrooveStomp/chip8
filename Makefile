@@ -1,7 +1,7 @@
 #******************************************************************************
 # File: Makefile
 # Created: 2019-06-27
-# Updated: 2019-07-27
+# Updated: 2019-07-30
 # Author: Aaron Oman
 # Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
 #******************************************************************************
@@ -32,7 +32,7 @@ TSTEXE = $(patsubst $(TSTDIR)/%.c,$(TSTDIR)/%,$(TSTSRC))
 TSTOBJ = $(filter-out $(TSTDIR)/main.o,$(addprefix $(TSTDIR)/,$(OBJFILES)))
 
 DEFAULT_GOAL := $(release)
-.PHONY: clean debug release splint test uno valgrind
+.PHONY: clean debug docs release splint test uno valgrind
 
 release: $(RELEXE)
 
@@ -67,7 +67,10 @@ runtests: test
 	$(foreach exe,$(TSTEXE),./$(exe);)
 
 clean:
-	rm -rf core debug release ${LINTFILES} ${TSTOBJ} ${TSTEXE} cachegrind.out.* callgrind.out.*
+	rm -rf core debug release ${LINTFILES} ${TSTOBJ} ${TSTEXE} cachegrind.out.* callgrind.out.* docs
+
+docs:
+	doxygen .doxygen.conf
 
 valgrind:
 	echo "valgrind"

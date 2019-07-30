@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound.c
   Created: 2019-07-07
-  Updated: 2019-07-16
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -12,9 +12,6 @@
 
 #include <soundio/soundio.h>
 
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
-
 struct sound {
         struct SoundIo *lib;
         struct SoundIoDevice *dev;
@@ -22,14 +19,6 @@ struct sound {
         char *errString;
         int err;
 };
-
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
-
-void SoundMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
 
 void SoundStop(struct sound *s) {
         int err;
@@ -54,7 +43,7 @@ void SoundDeinit(struct sound *sound) {
         if (NULL != sound->lib)
                 soundio_destroy(sound->lib);
 
-        DEALLOCATOR(sound);
+        free(sound);
 }
 
 static void WriteCallback(struct SoundIoOutStream *out, int frameCountMin, int frameCountMax) {
@@ -110,7 +99,7 @@ void SoundPlay(struct sound *s) {
 struct sound *SoundInit() {
         int err;
 
-        struct sound *sound = (struct sound *)ALLOCATOR(sizeof(struct sound));
+        struct sound *sound = (struct sound *)malloc(sizeof(struct sound));
         memset(sound, 0, sizeof(struct sound));
 
         sound->lib = soundio_create();

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: graphics.h
   Created: 2019-07-16
-  Updated: 2019-07-27
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -12,9 +12,6 @@
 
 struct system;
 struct ui;
-
-void
-GraphicsMemControl(void *(*allocator)(size_t), void (*deallocator)(void *));
 
 struct graphics *
 GraphicsInit(int debug);

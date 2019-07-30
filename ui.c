@@ -1,7 +1,7 @@
 /******************************************************************************
   File: ui.c
   Created: 2019-06-27
-  Updated: 2019-07-27
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -31,9 +31,6 @@
 #define MAX_VERTEX_MEMORY 512 * 1024 // ??
 #define MAX_ELEMENT_MEMORY 128 * 1024 // ??
 
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
-
 struct ui {
         int enabled;
         struct nk_context *ctx;
@@ -42,16 +39,8 @@ struct ui {
         SDL_Window *window;
 };
 
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
-
-void UIMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
-
 struct ui *UIInit(int shouldBeEnabled, unsigned int widgetWidth, unsigned int widgetHeight, SDL_Window *window) {
-        struct ui *ui = (struct ui *)ALLOCATOR(sizeof(struct ui));
+        struct ui *ui = (struct ui *)malloc(sizeof(struct ui));
         memset(ui, 0, sizeof(struct ui));
 
         ui->enabled = shouldBeEnabled;
@@ -349,5 +338,5 @@ void UIDeinit(struct ui *ui) {
                 nk_sdl_shutdown();
         }
 
-        DEALLOCATOR(ui);
+        free(ui);
 }

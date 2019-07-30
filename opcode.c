@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.c
   Created: 2019-06-04
-  Updated: 2019-07-21
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -11,40 +11,43 @@
 #include <stdio.h>
 
 #include "system.h"
+//! \file opcode.c
 
 struct opcode;
+
+//! Function pointer to the implementation of a given opcode
 typedef void (*opcode_fn)(struct opcode *c, struct system *);
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
 
+//! \brief Opcode function debugging information. Unexported.
+//!
+//! Associates an opcode operation (function) with a name and description.
+//! This is used when running the built-in debugger UI.
 struct opcode_fn_map {
-        char *name;
-        opcode_fn address;
-        char *description;
+        char *name; //!< Name of the function, like 6XNN
+        opcode_fn address; //!< Address of the function
+        char *description; //!< Description of what the opcode function does
 };
 
-// All instructions are 2 bytes store most-significant byte first. (Big Endian)
+//! \brief State representing the active opcode. Unexported.
+//!
+//! State required to represent an instruction in the CHIP-8.
+//! Each instruction is represented by a function as described in
+//! https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 struct opcode {
-        unsigned short jumpToInstruction;
-        int skipNextInstruction;
-        unsigned short instruction;
-        opcode_fn fn;
-        struct opcode_fn_map debug_fn_map[35];
+// All instructions are 2 bytes store most-significant byte first. (Big Endian)
+        unsigned short jumpToInstruction; //!< Address of next instruction to jump to, or zero
+        int skipNextInstruction; //!< Boolean state
+        unsigned short instruction; //!< Address of the next instruction to execute
+        opcode_fn fn; //!< The function implementation of the next instruction to execute
+        struct opcode_fn_map debug_fn_map[35]; //!< Debug info
 };
 
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
-
-void OpcodeMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
-
+// Described in header file
 unsigned short OpcodeInstruction(struct opcode *c) {
         return c->instruction;
 }
 
-// Returns non-zero if successfully written.
+// Describe in header file
 int OpcodeDescription(struct opcode *c, char *str, unsigned int maxLen) {
         if (str == NULL) {
                 return 0;
@@ -60,15 +63,29 @@ int OpcodeDescription(struct opcode *c, char *str, unsigned int maxLen) {
         return !0;
 }
 
+//! \brief Gets the top 8 bits of the 16-bit instruction
+//! \param[in] c Opcode state to be read
+//! \return The top 8 bits of the opcode instruction
 unsigned int HighByte(struct opcode *c) {
         return c->instruction >> 8;
 }
 
+//! \brief Gets the low 8 bits of the 16-bit instruction
+//! \param[in] c Opcode state to be read
+//! \return the low 8 bits of the opcode instruction
 unsigned int LowByte(struct opcode *c) {
         return c->instruction & 0x00FF;
 }
 
-// pos: LSB first. 0 is LSB, 1 is next most significant byte, etc.
+//! \brief Get a 4-bit nibble from the current instruction
+//!
+//! Each instruction is a 16-bit value that can be interpreted as 4 4-bit
+//! nibbles.
+//! This function interprets 0 as the low nibble and 3 as the high nibble.
+//!
+//! \param[in] c Opcode state to be read
+//! \param[in] pos Nibble position to be read from current instruction
+//! \return The desired nibble in a byte with high nibble zeroed
 unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
         switch (pos) {
                 case 0:
@@ -422,7 +439,7 @@ void FnFX65(struct opcode *c, struct system *s) {
 }
 
 struct opcode *OpcodeInit() {
-        struct opcode *c = (struct opcode *)ALLOCATOR(sizeof(struct opcode));
+        struct opcode *c = (struct opcode *)malloc(sizeof(struct opcode));
         memset(c, 0, sizeof(struct opcode));
 
         c->instruction = 0;
@@ -473,26 +490,7 @@ void OpcodeDeinit(struct opcode *c) {
         if (NULL == c)
                 return;
 
-        DEALLOCATOR(c);
-}
-
-void OpcodeDebug(struct opcode *c) {
-        printf("struct opcode {\n");
-        printf("\tinstruction: 0x%04X\n", c->instruction);
-        printf("\tfn:_________ ");
-        unsigned char *ptr = (unsigned char *)&c->fn;
-        for (int i = 0; i < sizeof(opcode_fn); i++) {
-                printf("%02x", ptr[i]);
-        }
-        printf("\n");
-
-        for (int i=0; i<35; i++) {
-                if (c->fn == c->debug_fn_map[i].address) {
-                        printf("\tfn name:____ %s\n", c->debug_fn_map[i].name);
-                        printf("\tfn desc:____ %s\n", c->debug_fn_map[i].description);
-                }
-        }
-        printf("}\n");
+        free(c);
 }
 
 // Stores two-byte opcode from memory pointed to by pc into opcode c.
@@ -676,7 +674,6 @@ void OpcodeDecode(struct opcode *c) {
                 } break;
                 default: {
                         printf("Unknown opcode: 0x%04X\n", c->instruction);
-                        OpcodeDebug(c);
                 }
         }
 }

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: gfxinputthread.c
   Created: 2019-07-25
-  Updated: 2019-07-27
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -61,10 +61,10 @@ void *gfxInputWork(void *context) {
                 struct timespec end;
                 clock_gettime(CLOCK_REALTIME, &end);
 
-                double elapsed_time = S_TO_MS(end.tv_sec - start.tv_sec);
-                elapsed_time += NS_TO_MS(end.tv_nsec - start.tv_nsec);
+                double elapsedTime = S_TO_MS(end.tv_sec - start.tv_sec);
+                elapsedTime += NS_TO_MS(end.tv_nsec - start.tv_nsec);
 
-                struct timespec sleep = { .tv_sec = 0, .tv_nsec = MS_TO_NS(msPerFrame - elapsed_time) };
+                struct timespec sleep = { .tv_sec = 0, .tv_nsec = MS_TO_NS(msPerFrame - elapsedTime) };
                 nanosleep(&sleep, NULL);
         }
 

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: graphics.c
   Created: 2019-06-25
-  Updated: 2019-07-27
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -32,23 +32,12 @@ struct graphics {
         GLuint glTextureName;
 };
 
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
-
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
-
-void GraphicsMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
-
 struct graphics *GraphicsInit(int debug) {
-        struct graphics *g = (struct graphics *)ALLOCATOR(sizeof(struct graphics));
+        struct graphics *g = (struct graphics *)malloc(sizeof(struct graphics));
         memset(g, 0, sizeof(struct graphics));
 
         g->debug = debug;
-        g->textureData = (GLubyte *)ALLOCATOR(CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3);
+        g->textureData = (GLubyte *)malloc(CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3);
 
         if (debug) {
                 g->displayWidth = DISPLAY_WIDTH_WITH_DEBUGGER;
@@ -101,8 +90,8 @@ void GraphicsDeinit(struct graphics *g) {
         SDL_DestroyWindow(g->sdlWindow);
         SDL_Quit();
 
-        DEALLOCATOR(g->textureData);
-        DEALLOCATOR(g);
+        free(g->textureData);
+        free(g);
 }
 
 void Raster(struct graphics *g, struct system *s) {

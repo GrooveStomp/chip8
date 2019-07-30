@@ -12,6 +12,9 @@ More Details coming soon.
 - libmath
 - libpthread
 - soundio
+- gcc (Built using 8.3.0)
+- Doxygen (For building documentation. Tested with 1.8.13)
+
 
 # Build
 ```
@@ -45,4 +48,11 @@ To build all tests and run them:
 ```
 make test
 make runtests
+```
+
+# Documentation
+Doxygen is used to generate sourcecode documentation.
+Use the `docs` make target to generate Doxygen output in the `docs/` directory.
+```
+make docs
 ```

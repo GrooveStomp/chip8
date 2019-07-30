@@ -1,7 +1,7 @@
 /******************************************************************************
   File: input.c
   Created: 2019-06-21
-  Updated: 2019-07-25
+  Updated: 2019-07-30
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -14,19 +14,8 @@ struct input {
         SDL_Keycode keycodeIndices[NUM_KEYS];
 };
 
-typedef void *(*allocator)(size_t);
-typedef void (*deallocator)(void *);
-
-static allocator ALLOCATOR = malloc;
-static deallocator DEALLOCATOR = free;
-
-void InputMemControl(allocator Alloc, deallocator Dealloc) {
-        ALLOCATOR = Alloc;
-        DEALLOCATOR = Dealloc;
-}
-
 struct input *InputInit() {
-        struct input *i = (struct input *)ALLOCATOR(sizeof(struct input));
+        struct input *i = (struct input *)malloc(sizeof(struct input));
         memset(i, 0, sizeof(struct input));
 
         // TODO: Support remapping of keys.
@@ -54,7 +43,7 @@ void InputDeinit(struct input *i) {
         if (NULL == i)
                 return;
 
-        DEALLOCATOR(i);
+        free(i);
 }
 
 void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
