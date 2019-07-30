@@ -1,0 +1,8 @@
+<map id="system.h" name="system.h">
+<area shape="rect" id="node2" href="$graphics_8c.html" title="graphics.c" alt="" coords="5,80,88,107"/>
+<area shape="rect" id="node3" href="$input_8c.html" title="input.c" alt="" coords="112,80,173,107"/>
+<area shape="rect" id="node4" href="$main_8c.html" title="main.c" alt="" coords="197,80,259,107"/>
+<area shape="rect" id="node5" href="$opcode_8c.html" title="opcode.c" alt="" coords="283,80,357,107"/>
+<area shape="rect" id="node6" href="$system_8c.html" title="system.c" alt="" coords="382,80,458,107"/>
+<area shape="rect" id="node7" href="$ui_8c.html" title="ui.c" alt="" coords="483,80,525,107"/>
+</map>
