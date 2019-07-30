@@ -12,4 +12,5 @@ bin
 debug
 release
 test/*_test
-docs
+*~
+docs/latex

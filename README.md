@@ -56,3 +56,4 @@ Use the `docs` make target to generate Doxygen output in the `docs/` directory.
 ```
 make docs
 ```
+Current documentation is available at https://groovestomp.github.io/chip8

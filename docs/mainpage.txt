@@ -1,0 +1,12 @@
+//! \mainpage Aaron Oman's CHIP-8 Emulator
+//!
+//! \section intro_sec Introduction
+//!
+//! This is my project to implement an emulator.
+//! 
+//! I chose the CHIP-8 as it is known to be a good first emulation
+//! project due to the limited specs of the described system, and
+//! especially the low number (35!) of opcodes supported.
+//!
+//! For more information, see: https://en.wikipedia.org/wiki/CHIP-8 (This
+//! will be updated with offline information.)
