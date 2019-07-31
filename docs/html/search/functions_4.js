@@ -1,6 +1,10 @@
 var searchData=
 [
-  ['inputcheck',['InputCheck',['../input_8c.html#a349e33d74822848e0db43cc56c0a03b1',1,'InputCheck(struct input *i, struct system *s, SDL_Event *event):&#160;input.c'],['../input_8h.html#ae2bab8b821756d8a5031b09cdae055f8',1,'InputCheck(struct input *i, struct system *s, SDL_Event *e):&#160;input.c']]],
-  ['inputdeinit',['InputDeinit',['../input_8c.html#a68054d62d814fb092e0927f163d0e8ad',1,'InputDeinit(struct input *i):&#160;input.c'],['../input_8h.html#a33447b8c412985180a0fb8feda63917c',1,'InputDeinit(struct input *):&#160;input.c']]],
-  ['inputinit',['InputInit',['../input_8c.html#a1d6bc79955841788279b2eb5cf12d390',1,'InputInit():&#160;input.c'],['../input_8h.html#a1d6bc79955841788279b2eb5cf12d390',1,'InputInit():&#160;input.c']]]
+  ['opcodedecode',['OpcodeDecode',['../opcode_8c.html#ae20c2f208f74f57ba6cb88cb04896520',1,'OpcodeDecode(struct opcode *c):&#160;opcode.c'],['../opcode_8h.html#a087ca0463cd33593500f501ce1e13e44',1,'OpcodeDecode(struct opcode *opcode):&#160;opcode.c']]],
+  ['opcodedeinit',['OpcodeDeinit',['../opcode_8c.html#a3fee5471673e3ea097e75f06539ca9f5',1,'OpcodeDeinit(struct opcode *c):&#160;opcode.c'],['../opcode_8h.html#aa2a7075a1d168899413d1ca9791edb2b',1,'OpcodeDeinit(struct opcode *opcode):&#160;opcode.c']]],
+  ['opcodedescription',['OpcodeDescription',['../opcode_8c.html#aa022d94d07d850d3bad42efe302b6e33',1,'OpcodeDescription(struct opcode *c, char *str, unsigned int maxLen):&#160;opcode.c'],['../opcode_8h.html#a7200b541c33b02b1482bb84061809e9f',1,'OpcodeDescription(struct opcode *opcode, char *string, unsigned int maxLength):&#160;opcode.c']]],
+  ['opcodeexecute',['OpcodeExecute',['../opcode_8c.html#a560352c7faa7bf81234095bd5a3290f0',1,'OpcodeExecute(struct opcode *c, struct system *s):&#160;opcode.c'],['../opcode_8h.html#ab169e72a2205d2b021c3aa4807dc2064',1,'OpcodeExecute(struct opcode *opcode, struct system *system):&#160;opcode.c']]],
+  ['opcodefetch',['OpcodeFetch',['../opcode_8c.html#a9ae2684ff08f508056340e7e427e7af6',1,'OpcodeFetch(struct opcode *c, struct system *s):&#160;opcode.c'],['../opcode_8h.html#aceaca743f281c7465bc20b80a78390c4',1,'OpcodeFetch(struct opcode *opcode, struct system *system):&#160;opcode.c']]],
+  ['opcodeinit',['OpcodeInit',['../opcode_8c.html#a7c51582f0ac14077e383b4c8147174c6',1,'OpcodeInit():&#160;opcode.c'],['../opcode_8h.html#a7c51582f0ac14077e383b4c8147174c6',1,'OpcodeInit():&#160;opcode.c']]],
+  ['opcodeinstruction',['OpcodeInstruction',['../opcode_8c.html#aaa47038994770b99a0950a523568f843',1,'OpcodeInstruction(struct opcode *c):&#160;opcode.c'],['../opcode_8h.html#ac53c4e1d9468a073cc90c7948336f5f9',1,'OpcodeInstruction(struct opcode *opcode):&#160;opcode.c']]]
 ];

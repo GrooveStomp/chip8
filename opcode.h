@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.h
   Created: 2019-06-14
-  Updated: 2019-07-30
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -37,8 +37,8 @@ struct system;
 struct opcode *
 OpcodeInit();
 
-//! \brief De-initializes and frees memory for the given opcode
-//! \param[in] opcode The initialized opcode object to be cleaned and reclaimed
+//! \brief De-initializes and frees memory for the given opcode object
+//! \param[in,out] opcode The initialized opcode object to be cleaned and reclaimed
 void
 OpcodeDeinit(struct opcode *opcode);
 
@@ -47,8 +47,8 @@ OpcodeDeinit(struct opcode *opcode);
 //! Reads the next instruction to be executed from the CHIP-8's pc and
 //! increments the pc by two bytes.
 //!
-//! \param[in] opcode State representing the instruction to be executed
-//! \param[in] system CHIP-8 system state to be read and updated
+//! \param[in,out] opcode State representing the instruction to be executed
+//! \param[in,out] system CHIP-8 system state to be read and updated
 void
 OpcodeFetch(struct opcode *opcode, struct system *system);
 
@@ -63,7 +63,7 @@ OpcodeFetch(struct opcode *opcode, struct system *system);
 //! Each opcode is represented internally by a function and stored as a function
 //! pointer: opcode_fn.
 //!
-//! \param[in] opcode Opcode state to be updated
+//! \param[in,out] opcode Opcode state to be updated
 //! \see CHIP-8 Opcode listing: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 void
 OpcodeDecode(struct opcode *opcode);
@@ -72,8 +72,8 @@ OpcodeDecode(struct opcode *opcode);
 //!
 //! Executes the described opcode via the internally stored function.
 //!
-//! \param[in] opcode The stored opcode state
-//! \param[in] system The CHIP-8 system state to be updated
+//! \param[in,out] opcode The stored opcode state
+//! \param[in,out] system The CHIP-8 system state to be updated
 void
 OpcodeExecute(struct opcode *opcode, struct system *system);
 

@@ -1,15 +1,18 @@
 /******************************************************************************
   File: input.c
   Created: 2019-06-21
-  Updated: 2019-07-30
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
 #include "SDL2/SDL.h"
 #include "system.h"
+//! \file input.c
 
+//! The number of keys in the CHIP-8
 #define NUM_KEYS 16
 
+//! \brief Keypress state. Unexported.
 struct input {
         SDL_Keycode keycodeIndices[NUM_KEYS];
 };
@@ -46,28 +49,42 @@ void InputDeinit(struct input *i) {
         free(i);
 }
 
-void HandleKeyDown(struct input *input, struct system *s, SDL_Keycode k) {
+//! \brief Key "down" event handler
+//! \param[in,out] input Input state to be updated
+//! \param[in,out] system CHIP-8 system state to be updated
+//! \param[in] keycode Keycode mapping which key has been pressed
+void HandleKeyDown(struct input *input, struct system *system, SDL_Keycode keycode) {
         if (NULL == input)
                 return;
 
         for (int i = 0; i < NUM_KEYS; i++) {
-                if (k == input->keycodeIndices[i]) {
-                        s->key[i] = 0xFF; // Pressed.
-                        if (SystemWFKWaiting(s)) {
-                                SystemWFKOccurred(s, i);
+                if (keycode == input->keycodeIndices[i]) {
+                        // Dangerous. Currently this is the only thread updating
+                        // these values, but poking into shared memory directly
+                        // like this is ripe for errors.
+                        system->key[i] = 0xFF; // Pressed.
+                        if (SystemWFKWaiting(system)) {
+                                SystemWFKOccurred(system, i);
                         }
                         break;
                 }
         }
 }
 
-void HandleKeyUp(struct input *input, struct system *s, SDL_Keycode k) {
+//! \brief Key "up" event handler
+//! \param[in,out] input Input state to be updated
+//! \param[in,out] system CHIP-8 system state to be updated
+//! \param[in] keycode Keycode maping which key has been released
+void HandleKeyUp(struct input *input, struct system *system, SDL_Keycode keycode) {
         if (NULL == input)
                 return;
 
         for (int i = 0; i < NUM_KEYS; i++) {
-                if (k == input->keycodeIndices[i]) {
-                        s->key[i] = 0x00; // Un-Pressed.
+                if (keycode == input->keycodeIndices[i]) {
+                        // Dangerous. Currently this is the only thread updating
+                        // these values, but poking into shared memory directly
+                        // like this is ripe for errors.
+                        system->key[i] = 0x00; // Un-Pressed.
                         break;
                 }
         }
