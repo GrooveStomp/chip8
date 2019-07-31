@@ -1,19 +1,38 @@
 /******************************************************************************
   File: gfxinputthread.c
   Created: 2019-07-25
-  Updated: 2019-07-30
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+
+//! \file gfxinputthread.c
+
 // NOTE: Kinda dangerous - anybody in this translation unit can access ui
 // without a synchronization primitive.  This may necessitate putting this c
 // file into a completely separate translation unit.
 static struct ui *ui;
 
+//! \brief A convenience function used in GraphicsPresent()
+//!
+//! Wraps UIRender() to match the prototype function pointer in GraphicsPresent()
 void UIRenderFn() {
         UIRender(ui);
 }
 
+//! \brief Thread for graphics and input updates
+//!
+//! Graphics and input are coupled together on the same thread because I
+//! figure both deal with human perception, so their frequency can be similar.
+//! Right now this thread is configured to run at 30hz.
+//!
+//! Decoupling graphics and input allows the emulation engine to run at a
+//! much higher frequency and not be limited by drawing routines.
+//!
+//! Input is included here due to coupling between UI and input.
+//!
+//! \param[in] context struct thread_args casted to void*
+//! \return NULL
 void *gfxInputWork(void *context) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wpointer-arith"

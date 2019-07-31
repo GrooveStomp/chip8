@@ -1,10 +1,13 @@
 /******************************************************************************
   File: graphics.c
   Created: 2019-06-25
-  Updated: 2019-07-30
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+
+//! \file graphics.c
+
 #include <string.h> // memset
 #include <stdio.h> // fprintf
 
@@ -20,6 +23,7 @@ const unsigned int CHIP8_DISPLAY_WIDTH = 64;
 const unsigned int CHIP8_DISPLAY_HEIGHT = 32;
 const unsigned int DISPLAY_SCALE = 16;
 
+//! \brief Graphics state
 struct graphics {
         GLubyte *textureData;
         SDL_Window *sdlWindow;
@@ -94,27 +98,35 @@ void GraphicsDeinit(struct graphics *g) {
         free(g);
 }
 
-void Raster(struct graphics *g, struct system *s) {
-        if (0 != SystemGfxLock(s)) {
+//! \brief Graphics rasterization to screen
+//!
+//! The CHIP-8 uses bitmapped graphics in its internal video memory.
+//! This bitmapped memory needs to be interpreted appropriately so the graphics
+//! system can render it to the screen.
+//!
+//! \param[in,out] graphics Graphics state to be updated
+//! \param[in] system CHIP-8 system state to be read
+void Raster(struct graphics *graphics, struct system *system) {
+        if (0 != SystemGfxLock(system)) {
                 fprintf(stderr, "Failed to lock system gfx rwlock");
                 return;
         }
 
-        memset(g->textureData, 0xFF, CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3);
+        memset(graphics->textureData, 0xFF, CHIP8_DISPLAY_WIDTH * CHIP8_DISPLAY_HEIGHT * 3);
 
         for (int y = CHIP8_DISPLAY_HEIGHT-1, cy = 0; cy < CHIP8_DISPLAY_HEIGHT; cy++, y--) {
                 for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
                         unsigned int pos = cy * (CHIP8_DISPLAY_WIDTH * 3) + x;
 
-                        if (s->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
+                        if (systems->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
                                 // Black (Foreground)
-                                g->textureData[pos + 0] = 0;
-                                g->textureData[pos + 1] = 0;
-                                g->textureData[pos + 2] = 0;
+                                graphics->textureData[pos + 0] = 0;
+                                graphics->textureData[pos + 1] = 0;
+                                graphics->textureData[pos + 2] = 0;
                         }
                 }
         }
-        SystemGfxUnlock(s);
+        SystemGfxUnlock(system);
 }
 
 void GraphicsPresent(struct graphics *g, struct system *s, void (*ui_render_fn)()) {

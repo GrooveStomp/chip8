@@ -1,10 +1,21 @@
 /******************************************************************************
   File: timerthread.c
   Created: 2019-07-25
-  Updated: 2019-07-30
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+
+//! \file timerthread.c
+
+//! \brief Thread for timer countdown
+//!
+//! The CHIP-8 has two timers: a delay timer and a sound timer.
+//! Each timer decrements at a frequency of 60hz and then stays at zero once
+//! zero is reached.
+//!
+//! \param[in] context struct thread_args casted to void*
+//! \return NULL
 void *timerTick(void *context) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wpointer-arith"

@@ -1,7 +1,7 @@
 /******************************************************************************
   File: main.c
   Created: 2019-06-04
-  Updated: 2019-07-27
+  Updated: 2019-07-31
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -17,6 +17,22 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_opengl.h"
 
+//! \file main.c
+//!
+//! This file is the main entrypoint for the CHIP-8 emulator.
+//! The program runs on four threads:
+//! - graphics + input
+//! - sound
+//! - timers
+//! - system emulation
+//!
+//! The system emulation (re: "main") thread provides routines for other threads
+//! to call into, and these routines internally use POSIX threads
+//! synchronization primitives to sync data.
+//!
+//! Besides creating the threads, this file is responsible for parsing CLI args,
+//! loading CHIP-8 ROM data and otherwise just being a main entrypoint.
+
 #include "input.h"
 #include "graphics.h"
 #include "opcode.h"
@@ -26,6 +42,7 @@
 #include "ui.h"
 
 #include "threadsync.c"
+
 struct thread_args {
         struct system *sys;
         struct opcode *opcode;
@@ -33,10 +50,10 @@ struct thread_args {
         struct thread_sync *threadSync;
 };
 
-#define S_TO_MS(x) (x) * 1000.0
-#define NS_TO_MS(x) (x) / 1000000.0
-#define MS_TO_NS(x) (x) * 1000000.0
-#define HZ_TO_MS(x) (1.0 / (x)) * 1000.0
+#define S_TO_MS(x) (x) * 1000.0 //!< Convert seconds to milliseconds
+#define NS_TO_MS(x) (x) / 1000000.0 //!< Convert nanoseconds to milliseconds
+#define MS_TO_NS(x) (x) * 1000000.0 //!< Convert milliseconds to nanoseconds
+#define HZ_TO_MS(x) (1.0 / (x)) * 1000.0 //!< Convert hertz to milliseconds per frame
 
 #include "gfxinputthread.c"
 #include "soundthread.c"
@@ -50,6 +67,11 @@ static pthread_t timerThread;
 static pthread_t soundThread;
 static pthread_t gfxInputThread;
 
+//! \brief Gracefully handle shutting down the program
+//!
+//! Signals all threads to terminate, then waits until they return.
+//!
+//! \param[in] status Status code to terminate program with. 0 on succes.
 void Shutdown(int status) {
         void *threadStatus;
         ThreadSyncSignalShutdown(threadSync);
@@ -66,13 +88,16 @@ void Shutdown(int status) {
         exit(status);
 }
 
-
+//! \brief Displays proper program invocation on the CLI
 void Usage() {
         printf("chip-8 [-d] PROGRAM\n");
         printf("\t-d: interactive debug mode\n");
 }
 
-// Returns whether debug is enabled.
+//! \brief Parses command line arguments
+//! \param[in] argc Number of CLI arguments
+//! \param[in] argv CLI arguments as array of strings
+//! \return 0 if visual debugger is disabled, otherwise 1
 int ArgParse(int argc, char **argv) {
         int debugEnabled = 0;
 
@@ -94,6 +119,7 @@ int ArgParse(int argc, char **argv) {
         return debugEnabled;
 }
 
+//! \brief CHIP-8 emulator main entrypoint
 int main(int argc, char **argv) {
         int debugEnabled = ArgParse(argc, argv);
 
