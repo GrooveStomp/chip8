@@ -16,7 +16,7 @@
 //!
 //! \param[in] context struct thread_args casted to void*
 //! \return NULL
-void *timerTick(void *context) {
+void *TimerThread(void *context) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wpointer-arith"
         struct thread_args *ctx = (struct thread_args *)context;

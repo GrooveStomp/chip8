@@ -33,7 +33,7 @@ void UIRenderFn() {
 //!
 //! \param[in] context struct thread_args casted to void*
 //! \return NULL
-void *gfxInputWork(void *context) {
+void *GFXInputThread(void *context) {
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wpointer-arith"
         struct thread_args *ctx = (struct thread_args *)context;

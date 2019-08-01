@@ -85,6 +85,9 @@ void Shutdown(int status) {
         if (NULL != sys)
                 SystemDeinit(sys);
 
+        if (NULL != threadSync)
+                ThreadSyncDeinit(threadSync);
+
         exit(status);
 }
 
@@ -180,15 +183,15 @@ int main(int argc, char **argv) {
                 .threadSync = threadSync
         };
 
-        if (0 != (err = pthread_create(&timerThread, NULL, timerTick, &threadArgs))) {
+        if (0 != (err = pthread_create(&timerThread, NULL, TimerThread, &threadArgs))) {
                 fprintf(stderr, "Couldn't create timerThread: errno(%d)\n", err);
         }
 
-        if (0 != (err = pthread_create(&soundThread, NULL, soundWork, &threadArgs))) {
+        if (0 != (err = pthread_create(&soundThread, NULL, SoundThread, &threadArgs))) {
                 fprintf(stderr, "Couldn't create soundThread: errno(%d)\n", err);
         }
 
-        if (0 != (err = pthread_create(&gfxInputThread, NULL, gfxInputWork, &threadArgs))) {
+        if (0 != (err = pthread_create(&gfxInputThread, NULL, GFXInputThread, &threadArgs))) {
                 fprintf(stderr, "Couldn't create gfxInputThread: errno(%d)\n", err);
         }
 

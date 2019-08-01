@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['name',['name',['../structopcode__fn__map.html#a4f728e19394691bf510de8de5499a4ed',1,'opcode_fn_map']]],
-  ['nibbleat',['NibbleAt',['../opcode_8c.html#a3b15f8eb99fc117301d9ab49713491fe',1,'opcode.c']]],
-  ['ns_5fto_5fms',['NS_TO_MS',['../main_8c.html#a2e45dc5d9b00ca88131467e155d673b1',1,'main.c']]],
-  ['num_5fkeys',['NUM_KEYS',['../input_8c.html#a9a8c7403a867e0c9543467ee8754050d',1,'input.c']]]
+  ['main',['main',['../main_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main.c']]],
+  ['main_2ec',['main.c',['../main_8c.html',1,'']]],
+  ['memory',['memory',['../structsystem.html#af172efa7d28757641b9f8ccc503ae4c8',1,'system']]],
+  ['ms_5fto_5fns',['MS_TO_NS',['../main_8c.html#aab882fbb7595b97461f54850fc8eb217',1,'main.c']]]
 ];

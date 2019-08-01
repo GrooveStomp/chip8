@@ -1,7 +1,8 @@
 var searchData=
 [
+  ['gfx',['gfx',['../structsystem.html#a02ee1e279f59545f10cdc36a9aeb6489',1,'system']]],
+  ['gfxinputthread',['GFXInputThread',['../gfxinputthread_8c.html#aa9806ad61e4a2190287ece943768e3ec',1,'gfxinputthread.c']]],
   ['gfxinputthread_2ec',['gfxinputthread.c',['../gfxinputthread_8c.html',1,'']]],
-  ['gfxinputwork',['gfxInputWork',['../gfxinputthread_8c.html#ad322bb81d79d431f3c6639da7da49277',1,'gfxinputthread.c']]],
   ['graphics',['graphics',['../structgraphics.html',1,'']]],
   ['graphics_2ec',['graphics.c',['../graphics_8c.html',1,'']]],
   ['graphics_2eh',['graphics.h',['../graphics_8h.html',1,'']]],

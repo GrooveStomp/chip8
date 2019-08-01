@@ -118,7 +118,7 @@ void Raster(struct graphics *graphics, struct system *system) {
                 for (int x = 0, cx = 0; cx < CHIP8_DISPLAY_WIDTH; cx++, x+=3) {
                         unsigned int pos = cy * (CHIP8_DISPLAY_WIDTH * 3) + x;
 
-                        if (systems->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
+                        if (system->gfx[y * CHIP8_DISPLAY_WIDTH + cx]) {
                                 // Black (Foreground)
                                 graphics->textureData[pos + 0] = 0;
                                 graphics->textureData[pos + 1] = 0;

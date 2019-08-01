@@ -80,17 +80,22 @@ Include dependency graph for sound.c:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsound.html">sound</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sound state.  <a href="structsound.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aab77ef3172030534ad280c1caec1028b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sound_8c.html#aab77ef3172030534ad280c1caec1028b">SoundStop</a> (struct <a class="el" href="structsound.html">sound</a> *s)</td></tr>
+<tr class="memdesc:aab77ef3172030534ad280c1caec1028b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop playback.  <a href="#aab77ef3172030534ad280c1caec1028b">More...</a><br /></td></tr>
 <tr class="separator:aab77ef3172030534ad280c1caec1028b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ab6a98041c4b8e14c3586fb12ecc9bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sound_8c.html#a2ab6a98041c4b8e14c3586fb12ecc9bc">SoundDeinit</a> (struct <a class="el" href="structsound.html">sound</a> *<a class="el" href="structsound.html">sound</a>)</td></tr>
+<tr class="memdesc:a2ab6a98041c4b8e14c3586fb12ecc9bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-initializes and frees memory for the given sound object.  <a href="#a2ab6a98041c4b8e14c3586fb12ecc9bc">More...</a><br /></td></tr>
 <tr class="separator:a2ab6a98041c4b8e14c3586fb12ecc9bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0327c664ae208d2b6bc031a523f3a16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sound_8c.html#ac0327c664ae208d2b6bc031a523f3a16">SoundPlay</a> (struct <a class="el" href="structsound.html">sound</a> *s)</td></tr>
+<tr class="memdesc:ac0327c664ae208d2b6bc031a523f3a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start playback of A4 (440hz)  <a href="#ac0327c664ae208d2b6bc031a523f3a16">More...</a><br /></td></tr>
 <tr class="separator:ac0327c664ae208d2b6bc031a523f3a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a70bdde261cb34c196a9a9f5b5c6983"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structsound.html">sound</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sound_8c.html#a0a70bdde261cb34c196a9a9f5b5c6983">SoundInit</a> ()</td></tr>
+<tr class="memdesc:a0a70bdde261cb34c196a9a9f5b5c6983"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and initializes a new sound object.  <a href="#a0a70bdde261cb34c196a9a9f5b5c6983">More...</a><br /></td></tr>
 <tr class="separator:a0a70bdde261cb34c196a9a9f5b5c6983"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -110,6 +115,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>De-initializes and frees memory for the given sound object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sound</td><td>The initialized sound object to be cleaned and reclaimed </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a0a70bdde261cb34c196a9a9f5b5c6983"></a>
@@ -127,6 +140,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates and initializes a new sound object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The initialized sound object </dd></dl>
+
 </div>
 </div>
 <a id="ac0327c664ae208d2b6bc031a523f3a16"></a>
@@ -139,11 +155,19 @@ Functions</h2></td></tr>
           <td class="memname">void SoundPlay </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsound.html">sound</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>sound</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Start playback of A4 (440hz) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sound</td><td>Sound interface to invoke playback on </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -157,11 +181,19 @@ Functions</h2></td></tr>
           <td class="memname">void SoundStop </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsound.html">sound</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>sound</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Stop playback. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">sound</td><td>Sound interface to stop playback on </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
