@@ -87,76 +87,30 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structtimer.html">timer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queryable timer state used in <a class="el" href="soundthread_8c.html">soundthread.c</a>.  <a href="structtimer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a17e42c73244f026b51aeb166892f8f53"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#a17e42c73244f026b51aeb166892f8f53">TIMER_VERSION</a>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
+<tr class="memitem:a17e42c73244f026b51aeb166892f8f53"><td class="memItemLeft" align="right" valign="top"><a id="a17e42c73244f026b51aeb166892f8f53"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>TIMER_VERSION</b>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
 <tr class="separator:a17e42c73244f026b51aeb166892f8f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a60d82613d75fe5957cfbe3632c845ede"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structtimer.html">timer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#a60d82613d75fe5957cfbe3632c845ede">TimerInit</a> (unsigned int ms)</td></tr>
+<tr class="memdesc:a60d82613d75fe5957cfbe3632c845ede"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pointer to an initialized timer on the heap.  <a href="#a60d82613d75fe5957cfbe3632c845ede">More...</a><br /></td></tr>
 <tr class="separator:a60d82613d75fe5957cfbe3632c845ede"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a842a8b1800fa4e215494bfeda15663d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#a842a8b1800fa4e215494bfeda15663d5">TimerDebug</a> (struct <a class="el" href="structtimer.html">timer</a> *t, FILE *stream, char *name)</td></tr>
-<tr class="separator:a842a8b1800fa4e215494bfeda15663d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af841d2f39b1a873699e85e7d1a283b46"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#af841d2f39b1a873699e85e7d1a283b46">TimerHasElapsed</a> (struct <a class="el" href="structtimer.html">timer</a> *t)</td></tr>
-<tr class="separator:af841d2f39b1a873699e85e7d1a283b46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f6af7fb83c274709785345140a2e558"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#a0f6af7fb83c274709785345140a2e558">TimerReset</a> (struct <a class="el" href="structtimer.html">timer</a> *t)</td></tr>
-<tr class="separator:a0f6af7fb83c274709785345140a2e558"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd7a68ab2f873202d1d3281c490c4d92"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#acd7a68ab2f873202d1d3281c490c4d92">TimerHasElapsed</a> (struct <a class="el" href="structtimer.html">timer</a> *<a class="el" href="structtimer.html">timer</a>)</td></tr>
+<tr class="memdesc:acd7a68ab2f873202d1d3281c490c4d92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has this timer "fired"?  <a href="#acd7a68ab2f873202d1d3281c490c4d92">More...</a><br /></td></tr>
+<tr class="separator:acd7a68ab2f873202d1d3281c490c4d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac416ea270bf77ad406009acb4794e249"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timer_8c.html#ac416ea270bf77ad406009acb4794e249">TimerReset</a> (struct <a class="el" href="structtimer.html">timer</a> *<a class="el" href="structtimer.html">timer</a>)</td></tr>
+<tr class="memdesc:ac416ea270bf77ad406009acb4794e249"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the timer.  <a href="#ac416ea270bf77ad406009acb4794e249">More...</a><br /></td></tr>
+<tr class="separator:ac416ea270bf77ad406009acb4794e249"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a17e42c73244f026b51aeb166892f8f53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17e42c73244f026b51aeb166892f8f53">&#9670;&nbsp;</a></span>TIMER_VERSION</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TIMER_VERSION&#160;&#160;&#160;&quot;0.1.0&quot;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a842a8b1800fa4e215494bfeda15663d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a842a8b1800fa4e215494bfeda15663d5">&#9670;&nbsp;</a></span>TimerDebug()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TimerDebug </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structtimer.html">timer</a> *&#160;</td>
-          <td class="paramname"><em>t</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af841d2f39b1a873699e85e7d1a283b46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af841d2f39b1a873699e85e7d1a283b46">&#9670;&nbsp;</a></span>TimerHasElapsed()</h2>
+<a id="acd7a68ab2f873202d1d3281c490c4d92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd7a68ab2f873202d1d3281c490c4d92">&#9670;&nbsp;</a></span>TimerHasElapsed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -165,11 +119,20 @@ Functions</h2></td></tr>
           <td class="memname">int TimerHasElapsed </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structtimer.html">timer</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
+          <td class="paramname"><em>timer</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Has this timer "fired"? </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer</td><td>Timer state to query </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if the timer has "fired" otherwise 0 </dd></dl>
 
 </div>
 </div>
@@ -189,10 +152,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns a pointer to an initialized timer on the heap. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ms</td><td>Time in ms after which the timer is considered to have "fired" </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The initialized timer </dd></dl>
+
 </div>
 </div>
-<a id="a0f6af7fb83c274709785345140a2e558"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f6af7fb83c274709785345140a2e558">&#9670;&nbsp;</a></span>TimerReset()</h2>
+<a id="ac416ea270bf77ad406009acb4794e249"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac416ea270bf77ad406009acb4794e249">&#9670;&nbsp;</a></span>TimerReset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,11 +173,19 @@ Functions</h2></td></tr>
           <td class="memname">void TimerReset </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structtimer.html">timer</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
+          <td class="paramname"><em>timer</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reset the timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">timer</td><td>Timer state to reset </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

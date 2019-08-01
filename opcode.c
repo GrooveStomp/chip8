@@ -1,17 +1,17 @@
 /******************************************************************************
   File: opcode.c
   Created: 2019-06-04
-  Updated: 2019-07-30
+  Updated: 2019-0
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+//! \file opcode.c
 #include <limits.h> // UINT_MAX
 #include <stdlib.h> // rand, malloc, free
 #include <string.h> // memset
 #include <stdio.h>
 
 #include "system.h"
-//! \file opcode.c
 
 struct opcode;
 
@@ -108,22 +108,22 @@ unsigned int NibbleAt(struct opcode *c, unsigned int pos) {
 // See full fn listing: https://en.wikipedia.org/wiki/CHIP-8#Opcode_table
 
 // Call: Calls RCA 1802 program at address NNN. Not necessary for most ROMs.
-void Fn0NNN(struct opcode *c, struct system *s) {
+static void Fn0NNN(struct opcode *c, struct system *s) {
         // Not Implemented.
 }
 
 // Display: Clears the screen.
-void Fn00E0(struct opcode *c, struct system *s) {
+static void Fn00E0(struct opcode *c, struct system *s) {
         SystemClearScreen(s);
 }
 
 // Flow control: Returns from a subroutine.
-void Fn00EE(struct opcode *c, struct system *s) {
+static void Fn00EE(struct opcode *c, struct system *s) {
         SystemPopStack(s);
 }
 
 // Flow control: goto NNN;
-void Fn1NNN(struct opcode *c, struct system *s) {
+static void Fn1NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
@@ -131,7 +131,7 @@ void Fn1NNN(struct opcode *c, struct system *s) {
 }
 
 // Flow control: Call subroutine at NNN;
-void Fn2NNN(struct opcode *c, struct system *s) {
+static void Fn2NNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
@@ -141,7 +141,7 @@ void Fn2NNN(struct opcode *c, struct system *s) {
 }
 
 // Condition: Skip next instruction if VX equals NN.
-void Fn3XNN(struct opcode *c, struct system *s) {
+static void Fn3XNN(struct opcode *c, struct system *s) {
         unsigned int nn = LowByte(c);
         unsigned int x = NibbleAt(c, 2);
 
@@ -151,7 +151,7 @@ void Fn3XNN(struct opcode *c, struct system *s) {
 }
 
 // Condition: Skip next instruction if VX doesn't equal NN.
-void Fn4XNN(struct opcode *c, struct system *s) {
+static void Fn4XNN(struct opcode *c, struct system *s) {
         unsigned int nn = LowByte(c);
         unsigned int x = NibbleAt(c, 2);
 
@@ -161,7 +161,7 @@ void Fn4XNN(struct opcode *c, struct system *s) {
 }
 
 // Condition: Skip next instruction if VX equals VY.
-void Fn5XY0(struct opcode *c, struct system *s) {
+static void Fn5XY0(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -171,7 +171,7 @@ void Fn5XY0(struct opcode *c, struct system *s) {
 }
 
 // Constant expression: Sets VX to NN.
-void Fn6XNN(struct opcode *c, struct system *s) {
+static void Fn6XNN(struct opcode *c, struct system *s) {
         unsigned int nn = LowByte(c);
         unsigned int x = NibbleAt(c, 2);
 
@@ -179,7 +179,7 @@ void Fn6XNN(struct opcode *c, struct system *s) {
 }
 
 // Constant expression: Adds NN to VX (carry flag is not changed).
-void Fn7XNN(struct opcode *c, struct system *s) {
+static void Fn7XNN(struct opcode *c, struct system *s) {
         unsigned int nn = LowByte(c);
         unsigned int x = NibbleAt(c, 2);
 
@@ -187,7 +187,7 @@ void Fn7XNN(struct opcode *c, struct system *s) {
 }
 
 // Assignment: Sets VX to the value of VY.
-void Fn8XY0(struct opcode *c, struct system *s) {
+static void Fn8XY0(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -195,7 +195,7 @@ void Fn8XY0(struct opcode *c, struct system *s) {
 }
 
 // Bitwise operation: Sets VX to: VX | VY.
-void Fn8XY1(struct opcode *c, struct system *s) {
+static void Fn8XY1(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -203,7 +203,7 @@ void Fn8XY1(struct opcode *c, struct system *s) {
 }
 
 // Bitwise operation: Sets VX to: VX & VY.
-void Fn8XY2(struct opcode *c, struct system *s) {
+static void Fn8XY2(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -211,7 +211,7 @@ void Fn8XY2(struct opcode *c, struct system *s) {
 }
 
 // Bitwise operation: Sets VX to: VX ^ VY.
-void Fn8XY3(struct opcode *c, struct system *s) {
+static void Fn8XY3(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -219,7 +219,7 @@ void Fn8XY3(struct opcode *c, struct system *s) {
 }
 
 // Math: Adds VY to VX. VF is set to 1 when there's a carry and 0 otherwise.
-void Fn8XY4(struct opcode *c, struct system *s) {
+static void Fn8XY4(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -232,7 +232,7 @@ void Fn8XY4(struct opcode *c, struct system *s) {
 }
 
 // Math: VY is subtracted from VX. VF is set to 0 when there's a borrow and 1 otherwise.
-void Fn8XY5(struct opcode *c, struct system *s) {
+static void Fn8XY5(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -246,7 +246,7 @@ void Fn8XY5(struct opcode *c, struct system *s) {
 }
 
 // Bitwise operation: Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
-void Fn8XY6(struct opcode *c, struct system *s) {
+static void Fn8XY6(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         // unsigned int y = NibbleAt(c, 1);
 
@@ -256,7 +256,7 @@ void Fn8XY6(struct opcode *c, struct system *s) {
 }
 
 // Math: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-void Fn8XY7(struct opcode *c, struct system *s) {
+static void Fn8XY7(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -270,7 +270,7 @@ void Fn8XY7(struct opcode *c, struct system *s) {
 }
 
 // Bitwise operation: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
-void Fn8XYE(struct opcode *c, struct system *s) {
+static void Fn8XYE(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         unsigned char msb = s->v[x] | 0x80;
@@ -279,7 +279,7 @@ void Fn8XYE(struct opcode *c, struct system *s) {
 }
 
 // Condition: Skips the next instruction if VX doesn't equal VY.
-void Fn9XY0(struct opcode *c, struct system *s) {
+static void Fn9XY0(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned int y = NibbleAt(c, 1);
 
@@ -289,7 +289,7 @@ void Fn9XY0(struct opcode *c, struct system *s) {
 }
 
 // Memory: Sets I to the address NNN.
-void FnANNN(struct opcode *c, struct system *s) {
+static void FnANNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
@@ -298,7 +298,7 @@ void FnANNN(struct opcode *c, struct system *s) {
 }
 
 // Flow control: Jumps to the address NNN plus V0.
-void FnBNNN(struct opcode *c, struct system *s) {
+static void FnBNNN(struct opcode *c, struct system *s) {
         unsigned int low_byte = LowByte(c);
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
@@ -307,7 +307,7 @@ void FnBNNN(struct opcode *c, struct system *s) {
 }
 
 // Random: Sets VX to the result of a bitwise AND on a random number (0-255) and NN.
-void FnCXNN(struct opcode *c, struct system *s) {
+static void FnCXNN(struct opcode *c, struct system *s) {
         unsigned int nn = LowByte(c);
         unsigned int x = NibbleAt(c, 2);
 
@@ -322,7 +322,7 @@ void FnCXNN(struct opcode *c, struct system *s) {
 // flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t
 // happen.
 // I'm assuming (VX, VY) is the lower-left corner of the sprite, not the center.
-void FnDXYN(struct opcode *c, struct system *s) {
+static void FnDXYN(struct opcode *c, struct system *s) {
         unsigned int x = s->v[NibbleAt(c, 2)];
         unsigned int y = s->v[NibbleAt(c, 1)];
         unsigned int height = NibbleAt(c, 0);
@@ -331,7 +331,7 @@ void FnDXYN(struct opcode *c, struct system *s) {
 }
 
 // Key operation: Skips the next instruction if the key stored in VX is pressed.
-void FnEX9E(struct opcode *c, struct system *s) {
+static void FnEX9E(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned char key = s->v[x];
 
@@ -341,7 +341,7 @@ void FnEX9E(struct opcode *c, struct system *s) {
 }
 
 // Key operation: Skips the next instruction if the key stored in VX isn't pressed.
-void FnEXA1(struct opcode *c, struct system *s) {
+static void FnEXA1(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned char key = s->v[x];
 
@@ -351,28 +351,28 @@ void FnEXA1(struct opcode *c, struct system *s) {
 }
 
 // Timer: Sets VX to the value of the delay timer.
-void FnFX07(struct opcode *c, struct system *s) {
+static void FnFX07(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         s->v[x] = SystemDelayTimer(s);
 }
 
 // Key operation: Block until a key press occurs, then store it in VX.
-void FnFX0A(struct opcode *c, struct system *s) {
+static void FnFX0A(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         SystemWFKSet(s, x);
 }
 
 // Timer: Sets the delay timer to VX.
-void FnFX15(struct opcode *c, struct system *s) {
+static void FnFX15(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         SystemSetTimers(s, s->v[x], -1);
 }
 
 // Sound: Sets the sound timer to VX.
-void FnFX18(struct opcode *c, struct system *s) {
+static void FnFX18(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         SystemSetTimers(s, -1, s->v[x]);
@@ -380,7 +380,7 @@ void FnFX18(struct opcode *c, struct system *s) {
 }
 
 // Memory: Adds VX to I.
-void FnFX1E(struct opcode *c, struct system *s) {
+static void FnFX1E(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         s->i += s->v[x];
@@ -388,7 +388,7 @@ void FnFX1E(struct opcode *c, struct system *s) {
 
 // Memory: Sets I to the location of the sprite for the character in
 // VX. Characters 0-F (hex) are represented by a 4x5 font.
-void FnFX29(struct opcode *c, struct system *s) {
+static void FnFX29(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         unsigned char sprite = s->v[x];
@@ -402,7 +402,7 @@ void FnFX29(struct opcode *c, struct system *s) {
 // words, take the decimal representation of VX, place the hundreds digit in
 // memory at location in I, the tens digit at location I+1, and the ones digit
 // at location I+2.)
-void FnFX33(struct opcode *c, struct system *s) {
+static void FnFX33(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned char val = s->v[x];
 
@@ -420,7 +420,7 @@ void FnFX33(struct opcode *c, struct system *s) {
 
 // Memory: Stores V0 to VX (inclusive) in memory starting at address I. I is
 // unmodified.
-void FnFX55(struct opcode *c, struct system *s) {
+static void FnFX55(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         for (int i=0; i <= x; i++) {
@@ -430,7 +430,7 @@ void FnFX55(struct opcode *c, struct system *s) {
 
 // Memory: Fills V0 to VX (inclusive) with values from memory starting at
 // address I.  I is unmodified.
-void FnFX65(struct opcode *c, struct system *s) {
+static void FnFX65(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
 
         for (int i=0; i <= x; i++) {

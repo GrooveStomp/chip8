@@ -76,18 +76,19 @@ This graph shows which files directly or indirectly include this file:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a9f72edb48c75a0a2b47493c77e785cf8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="soundthread_8c.html#a9f72edb48c75a0a2b47493c77e785cf8">soundWork</a> (void *context)</td></tr>
-<tr class="separator:a9f72edb48c75a0a2b47493c77e785cf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a363c185def0a342cd84596296a889b38"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="soundthread_8c.html#a363c185def0a342cd84596296a889b38">SoundThread</a> (void *context)</td></tr>
+<tr class="memdesc:a363c185def0a342cd84596296a889b38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread for sound playback.  <a href="#a363c185def0a342cd84596296a889b38">More...</a><br /></td></tr>
+<tr class="separator:a363c185def0a342cd84596296a889b38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a9f72edb48c75a0a2b47493c77e785cf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f72edb48c75a0a2b47493c77e785cf8">&#9670;&nbsp;</a></span>soundWork()</h2>
+<a id="a363c185def0a342cd84596296a889b38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a363c185def0a342cd84596296a889b38">&#9670;&nbsp;</a></span>SoundThread()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* soundWork </td>
+          <td class="memname">void* SoundThread </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>context</em></td><td>)</td>
@@ -95,6 +96,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Thread for sound playback. </p>
+<p>Sound playback is triggered via the CHIP-8's sound timer. When the timer reaches zero, a sound is played back. The specifications seem loose on what this means exactly, so this emulator plays back a tone of 440hz for 200ms.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>struct <a class="el" href="structthread__args.html">thread_args</a> casted to void* </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NULL </dd></dl>
 
 </div>
 </div>

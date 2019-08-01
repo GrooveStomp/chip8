@@ -76,8 +76,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <area shape="rect" id="node3" href="input_8c.html" title="input.c" alt="" coords="112,80,173,107"/>
 <area shape="rect" id="node4" href="main_8c.html" title="main.c" alt="" coords="197,80,259,107"/>
 <area shape="rect" id="node5" href="opcode_8c.html" title="opcode.c" alt="" coords="283,80,357,107"/>
-<area shape="rect" id="node6" href="system_8c.html" title="system.c" alt="" coords="382,80,458,107"/>
-<area shape="rect" id="node7" href="ui_8c.html" title="ui.c" alt="" coords="483,80,525,107"/>
 </map>
 </div>
 </div>
@@ -90,92 +88,119 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ac13b39d92263b3c765189651110c64f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac13b39d92263b3c765189651110c64f3">SYSTEM_VERSION</a>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
+<tr class="memitem:ac13b39d92263b3c765189651110c64f3"><td class="memItemLeft" align="right" valign="top"><a id="ac13b39d92263b3c765189651110c64f3"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac13b39d92263b3c765189651110c64f3">SYSTEM_VERSION</a>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
+<tr class="memdesc:ac13b39d92263b3c765189651110c64f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">include guard <br /></td></tr>
 <tr class="separator:ac13b39d92263b3c765189651110c64f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:af50881ff59a9d647fb73c5ec6d0934b8"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structsystem.html">system</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#af50881ff59a9d647fb73c5ec6d0934b8">SystemInit</a> (int isDebugEnabled)</td></tr>
+<tr class="memdesc:af50881ff59a9d647fb73c5ec6d0934b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and initializes a new system object instance.  <a href="#af50881ff59a9d647fb73c5ec6d0934b8">More...</a><br /></td></tr>
 <tr class="separator:af50881ff59a9d647fb73c5ec6d0934b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a286e8a07c3c5345c83c619267ad6204f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a286e8a07c3c5345c83c619267ad6204f">SystemDeinit</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a286e8a07c3c5345c83c619267ad6204f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31e591a9b79972fcb266741df786185a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a31e591a9b79972fcb266741df786185a">SystemIncrementPC</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a31e591a9b79972fcb266741df786185a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d3a7e67322034d8f5459c67a41db0a7"><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a4d3a7e67322034d8f5459c67a41db0a7">SystemFontSprite</a> (struct <a class="el" href="structsystem.html">system</a> *s, unsigned int index)</td></tr>
-<tr class="separator:a4d3a7e67322034d8f5459c67a41db0a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b88a300512679b044afb8f4e817fcdb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a2b88a300512679b044afb8f4e817fcdb">SystemLoadProgram</a> (struct <a class="el" href="structsystem.html">system</a> *s, unsigned char *m, unsigned int size)</td></tr>
-<tr class="separator:a2b88a300512679b044afb8f4e817fcdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff62951c83771de4071d712ddcfb1848"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#aff62951c83771de4071d712ddcfb1848">SystemDecrementTimers</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:aff62951c83771de4071d712ddcfb1848"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47b427e53c46dfb0a955da57cf10df35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a47b427e53c46dfb0a955da57cf10df35">SystemPushStack</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a47b427e53c46dfb0a955da57cf10df35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9af7fc73970077f227e8349bd7b55267"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a9af7fc73970077f227e8349bd7b55267">SystemPopStack</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a9af7fc73970077f227e8349bd7b55267"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe28fa591e6b3720301a072704dd27c6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#afe28fa591e6b3720301a072704dd27c6">SystemGfxLock</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:afe28fa591e6b3720301a072704dd27c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f628c649c78aa00d09e6b33143a122d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a8f628c649c78aa00d09e6b33143a122d">SystemGfxUnlock</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a8f628c649c78aa00d09e6b33143a122d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97f4234e004d31bbd573a8f9362327b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a97f4234e004d31bbd573a8f9362327b2">SystemGfxPresent</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a97f4234e004d31bbd573a8f9362327b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54ad32435772a9906e2ca18e21715f46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a54ad32435772a9906e2ca18e21715f46">SystemClearScreen</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a54ad32435772a9906e2ca18e21715f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3327a346bf326150d90e8a0e453d289"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ad3327a346bf326150d90e8a0e453d289">SystemDrawSprite</a> (struct <a class="el" href="structsystem.html">system</a> *s, unsigned int x, unsigned int y, unsigned int height)</td></tr>
-<tr class="separator:ad3327a346bf326150d90e8a0e453d289"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e89ca0068ca6e48984b3077c2d617e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a9e89ca0068ca6e48984b3077c2d617e1">SystemWFKSet</a> (struct <a class="el" href="structsystem.html">system</a> *s, unsigned char key)</td></tr>
-<tr class="separator:a9e89ca0068ca6e48984b3077c2d617e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18f05007c53577b28a6fe44ce2d10a37"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a18f05007c53577b28a6fe44ce2d10a37">SystemWFKWaiting</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a18f05007c53577b28a6fe44ce2d10a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7168c56674e6f1483e26ad6b9950854c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a7168c56674e6f1483e26ad6b9950854c">SystemWFKOccurred</a> (struct <a class="el" href="structsystem.html">system</a> *s, unsigned char key)</td></tr>
-<tr class="separator:a7168c56674e6f1483e26ad6b9950854c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24a5150ab7ea52a47d99139a1c6a4395"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a24a5150ab7ea52a47d99139a1c6a4395">SystemWFKChanged</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a24a5150ab7ea52a47d99139a1c6a4395"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab977672260644fc070b6e79d7cece709"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ab977672260644fc070b6e79d7cece709">SystemWFKStop</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:ab977672260644fc070b6e79d7cece709"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ff06acf678d476d9c2d7b82f82de6e5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a8ff06acf678d476d9c2d7b82f82de6e5">SystemDelayTimer</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a8ff06acf678d476d9c2d7b82f82de6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60ac2d4f185f91acb0c147885e86bc8b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a60ac2d4f185f91acb0c147885e86bc8b">SystemSoundTimer</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a60ac2d4f185f91acb0c147885e86bc8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad14b4c0a08c43cee96b806aa28ec407d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ad14b4c0a08c43cee96b806aa28ec407d">SystemSetTimers</a> (struct <a class="el" href="structsystem.html">system</a> *s, int dt, int st)</td></tr>
-<tr class="separator:ad14b4c0a08c43cee96b806aa28ec407d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a22cc741823e1a811b4cc34e60094dcd2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a22cc741823e1a811b4cc34e60094dcd2">SystemSoundTriggered</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a22cc741823e1a811b4cc34e60094dcd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dfa6c137ffa10a9fdba1eab749ab323"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a6dfa6c137ffa10a9fdba1eab749ab323">SystemSoundSetTrigger</a> (struct <a class="el" href="structsystem.html">system</a> *s, int v)</td></tr>
-<tr class="separator:a6dfa6c137ffa10a9fdba1eab749ab323"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a61fd7761177c76bd52fbd912c62a3b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a8a61fd7761177c76bd52fbd912c62a3b">SystemShouldQuit</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a8a61fd7761177c76bd52fbd912c62a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a403b4ce55212d318214024415927b028"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a403b4ce55212d318214024415927b028">SystemSignalQuit</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a403b4ce55212d318214024415927b028"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33446cf0d09356a732f0e9b6794689b7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a33446cf0d09356a732f0e9b6794689b7">SystemDebugIsEnabled</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
-<tr class="separator:a33446cf0d09356a732f0e9b6794689b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae05eeb8e58c02dd4836402c0b52ef93c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ae05eeb8e58c02dd4836402c0b52ef93c">SystemDebugShouldFetchAndDecode</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
+<tr class="memitem:a52719b683c5e2eff39e7df9c01872faa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a52719b683c5e2eff39e7df9c01872faa">SystemDeinit</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a52719b683c5e2eff39e7df9c01872faa"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-initializes and frees memory for the given system object.  <a href="#a52719b683c5e2eff39e7df9c01872faa">More...</a><br /></td></tr>
+<tr class="separator:a52719b683c5e2eff39e7df9c01872faa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9acae4a2df72661389135982a324452"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ad9acae4a2df72661389135982a324452">SystemIncrementPC</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:ad9acae4a2df72661389135982a324452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increments the system PC to point to the next instruction.  <a href="#ad9acae4a2df72661389135982a324452">More...</a><br /></td></tr>
+<tr class="separator:ad9acae4a2df72661389135982a324452"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae75fe33d712849765814d18c3fce54ac"><td class="memItemLeft" align="right" valign="top">unsigned short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ae75fe33d712849765814d18c3fce54ac">SystemFontSprite</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned int index)</td></tr>
+<tr class="memdesc:ae75fe33d712849765814d18c3fce54ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the CHIP-8 memory address of the desired font sprite.  <a href="#ae75fe33d712849765814d18c3fce54ac">More...</a><br /></td></tr>
+<tr class="separator:ae75fe33d712849765814d18c3fce54ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e4c217c70f4b9ba534159c73679b307"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a6e4c217c70f4b9ba534159c73679b307">SystemLoadProgram</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned char *rom, unsigned int size)</td></tr>
+<tr class="memdesc:a6e4c217c70f4b9ba534159c73679b307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies ROM into the CHIP-8's memory.  <a href="#a6e4c217c70f4b9ba534159c73679b307">More...</a><br /></td></tr>
+<tr class="separator:a6e4c217c70f4b9ba534159c73679b307"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa558418465b3d50d58b59ab42117602"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#aaa558418465b3d50d58b59ab42117602">SystemPushStack</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:aaa558418465b3d50d58b59ab42117602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets stack[sp] to pc and increments sp.  <a href="#aaa558418465b3d50d58b59ab42117602">More...</a><br /></td></tr>
+<tr class="separator:aaa558418465b3d50d58b59ab42117602"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd5b0b79c6949585268a718b64983234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#acd5b0b79c6949585268a718b64983234">SystemPopStack</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:acd5b0b79c6949585268a718b64983234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pc to stack[sp] and decrements sp.  <a href="#acd5b0b79c6949585268a718b64983234">More...</a><br /></td></tr>
+<tr class="separator:acd5b0b79c6949585268a718b64983234"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3c0ed87598fcc470bff4f2245d705c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ad3c0ed87598fcc470bff4f2245d705c0">SystemGfxLock</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:ad3c0ed87598fcc470bff4f2245d705c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomically locks the CHIP-8's graphics memory.  <a href="#ad3c0ed87598fcc470bff4f2245d705c0">More...</a><br /></td></tr>
+<tr class="separator:ad3c0ed87598fcc470bff4f2245d705c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa36e5e5a6a5f63b29651db0f0cb50349"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#aa36e5e5a6a5f63b29651db0f0cb50349">SystemGfxUnlock</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:aa36e5e5a6a5f63b29651db0f0cb50349"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomically unlocks the CHIP-8's graphics memory.  <a href="#aa36e5e5a6a5f63b29651db0f0cb50349">More...</a><br /></td></tr>
+<tr class="separator:aa36e5e5a6a5f63b29651db0f0cb50349"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93d05a61bf50c40d523d233ea62156c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a93d05a61bf50c40d523d233ea62156c3">SystemClearScreen</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a93d05a61bf50c40d523d233ea62156c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">resets CHIP-8's video memory to zeroes  <a href="#a93d05a61bf50c40d523d233ea62156c3">More...</a><br /></td></tr>
+<tr class="separator:a93d05a61bf50c40d523d233ea62156c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d2ce16b39dc58b934b814ca0279ffd3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a9d2ce16b39dc58b934b814ca0279ffd3">SystemDrawSprite</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned int x, unsigned int y, unsigned int height)</td></tr>
+<tr class="memdesc:a9d2ce16b39dc58b934b814ca0279ffd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draws a sprite in video memory.  <a href="#a9d2ce16b39dc58b934b814ca0279ffd3">More...</a><br /></td></tr>
+<tr class="separator:a9d2ce16b39dc58b934b814ca0279ffd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6908b06ec010236620ee9738ec362a08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a6908b06ec010236620ee9738ec362a08">SystemWFKSet</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned char reg)</td></tr>
+<tr class="memdesc:a6908b06ec010236620ee9738ec362a08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the system to wait for a keypress.  <a href="#a6908b06ec010236620ee9738ec362a08">More...</a><br /></td></tr>
+<tr class="separator:a6908b06ec010236620ee9738ec362a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29b467f7966c5ce1c312c8544fac772f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a29b467f7966c5ce1c312c8544fac772f">SystemWFKWaiting</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a29b467f7966c5ce1c312c8544fac772f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the system waiting for a keypress?  <a href="#a29b467f7966c5ce1c312c8544fac772f">More...</a><br /></td></tr>
+<tr class="separator:a29b467f7966c5ce1c312c8544fac772f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4bf25a3c4d96045d5e5aa299b0de1fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa">SystemWFKOccurred</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned char key)</td></tr>
+<tr class="memdesc:ac4bf25a3c4d96045d5e5aa299b0de1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the system that a keypress occured, so stop waiting.  <a href="#ac4bf25a3c4d96045d5e5aa299b0de1fa">More...</a><br /></td></tr>
+<tr class="separator:ac4bf25a3c4d96045d5e5aa299b0de1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c7753bf13e77e56b261214279f30e86"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a5c7753bf13e77e56b261214279f30e86">SystemWFKChanged</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a5c7753bf13e77e56b261214279f30e86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has the system just transitioned out of a WFK state?  <a href="#a5c7753bf13e77e56b261214279f30e86">More...</a><br /></td></tr>
+<tr class="separator:a5c7753bf13e77e56b261214279f30e86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38200bcf77d8fae2a9382b9eae342c10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a38200bcf77d8fae2a9382b9eae342c10">SystemWFKStop</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a38200bcf77d8fae2a9382b9eae342c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the system to stop waiting for a keypress.  <a href="#a38200bcf77d8fae2a9382b9eae342c10">More...</a><br /></td></tr>
+<tr class="separator:a38200bcf77d8fae2a9382b9eae342c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8fea7b4557e19469debca19fd003e36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac8fea7b4557e19469debca19fd003e36">SystemDecrementTimers</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:ac8fea7b4557e19469debca19fd003e36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrements both the sound and delay timers.  <a href="#ac8fea7b4557e19469debca19fd003e36">More...</a><br /></td></tr>
+<tr class="separator:ac8fea7b4557e19469debca19fd003e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b2b56d51183e8eff08b859625461864"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a0b2b56d51183e8eff08b859625461864">SystemDelayTimer</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a0b2b56d51183e8eff08b859625461864"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the delay timer.  <a href="#a0b2b56d51183e8eff08b859625461864">More...</a><br /></td></tr>
+<tr class="separator:a0b2b56d51183e8eff08b859625461864"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac597e4b5a15e4f29b2b756643bb3d256"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac597e4b5a15e4f29b2b756643bb3d256">SystemSoundTimer</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:ac597e4b5a15e4f29b2b756643bb3d256"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the sound timer.  <a href="#ac597e4b5a15e4f29b2b756643bb3d256">More...</a><br /></td></tr>
+<tr class="separator:ac597e4b5a15e4f29b2b756643bb3d256"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a972656c4c54821cdcbd36104f09edb38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a972656c4c54821cdcbd36104f09edb38">SystemSetTimers</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, int delayTimer, int soundTimer)</td></tr>
+<tr class="memdesc:a972656c4c54821cdcbd36104f09edb38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of the sound and delay timers.  <a href="#a972656c4c54821cdcbd36104f09edb38">More...</a><br /></td></tr>
+<tr class="separator:a972656c4c54821cdcbd36104f09edb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98c800bbb9a8874ff5131f0b775ed4a6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a98c800bbb9a8874ff5131f0b775ed4a6">SystemSoundTriggered</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a98c800bbb9a8874ff5131f0b775ed4a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has the sound timer reached zero after being set?  <a href="#a98c800bbb9a8874ff5131f0b775ed4a6">More...</a><br /></td></tr>
+<tr class="separator:a98c800bbb9a8874ff5131f0b775ed4a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9ef1f06ad6b5fd9c5ec763676b8a8ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac9ef1f06ad6b5fd9c5ec763676b8a8ba">SystemSoundSetTrigger</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, int triggeredStatus)</td></tr>
+<tr class="memdesc:ac9ef1f06ad6b5fd9c5ec763676b8a8ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the system that sound playback should begin.  <a href="#ac9ef1f06ad6b5fd9c5ec763676b8a8ba">More...</a><br /></td></tr>
+<tr class="separator:ac9ef1f06ad6b5fd9c5ec763676b8a8ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfe7dc237f9f75bb13577d3078f3cd0d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#abfe7dc237f9f75bb13577d3078f3cd0d">SystemShouldQuit</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:abfe7dc237f9f75bb13577d3078f3cd0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns whether the system is in a "Ready to Shutdown" state.  <a href="#abfe7dc237f9f75bb13577d3078f3cd0d">More...</a><br /></td></tr>
+<tr class="separator:abfe7dc237f9f75bb13577d3078f3cd0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a0028b0bb0d51f4d97efcfa43a43405"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a4a0028b0bb0d51f4d97efcfa43a43405">SystemSignalQuit</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a4a0028b0bb0d51f4d97efcfa43a43405"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal to the system that shutdown should begin.  <a href="#a4a0028b0bb0d51f4d97efcfa43a43405">More...</a><br /></td></tr>
+<tr class="separator:a4a0028b0bb0d51f4d97efcfa43a43405"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accc8ada92e4b1a34bc242186dfa17b54"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#accc8ada92e4b1a34bc242186dfa17b54">SystemDebugIsEnabled</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:accc8ada92e4b1a34bc242186dfa17b54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has the embedded graphical debugger been enabled?  <a href="#accc8ada92e4b1a34bc242186dfa17b54">More...</a><br /></td></tr>
+<tr class="separator:accc8ada92e4b1a34bc242186dfa17b54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef632e4571a2fb67376afe84784472d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a9ef632e4571a2fb67376afe84784472d">SystemDebugSetEnabled</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, int onOrOff)</td></tr>
+<tr class="memdesc:a9ef632e4571a2fb67376afe84784472d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell the system to enable or disable the embedded graphical debugger.  <a href="#a9ef632e4571a2fb67376afe84784472d">More...</a><br /></td></tr>
+<tr class="separator:a9ef632e4571a2fb67376afe84784472d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05eeb8e58c02dd4836402c0b52ef93c"><td class="memItemLeft" align="right" valign="top"><a id="ae05eeb8e58c02dd4836402c0b52ef93c"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>SystemDebugShouldFetchAndDecode</b> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
 <tr class="separator:ae05eeb8e58c02dd4836402c0b52ef93c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0284ac841a72e5a7b79149c0b8d93f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac0284ac841a72e5a7b79149c0b8d93f7">SystemDebugShouldExecute</a> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
+<tr class="memitem:ac0284ac841a72e5a7b79149c0b8d93f7"><td class="memItemLeft" align="right" valign="top"><a id="ac0284ac841a72e5a7b79149c0b8d93f7"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>SystemDebugShouldExecute</b> (struct <a class="el" href="structsystem.html">system</a> *s)</td></tr>
 <tr class="separator:ac0284ac841a72e5a7b79149c0b8d93f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c60b871ef94fefbc7e2d3a623d555e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a7c60b871ef94fefbc7e2d3a623d555e1">SystemDebugSetEnabled</a> (struct <a class="el" href="structsystem.html">system</a> *s, int onOrOff)</td></tr>
-<tr class="separator:a7c60b871ef94fefbc7e2d3a623d555e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42b2968c3438a3c60f634c0eae7cecdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a42b2968c3438a3c60f634c0eae7cecdf">SystemDebugSetFetchAndDecode</a> (struct <a class="el" href="structsystem.html">system</a> *s, int onOrOff)</td></tr>
+<tr class="memitem:a42b2968c3438a3c60f634c0eae7cecdf"><td class="memItemLeft" align="right" valign="top"><a id="a42b2968c3438a3c60f634c0eae7cecdf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SystemDebugSetFetchAndDecode</b> (struct <a class="el" href="structsystem.html">system</a> *s, int onOrOff)</td></tr>
 <tr class="separator:a42b2968c3438a3c60f634c0eae7cecdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac50db78dc247a28ab1e8ffe8112200e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ac50db78dc247a28ab1e8ffe8112200e4">SystemDebugSetExecute</a> (struct <a class="el" href="structsystem.html">system</a> *s, int onOrOff)</td></tr>
+<tr class="memitem:ac50db78dc247a28ab1e8ffe8112200e4"><td class="memItemLeft" align="right" valign="top"><a id="ac50db78dc247a28ab1e8ffe8112200e4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SystemDebugSetExecute</b> (struct <a class="el" href="structsystem.html">system</a> *s, int onOrOff)</td></tr>
 <tr class="separator:ac50db78dc247a28ab1e8ffe8112200e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ac13b39d92263b3c765189651110c64f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac13b39d92263b3c765189651110c64f3">&#9670;&nbsp;</a></span>SYSTEM_VERSION</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SYSTEM_VERSION&#160;&#160;&#160;&quot;0.1.0&quot;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a54ad32435772a9906e2ca18e21715f46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54ad32435772a9906e2ca18e21715f46">&#9670;&nbsp;</a></span>SystemClearScreen()</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>This is the core system emulation package.</p>
+<p>Generally speaking, the emulation occurs on the main thread with other subsystems operating in separate threads. Threadsafe synchronization primitives are used in system methods to allow threadsafe data access and manipulation.</p>
+<p>There are two small logical subsystems of this package to handle tricky state management:</p><ul>
+<li>WFK (aka Wait For Key)</li>
+<li>Debug</li>
+</ul>
+<p>These logical subsystems are interesting because they break the normal opcode:fetch -&gt; opcode:decode -&gt; opcode:execute flow of the emulation.</p>
+<p>They should be thought of as logical subsystems and their methods are grouped syntactically together:</p><ul>
+<li>WFK methods are all prefixed with: SystemWFK</li>
+<li>Debug methods are all prefixed with: SystemDebug </li>
+</ul>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a93d05a61bf50c40d523d233ea62156c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93d05a61bf50c40d523d233ea62156c3">&#9670;&nbsp;</a></span>SystemClearScreen()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -184,16 +209,25 @@ Functions</h2></td></tr>
           <td class="memname">void SystemClearScreen </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>resets CHIP-8's video memory to zeroes </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a33446cf0d09356a732f0e9b6794689b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33446cf0d09356a732f0e9b6794689b7">&#9670;&nbsp;</a></span>SystemDebugIsEnabled()</h2>
+<a id="accc8ada92e4b1a34bc242186dfa17b54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accc8ada92e4b1a34bc242186dfa17b54">&#9670;&nbsp;</a></span>SystemDebugIsEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -202,16 +236,25 @@ Functions</h2></td></tr>
           <td class="memname">int SystemDebugIsEnabled </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Has the embedded graphical debugger been enabled? </p>
+<p>Threadsafe. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if debugging is <em>NOT</em> enabled, otherwise non-zero </dd></dl>
+
 </div>
 </div>
-<a id="a7c60b871ef94fefbc7e2d3a623d555e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c60b871ef94fefbc7e2d3a623d555e1">&#9670;&nbsp;</a></span>SystemDebugSetEnabled()</h2>
+<a id="a9ef632e4571a2fb67376afe84784472d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ef632e4571a2fb67376afe84784472d">&#9670;&nbsp;</a></span>SystemDebugSetEnabled()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -220,7 +263,7 @@ Functions</h2></td></tr>
           <td class="memname">void SystemDebugSetEnabled </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -236,102 +279,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="ac50db78dc247a28ab1e8ffe8112200e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac50db78dc247a28ab1e8ffe8112200e4">&#9670;&nbsp;</a></span>SystemDebugSetExecute()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SystemDebugSetExecute </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>onOrOff</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Tell the system to enable or disable the embedded graphical debugger. </p>
+<p>Threadsafe. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be udpated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">onOrOff</td><td>0 to disable debugger, or non-zero to enable </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="a42b2968c3438a3c60f634c0eae7cecdf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42b2968c3438a3c60f634c0eae7cecdf">&#9670;&nbsp;</a></span>SystemDebugSetFetchAndDecode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SystemDebugSetFetchAndDecode </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>onOrOff</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac0284ac841a72e5a7b79149c0b8d93f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0284ac841a72e5a7b79149c0b8d93f7">&#9670;&nbsp;</a></span>SystemDebugShouldExecute()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int SystemDebugShouldExecute </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae05eeb8e58c02dd4836402c0b52ef93c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae05eeb8e58c02dd4836402c0b52ef93c">&#9670;&nbsp;</a></span>SystemDebugShouldFetchAndDecode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int SystemDebugShouldFetchAndDecode </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aff62951c83771de4071d712ddcfb1848"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff62951c83771de4071d712ddcfb1848">&#9670;&nbsp;</a></span>SystemDecrementTimers()</h2>
+<a id="ac8fea7b4557e19469debca19fd003e36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8fea7b4557e19469debca19fd003e36">&#9670;&nbsp;</a></span>SystemDecrementTimers()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -340,16 +300,25 @@ Functions</h2></td></tr>
           <td class="memname">void SystemDecrementTimers </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Decrements both the sound and delay timers. </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a286e8a07c3c5345c83c619267ad6204f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a286e8a07c3c5345c83c619267ad6204f">&#9670;&nbsp;</a></span>SystemDeinit()</h2>
+<a id="a52719b683c5e2eff39e7df9c01872faa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52719b683c5e2eff39e7df9c01872faa">&#9670;&nbsp;</a></span>SystemDeinit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -358,16 +327,24 @@ Functions</h2></td></tr>
           <td class="memname">void SystemDeinit </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>De-initializes and frees memory for the given system object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>The initialized system object to be cleaned and reclaimed </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a8ff06acf678d476d9c2d7b82f82de6e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ff06acf678d476d9c2d7b82f82de6e5">&#9670;&nbsp;</a></span>SystemDelayTimer()</h2>
+<a id="a0b2b56d51183e8eff08b859625461864"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b2b56d51183e8eff08b859625461864">&#9670;&nbsp;</a></span>SystemDelayTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -376,16 +353,26 @@ Functions</h2></td></tr>
           <td class="memname">int SystemDelayTimer </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the value of the delay timer. </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>value of delay timer </dd></dl>
+
 </div>
 </div>
-<a id="ad3327a346bf326150d90e8a0e453d289"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3327a346bf326150d90e8a0e453d289">&#9670;&nbsp;</a></span>SystemDrawSprite()</h2>
+<a id="a9d2ce16b39dc58b934b814ca0279ffd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d2ce16b39dc58b934b814ca0279ffd3">&#9670;&nbsp;</a></span>SystemDrawSprite()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -394,7 +381,7 @@ Functions</h2></td></tr>
           <td class="memname">void SystemDrawSprite </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -422,10 +409,23 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Draws a sprite in video memory. </p>
+<p>Threadsafe.</p>
+<p>Display: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen. I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Which register holds the x-coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Which register holds the y-coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">height</td><td>Height in pixels of the sprite to be drawn </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a4d3a7e67322034d8f5459c67a41db0a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d3a7e67322034d8f5459c67a41db0a7">&#9670;&nbsp;</a></span>SystemFontSprite()</h2>
+<a id="ae75fe33d712849765814d18c3fce54ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae75fe33d712849765814d18c3fce54ac">&#9670;&nbsp;</a></span>SystemFontSprite()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -434,7 +434,7 @@ Functions</h2></td></tr>
           <td class="memname">unsigned short SystemFontSprite </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -450,10 +450,20 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Gets the CHIP-8 memory address of the desired font sprite. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">system</td><td>system state to be read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>Which font sprite to get (0-F) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>address in CHIP-8 memory for the sprite </dd></dl>
+
 </div>
 </div>
-<a id="afe28fa591e6b3720301a072704dd27c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe28fa591e6b3720301a072704dd27c6">&#9670;&nbsp;</a></span>SystemGfxLock()</h2>
+<a id="ad3c0ed87598fcc470bff4f2245d705c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3c0ed87598fcc470bff4f2245d705c0">&#9670;&nbsp;</a></span>SystemGfxLock()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -462,34 +472,27 @@ Functions</h2></td></tr>
           <td class="memname">int SystemGfxLock </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a97f4234e004d31bbd573a8f9362327b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97f4234e004d31bbd573a8f9362327b2">&#9670;&nbsp;</a></span>SystemGfxPresent()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SystemGfxPresent </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Atomically locks the CHIP-8's graphics memory. </p>
+<p>Threadsafe.</p>
+<p>Lock graphics memory so a separate thread can use it for rendering.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if the lock is held otherwise non-zero </dd></dl>
 
 </div>
 </div>
-<a id="a8f628c649c78aa00d09e6b33143a122d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f628c649c78aa00d09e6b33143a122d">&#9670;&nbsp;</a></span>SystemGfxUnlock()</h2>
+<a id="aa36e5e5a6a5f63b29651db0f0cb50349"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa36e5e5a6a5f63b29651db0f0cb50349">&#9670;&nbsp;</a></span>SystemGfxUnlock()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -498,16 +501,27 @@ Functions</h2></td></tr>
           <td class="memname">int SystemGfxUnlock </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Atomically unlocks the CHIP-8's graphics memory. </p>
+<p>Threadsafe.</p>
+<p>We need to lock graphics memory for rendering via a separate thread, this routine just unlocks it after that has been done.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if lock has been released otherwise non-zero </dd></dl>
+
 </div>
 </div>
-<a id="a31e591a9b79972fcb266741df786185a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31e591a9b79972fcb266741df786185a">&#9670;&nbsp;</a></span>SystemIncrementPC()</h2>
+<a id="ad9acae4a2df72661389135982a324452"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9acae4a2df72661389135982a324452">&#9670;&nbsp;</a></span>SystemIncrementPC()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -516,11 +530,20 @@ Functions</h2></td></tr>
           <td class="memname">void SystemIncrementPC </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Increments the system PC to point to the next instruction. </p>
+<p>The CHIP-8 uses 16-bit instructions, but stores that data big-endian. As a result, we read instructions as two 8-bit bytes in reverse order and increment the PC by two bytes.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -540,10 +563,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates and initializes a new system object instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">isDebugEnabled</td><td>whether to run with the integrated debugging UI </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The initialized system object </dd></dl>
+
 </div>
 </div>
-<a id="a2b88a300512679b044afb8f4e817fcdb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b88a300512679b044afb8f4e817fcdb">&#9670;&nbsp;</a></span>SystemLoadProgram()</h2>
+<a id="a6e4c217c70f4b9ba534159c73679b307"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e4c217c70f4b9ba534159c73679b307">&#9670;&nbsp;</a></span>SystemLoadProgram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -552,13 +584,13 @@ Functions</h2></td></tr>
           <td class="memname">int SystemLoadProgram </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">unsigned char *&#160;</td>
-          <td class="paramname"><em>m</em>, </td>
+          <td class="paramname"><em>rom</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -574,10 +606,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Copies ROM into the CHIP-8's memory. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state memory to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rom</td><td>program ROM to be loaded into CHIP-8 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>size of program ROM to be loaded </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>non-zero if program could be loaded, otherwise 0 </dd></dl>
+
 </div>
 </div>
-<a id="a9af7fc73970077f227e8349bd7b55267"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9af7fc73970077f227e8349bd7b55267">&#9670;&nbsp;</a></span>SystemPopStack()</h2>
+<a id="acd5b0b79c6949585268a718b64983234"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd5b0b79c6949585268a718b64983234">&#9670;&nbsp;</a></span>SystemPopStack()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -586,16 +629,24 @@ Functions</h2></td></tr>
           <td class="memname">void SystemPopStack </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets pc to stack[sp] and decrements sp. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a47b427e53c46dfb0a955da57cf10df35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47b427e53c46dfb0a955da57cf10df35">&#9670;&nbsp;</a></span>SystemPushStack()</h2>
+<a id="aaa558418465b3d50d58b59ab42117602"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa558418465b3d50d58b59ab42117602">&#9670;&nbsp;</a></span>SystemPushStack()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -604,16 +655,24 @@ Functions</h2></td></tr>
           <td class="memname">void SystemPushStack </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets stack[sp] to pc and increments sp. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="ad14b4c0a08c43cee96b806aa28ec407d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad14b4c0a08c43cee96b806aa28ec407d">&#9670;&nbsp;</a></span>SystemSetTimers()</h2>
+<a id="a972656c4c54821cdcbd36104f09edb38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a972656c4c54821cdcbd36104f09edb38">&#9670;&nbsp;</a></span>SystemSetTimers()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -622,19 +681,19 @@ Functions</h2></td></tr>
           <td class="memname">void SystemSetTimers </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>dt</em>, </td>
+          <td class="paramname"><em>delayTimer</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>st</em>&#160;</td>
+          <td class="paramname"><em>soundTimer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -644,10 +703,22 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Sets the value of the sound and delay timers. </p>
+<p>Threadsafe.</p>
+<p>It's not always desirable to set both timers at once, so use -1 <em>NOT</em> to set a timer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delayTimer</td><td>value to set delayTimer to, -1 to ignore </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">soundTimer</td><td>value to set soundTimer to, -1 to ignore </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a8a61fd7761177c76bd52fbd912c62a3b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a61fd7761177c76bd52fbd912c62a3b">&#9670;&nbsp;</a></span>SystemShouldQuit()</h2>
+<a id="abfe7dc237f9f75bb13577d3078f3cd0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfe7dc237f9f75bb13577d3078f3cd0d">&#9670;&nbsp;</a></span>SystemShouldQuit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -656,16 +727,25 @@ Functions</h2></td></tr>
           <td class="memname">int SystemShouldQuit </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns whether the system is in a "Ready to Shutdown" state. </p>
+<p>Threadsafe. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if ready to quit, otherwise 0 </dd></dl>
+
 </div>
 </div>
-<a id="a403b4ce55212d318214024415927b028"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a403b4ce55212d318214024415927b028">&#9670;&nbsp;</a></span>SystemSignalQuit()</h2>
+<a id="a4a0028b0bb0d51f4d97efcfa43a43405"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a0028b0bb0d51f4d97efcfa43a43405">&#9670;&nbsp;</a></span>SystemSignalQuit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -674,16 +754,24 @@ Functions</h2></td></tr>
           <td class="memname">void SystemSignalQuit </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Signal to the system that shutdown should begin. </p>
+<p>Threadsafe. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a6dfa6c137ffa10a9fdba1eab749ab323"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6dfa6c137ffa10a9fdba1eab749ab323">&#9670;&nbsp;</a></span>SystemSoundSetTrigger()</h2>
+<a id="ac9ef1f06ad6b5fd9c5ec763676b8a8ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9ef1f06ad6b5fd9c5ec763676b8a8ba">&#9670;&nbsp;</a></span>SystemSoundSetTrigger()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -692,13 +780,13 @@ Functions</h2></td></tr>
           <td class="memname">void SystemSoundSetTrigger </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>v</em>&#160;</td>
+          <td class="paramname"><em>triggeredStatus</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -708,10 +796,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Tell the system that sound playback should begin. </p>
+<p>Threadsafe. Called when the sound timer reaches zero after being set. Called by <a class="el" href="soundthread_8c.html#a363c185def0a342cd84596296a889b38" title="Thread for sound playback. ">SoundThread()</a> when sound playback begins, disabling the trigger.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">triggeredStatus</td><td>0 if not triggered, otherwise non-zero </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="soundthread_8c.html">soundthread.c</a> </dd></dl>
+
 </div>
 </div>
-<a id="a60ac2d4f185f91acb0c147885e86bc8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60ac2d4f185f91acb0c147885e86bc8b">&#9670;&nbsp;</a></span>SystemSoundTimer()</h2>
+<a id="ac597e4b5a15e4f29b2b756643bb3d256"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac597e4b5a15e4f29b2b756643bb3d256">&#9670;&nbsp;</a></span>SystemSoundTimer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -720,16 +819,26 @@ Functions</h2></td></tr>
           <td class="memname">int SystemSoundTimer </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the value of the sound timer. </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>value of sound timer </dd></dl>
+
 </div>
 </div>
-<a id="a22cc741823e1a811b4cc34e60094dcd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22cc741823e1a811b4cc34e60094dcd2">&#9670;&nbsp;</a></span>SystemSoundTriggered()</h2>
+<a id="a98c800bbb9a8874ff5131f0b775ed4a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98c800bbb9a8874ff5131f0b775ed4a6">&#9670;&nbsp;</a></span>SystemSoundTriggered()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -738,16 +847,25 @@ Functions</h2></td></tr>
           <td class="memname">int SystemSoundTriggered </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Has the sound timer reached zero after being set? </p>
+<p>Threadsafe. Called by <a class="el" href="soundthread_8c.html#a363c185def0a342cd84596296a889b38" title="Thread for sound playback. ">SoundThread()</a> </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if sound has not been triggered, otherwise non-zero </dd></dl>
+
 </div>
 </div>
-<a id="a24a5150ab7ea52a47d99139a1c6a4395"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24a5150ab7ea52a47d99139a1c6a4395">&#9670;&nbsp;</a></span>SystemWFKChanged()</h2>
+<a id="a5c7753bf13e77e56b261214279f30e86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c7753bf13e77e56b261214279f30e86">&#9670;&nbsp;</a></span>SystemWFKChanged()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -756,16 +874,34 @@ Functions</h2></td></tr>
           <td class="memname">int SystemWFKChanged </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Has the system just transitioned out of a WFK state? </p>
+<p>Threadsafe.</p>
+<p>We can signal to the system that a keypress occurred via <a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa" title="Tell the system that a keypress occured, so stop waiting. ">SystemWFKOccurred()</a>, but we still want to query afterward whether we were previously in a WFK state.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if the system has not transitioned, otherwise non-zero</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html#a6908b06ec010236620ee9738ec362a08" title="Tell the system to wait for a keypress. ">SystemWFKSet()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a29b467f7966c5ce1c312c8544fac772f" title="Is the system waiting for a keypress? ">SystemWFKWaiting()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa" title="Tell the system that a keypress occured, so stop waiting. ">SystemWFKOccurred()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a38200bcf77d8fae2a9382b9eae342c10" title="Tell the system to stop waiting for a keypress. ">SystemWFKStop()</a> </dd></dl>
+
 </div>
 </div>
-<a id="a7168c56674e6f1483e26ad6b9950854c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7168c56674e6f1483e26ad6b9950854c">&#9670;&nbsp;</a></span>SystemWFKOccurred()</h2>
+<a id="ac4bf25a3c4d96045d5e5aa299b0de1fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4bf25a3c4d96045d5e5aa299b0de1fa">&#9670;&nbsp;</a></span>SystemWFKOccurred()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -774,7 +910,7 @@ Functions</h2></td></tr>
           <td class="memname">void SystemWFKOccurred </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -790,10 +926,27 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Tell the system that a keypress occured, so stop waiting. </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>which of the keys [0..F] was pressed</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html#a6908b06ec010236620ee9738ec362a08" title="Tell the system to wait for a keypress. ">SystemWFKSet()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a29b467f7966c5ce1c312c8544fac772f" title="Is the system waiting for a keypress? ">SystemWFKWaiting()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a5c7753bf13e77e56b261214279f30e86" title="Has the system just transitioned out of a WFK state? ">SystemWFKChanged()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a38200bcf77d8fae2a9382b9eae342c10" title="Tell the system to stop waiting for a keypress. ">SystemWFKStop()</a> </dd></dl>
+
 </div>
 </div>
-<a id="a9e89ca0068ca6e48984b3077c2d617e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e89ca0068ca6e48984b3077c2d617e1">&#9670;&nbsp;</a></span>SystemWFKSet()</h2>
+<a id="a6908b06ec010236620ee9738ec362a08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6908b06ec010236620ee9738ec362a08">&#9670;&nbsp;</a></span>SystemWFKSet()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -802,13 +955,13 @@ Functions</h2></td></tr>
           <td class="memname">void SystemWFKSet </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">unsigned char&#160;</td>
-          <td class="paramname"><em>key</em>&#160;</td>
+          <td class="paramname"><em>reg</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -818,10 +971,28 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Tell the system to wait for a keypress. </p>
+<p>Threadsafe.</p>
+<p>When a keypress occurs, it will be one of the 16 hex keys used by the CHIP-8, indexed [0..F] Store that index in the specified register when it occurs.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">reg</td><td>which register to store the pressed hex key index in</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html#a29b467f7966c5ce1c312c8544fac772f" title="Is the system waiting for a keypress? ">SystemWFKWaiting()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa" title="Tell the system that a keypress occured, so stop waiting. ">SystemWFKOccurred()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a5c7753bf13e77e56b261214279f30e86" title="Has the system just transitioned out of a WFK state? ">SystemWFKChanged()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a38200bcf77d8fae2a9382b9eae342c10" title="Tell the system to stop waiting for a keypress. ">SystemWFKStop()</a> </dd></dl>
+
 </div>
 </div>
-<a id="ab977672260644fc070b6e79d7cece709"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab977672260644fc070b6e79d7cece709">&#9670;&nbsp;</a></span>SystemWFKStop()</h2>
+<a id="a38200bcf77d8fae2a9382b9eae342c10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38200bcf77d8fae2a9382b9eae342c10">&#9670;&nbsp;</a></span>SystemWFKStop()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -830,16 +1001,32 @@ Functions</h2></td></tr>
           <td class="memname">void SystemWFKStop </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Tell the system to stop waiting for a keypress. </p>
+<p>Threadsafe.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html#a6908b06ec010236620ee9738ec362a08" title="Tell the system to wait for a keypress. ">SystemWFKSet()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a29b467f7966c5ce1c312c8544fac772f" title="Is the system waiting for a keypress? ">SystemWFKWaiting()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa" title="Tell the system that a keypress occured, so stop waiting. ">SystemWFKOccurred()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a5c7753bf13e77e56b261214279f30e86" title="Has the system just transitioned out of a WFK state? ">SystemWFKChanged()</a> </dd></dl>
+
 </div>
 </div>
-<a id="a18f05007c53577b28a6fe44ce2d10a37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18f05007c53577b28a6fe44ce2d10a37">&#9670;&nbsp;</a></span>SystemWFKWaiting()</h2>
+<a id="a29b467f7966c5ce1c312c8544fac772f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29b467f7966c5ce1c312c8544fac772f">&#9670;&nbsp;</a></span>SystemWFKWaiting()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -848,11 +1035,29 @@ Functions</h2></td></tr>
           <td class="memname">int SystemWFKWaiting </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Is the system waiting for a keypress? </p>
+<p>Threadsafe.</p>
+<p>When the system is waiting for a keypress, it does not fetch, decode and execute instructions normally. However, timers do continue to decrement.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if the system is waiting for a keypress, otherwise non-zero</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="system_8h.html#a6908b06ec010236620ee9738ec362a08" title="Tell the system to wait for a keypress. ">SystemWFKSet()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#ac4bf25a3c4d96045d5e5aa299b0de1fa" title="Tell the system that a keypress occured, so stop waiting. ">SystemWFKOccurred()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a5c7753bf13e77e56b261214279f30e86" title="Has the system just transitioned out of a WFK state? ">SystemWFKChanged()</a> </dd>
+<dd>
+<a class="el" href="system_8h.html#a38200bcf77d8fae2a9382b9eae342c10" title="Tell the system to stop waiting for a keypress. ">SystemWFKStop()</a> </dd></dl>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['instruction',['instruction',['../structopcode.html#ac0085637a773e55d1a4e3dd73748fd2c',1,'opcode']]]
+  ['gfx',['gfx',['../structsystem.html#a02ee1e279f59545f10cdc36a9aeb6489',1,'system']]]
 ];

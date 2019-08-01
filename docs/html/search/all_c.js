@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['thread_5fargs',['thread_args',['../structthread__args.html',1,'']]],
-  ['thread_5fsync',['thread_sync',['../structthread__sync.html',1,'']]],
-  ['timer',['timer',['../structtimer.html',1,'']]]
+  ['pc',['pc',['../structsystem.html#a8f66c05b2d4bf1626ece8afece1968cb',1,'system']]],
+  ['prv',['prv',['../structsystem.html#a749bda8ec42ff087c601cdb52cda45ec',1,'system']]]
 ];

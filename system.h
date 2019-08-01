@@ -1,140 +1,346 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-07-30
+  Updated: 2019-08-01
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+//! \file system.h
+//!
+//! This is the core system emulation package.
+//!
+//! Generally speaking, the emulation occurs on the main thread with other
+//! subsystems operating in separate threads.  Threadsafe synchronization
+//! primitives are used in system methods to allow threadsafe data access and
+//! manipulation.
+//!
+//! There are two small logical subsystems of this package to handle tricky
+//! state management:
+//! - WFK (aka Wait For Key)
+//! - Debug
+//!
+//! These logical subsystems are interesting because they break the normal
+//! opcode:fetch -> opcode:decode -> opcode:execute flow of the emulation.
+//!
+//! They should be thought of as logical subsystems and their methods are
+//! grouped syntactically together:
+//! - WFK methods are all prefixed with: SystemWFK
+//! - Debug methods are all prefixed with: SystemDebug
+
 #ifndef SYSTEM_VERSION
+//! include guard
 #define SYSTEM_VERSION "0.1.0"
 
 struct system_private;
 
 struct system {
-        // 4k System memory map:
-        // 0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
-        // 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
-        // 0x200-0xFFF - Program ROM and work RAM
+        //! 4k System memory map:
+        //! 0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
+        //! 0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
+        //! 0x200-0xFFF - Program ROM and work RAM
         unsigned char *memory;
 
-        // CPU registers: The Chip 8 has 15 8-bit general purpose registers
-        // named V0,V1 up to VE. The 16th register is used for the ‘carry
-        // flag’. Eight bits is one byte so we can use an unsigned char for this
-        // purpose:
+        //! CPU registers: The Chip 8 has 15 8-bit general purpose registers
+        //! named V0,V1 up to VE. The 16th register is used for the ‘carry
+        //! flag’. Eight bits is one byte so we can use an unsigned char for this
+        //! purpose:
         unsigned char v[16];
 
-        // There is an Index register I and a program counter (pc) which can
-        // have a value from 0x000 to 0xFFF
-        unsigned short i;
-        unsigned short pc;
+        unsigned short i; //!< index register
+        unsigned short pc; //!< Program counter can be [0x000..0xFFF]
 
-        // The graphics of the Chip 8 are black and white and the screen has a
-        // total of 2048 pixels (64 x 32). This can easily be implemented using
-        // an array that hold the pixel state (1 or 0):
+        //! The graphics of the Chip 8 are black and white and the screen has a
+        //! total of 2048 pixels (64 x 32). This can easily be implemented using
+        //! an array that hold the pixel state (1 or 0)
         unsigned char *gfx;
 
-        unsigned short stack[16];
-        unsigned short sp;
+        //! The stack allows storing up to 16 addresses. Each address in the
+        //! stack is the location of a caller, so the stack works like function
+        //! calls.
+        unsigned short stack[16]; //!< Function call stack
+        unsigned short sp; //!< Stack pointer, indexes head element of stack
 
-        // Finally, the Chip 8 has a HEX based keypad (0x0-0xF), you can use an
-        // array to store the current state of the key.
-        unsigned char key[16];
+        //! The Chip 8 has a HEX based keypad (0x0-0xF), you can use an
+        //! array to store the current state of the key.
+        unsigned char key[16]; //!< Keyboard state (key pressed or not)
 
-        unsigned short fontp;
+        unsigned short fontp; //!< Pointer to font sprits in CHIP-8 memory
 
-        struct system_private *prv;
+        struct system_private *prv; //!< Unexported implementation data
 };
 
+//! \brief Creates and initializes a new system object instance
+//! \param[in] isDebugEnabled whether to run with the integrated debugging UI
+//! \return The initialized system object
 struct system *
 SystemInit(int isDebugEnabled);
 
+//! \brief De-initializes and frees memory for the given system object
+//! \param[in,out] system The initialized system object to be cleaned and reclaimed
 void
-SystemDeinit(struct system *s);
+SystemDeinit(struct system *system);
 
+//! \brief Increments the system PC to point to the next instruction
+//!
+//! The CHIP-8 uses 16-bit instructions, but stores that data big-endian.
+//! As a result, we read instructions as two 8-bit bytes in reverse order and
+//! increment the PC by two bytes.
+//!
+//! \param[in,out] system system state to be updated
 void
-SystemIncrementPC(struct system *s);
+SystemIncrementPC(struct system *system);
 
+//! \brief Gets the CHIP-8 memory address of the desired font sprite
+//! \param[in] system system state to be read
+//! \param[in] index Which font sprite to get (0-F)
+//! \return address in CHIP-8 memory for the sprite
 unsigned short
-SystemFontSprite(struct system *s, unsigned int index);
+SystemFontSprite(struct system *system, unsigned int index);
 
-// Returns 0 if program could no be loaded, or non-zero otherwise.
+//! \brief Copies ROM into the CHIP-8's memory
+//! \param[in,out] system system state memory to be updated
+//! \param[in] rom program ROM to be loaded into CHIP-8
+//! \param[in] size  size of program ROM to be loaded
+//! \return non-zero if program could be loaded, otherwise 0
 int
-SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size);
+SystemLoadProgram(struct system *system, unsigned char *rom, unsigned int size);
 
+//! \brief Sets stack[sp] to pc and increments sp
+//! \param[in,out] system system state to be updated
 void
-SystemDecrementTimers(struct system *s);
+SystemPushStack(struct system *system);
 
+//! \brief Sets pc to stack[sp] and decrements sp
+//! \param[in,out] system system state to be updated
 void
-SystemPushStack(struct system *s);
+SystemPopStack(struct system *system);
 
-void
-SystemPopStack(struct system *s);
-
+//! \brief Atomically locks the CHIP-8's graphics memory
+//!
+//! Threadsafe.
+//!
+//! Lock graphics memory so a separate thread can use it for rendering.
+//!
+//! \param[in,out] system system state to be updated
+//! \return 0 if the lock is held otherwise non-zero
 int
-SystemGfxLock(struct system *s);
+SystemGfxLock(struct system *system);
 
+//! \brief Atomically unlocks the CHIP-8's graphics memory
+//!
+//! Threadsafe.
+//!
+//! We need to lock graphics memory for rendering via a separate thread, this
+//! routine just unlocks it after that has been done.
+//!
+//! \param[in,out] system system state to be updated.
+//! \return 0 if lock has been released otherwise non-zero
 int
-SystemGfxUnlock(struct system *s);
+SystemGfxUnlock(struct system *system);
 
+//! \brief resets CHIP-8's video memory to zeroes
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated.
 void
-SystemGfxPresent(struct system *s);
+SystemClearScreen(struct system *system);
 
+//! \brief Draws a sprite in video memory
+//!
+//! Threadsafe.
+//!
+//! Display: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels
+//! and a height of N pixels. Each row of 8 pixels is read as bit-coded starting
+//! from memory location I; I value doesn’t change after the execution of this
+//! instruction. As described above, VF is set to 1 if any screen pixels are
+//! flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t
+//! happen.
+//! I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] x Which register holds the x-coordinate
+//! \param[in] y Which register holds the y-coordinate
+//! \param[in] height Height in pixels of the sprite to be drawn
 void
-SystemClearScreen(struct system *s);
+SystemDrawSprite(struct system *system, unsigned int x, unsigned int y, unsigned int height);
 
+//! \brief Tell the system to wait for a keypress
+//!
+//! Threadsafe.
+//!
+//! When a keypress occurs, it will be one of the 16 hex keys used by the
+//! CHIP-8, indexed [0..F]
+//! Store that index in the specified register when it occurs.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] reg which register to store the pressed hex key index in
+//!
+//! \see SystemWFKWaiting()
+//! \see SystemWFKOccurred()
+//! \see SystemWFKChanged()
+//! \see SystemWFKStop()
 void
-SystemDrawSprite(struct system *s, unsigned int x, unsigned int y, unsigned int height);
+SystemWFKSet(struct system *system, unsigned char reg);
 
-void
-SystemWFKSet(struct system *s, unsigned char key);
-
+//! \brief Is the system waiting for a keypress?
+//!
+//! Threadsafe.
+//!
+//! When the system is waiting for a keypress, it does not fetch, decode and
+//! execute instructions normally. However, timers do continue to decrement.
+//!
+//! \param[in,out] system system state to be updated
+//! \return 0 if the system is waiting for a keypress, otherwise non-zero
+//!
+//! \see SystemWFKSet()
+//! \see SystemWFKOccurred()
+//! \see SystemWFKChanged()
+//! \see SystemWFKStop()
 int
-SystemWFKWaiting(struct system *s);
+SystemWFKWaiting(struct system *system);
 
+//! \brief Tell the system that a keypress occured, so stop waiting
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] key which of the keys [0..F] was pressed
+//!
+//! \see SystemWFKSet()
+//! \see SystemWFKWaiting()
+//! \see SystemWFKChanged()
+//! \see SystemWFKStop()
 void
-SystemWFKOccurred(struct system *s, unsigned char key);
+SystemWFKOccurred(struct system *system, unsigned char key);
 
+//! \brief Has the system just transitioned out of a WFK state?
+//!
+//! Threadsafe.
+//!
+//! We can signal to the system that a keypress occurred via
+//! SystemWFKOccurred(), but we still want to query afterward whether we were
+//! previously in a WFK state.
+//!
+//! \param[in,out] system system state to be updated
+//! \return 0 if the system has not transitioned, otherwise non-zero
+//!
+//! \see SystemWFKSet()
+//! \see SystemWFKWaiting()
+//! \see SystemWFKOccurred()
+//! \see SystemWFKStop()
 int
-SystemWFKChanged(struct system *s);
+SystemWFKChanged(struct system *system);
 
+//! \brief Tell the system to stop waiting for a keypress
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated
+//!
+//! \see SystemWFKSet()
+//! \see SystemWFKWaiting()
+//! \see SystemWFKOccurred()
+//! \see SystemWFKChanged()
 void
-SystemWFKStop(struct system *s);
+SystemWFKStop(struct system *system);
 
+//! \brief Decrements both the sound and delay timers
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated
 void
-SystemDecrementTimers(struct system *s);
+SystemDecrementTimers(struct system *system);
 
+//! \brief Returns the value of the delay timer
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated
+//! \return value of delay timer
 int
-SystemDelayTimer(struct system *s);
+SystemDelayTimer(struct system *system);
 
+//! \brief Returns the value of the sound timer
+//!
+//! Threadsafe.
+//!
+//! \param[in,out] system system state to be updated
+//! \return value of sound timer
 int
-SystemSoundTimer(struct system *s);
+SystemSoundTimer(struct system *system);
 
+//! \brief Sets the value of the sound and delay timers
+//!
+//! Threadsafe.
+//!
+//! It's not always desirable to set both timers at once, so use -1 _NOT_ to set
+//! a timer.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] delayTimer value to set delayTimer to, -1 to ignore
+//! \param[in] soundTimer value to set soundTimer to, -1 to ignore
 void
-SystemSetTimers(struct system *s, int dt, int st);
+SystemSetTimers(struct system *system, int delayTimer, int soundTimer);
 
+//! \brief Has the sound timer reached zero after being set?
+//!
+//! Threadsafe.
+//! Called by SoundThread()
+//! \param[in,out] system system state to be read
+//! \return 0 if sound has not been triggered, otherwise non-zero
 int
-SystemSoundTriggered(struct system *s);
+SystemSoundTriggered(struct system *system);
 
+//! \brief Tell the system that sound playback should begin
+//!
+//! Threadsafe.
+//! Called when the sound timer reaches zero after being set.
+//! Called by SoundThread() when sound playback begins, disabling the trigger.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] triggeredStatus 0 if not triggered, otherwise non-zero
+//! \see soundthread.c
 void
-SystemSoundSetTrigger(struct system *s, int v);
+SystemSoundSetTrigger(struct system *system, int triggeredStatus);
 
+//! \brief Returns whether the system is in a "Ready to Shutdown" state.
+//!
+//! Threadsafe.
+//! \param[in,out] system system state to be read
+//! \return 1 if ready to quit, otherwise 0
 int
-SystemShouldQuit(struct system *s);
+SystemShouldQuit(struct system *system);
 
+//! \brief Signal to the system that shutdown should begin.
+//!
+//! Threadsafe.
+//! \param[in] system system state to be updated
 void
-SystemSignalQuit(struct system *s);
+SystemSignalQuit(struct system *system);
 
+//! \brief Has the embedded graphical debugger been enabled?
+//!
+//! Threadsafe.
+//! \param[in,out] system system state to be read
+//! \return 0 if debugging is _NOT_ enabled, otherwise non-zero
 int
-SystemDebugIsEnabled(struct system *s);
+SystemDebugIsEnabled(struct system *system);
+
+//! \brief Tell the system to enable or disable the embedded graphical debugger
+//!
+//! Threadsafe.
+//! \param[in,out] system system state to be udpated
+//! \param[in] onOrOff 0 to disable debugger, or non-zero to enable
+void
+SystemDebugSetEnabled(struct system *system, int onOrOff);
 
 int
 SystemDebugShouldFetchAndDecode(struct system *s);
 
 int
 SystemDebugShouldExecute(struct system *s);
-
-void
-SystemDebugSetEnabled(struct system *s, int onOrOff);
 
 void
 SystemDebugSetFetchAndDecode(struct system *s, int onOrOff);

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['input_2ec',['input.c',['../input_8c.html',1,'']]],
-  ['input_2eh',['input.h',['../input_8h.html',1,'']]]
+  ['gfxinputthread_2ec',['gfxinputthread.c',['../gfxinputthread_8c.html',1,'']]],
+  ['graphics_2ec',['graphics.c',['../graphics_8c.html',1,'']]],
+  ['graphics_2eh',['graphics.h',['../graphics_8h.html',1,'']]]
 ];

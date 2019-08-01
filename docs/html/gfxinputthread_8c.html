@@ -77,19 +77,21 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a4159a948932adb8dcaad5bde5939c301"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfxinputthread_8c.html#a4159a948932adb8dcaad5bde5939c301">UIRenderFn</a> ()</td></tr>
+<tr class="memdesc:a4159a948932adb8dcaad5bde5939c301"><td class="mdescLeft">&#160;</td><td class="mdescRight">A convenience function used in <a class="el" href="graphics_8c.html#aa61d24457cd73c58a66a24937362cfe2" title="Render the CHIP-8&#39;s video memory to the screen. ">GraphicsPresent()</a>  <a href="#a4159a948932adb8dcaad5bde5939c301">More...</a><br /></td></tr>
 <tr class="separator:a4159a948932adb8dcaad5bde5939c301"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad322bb81d79d431f3c6639da7da49277"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfxinputthread_8c.html#ad322bb81d79d431f3c6639da7da49277">gfxInputWork</a> (void *context)</td></tr>
-<tr class="separator:ad322bb81d79d431f3c6639da7da49277"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9806ad61e4a2190287ece943768e3ec"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gfxinputthread_8c.html#aa9806ad61e4a2190287ece943768e3ec">GFXInputThread</a> (void *context)</td></tr>
+<tr class="memdesc:aa9806ad61e4a2190287ece943768e3ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread for graphics and input updates.  <a href="#aa9806ad61e4a2190287ece943768e3ec">More...</a><br /></td></tr>
+<tr class="separator:aa9806ad61e4a2190287ece943768e3ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ad322bb81d79d431f3c6639da7da49277"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad322bb81d79d431f3c6639da7da49277">&#9670;&nbsp;</a></span>gfxInputWork()</h2>
+<a id="aa9806ad61e4a2190287ece943768e3ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9806ad61e4a2190287ece943768e3ec">&#9670;&nbsp;</a></span>GFXInputThread()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* gfxInputWork </td>
+          <td class="memname">void* GFXInputThread </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>context</em></td><td>)</td>
@@ -97,6 +99,18 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Thread for graphics and input updates. </p>
+<p>Graphics and input are coupled together on the same thread because I figure both deal with human perception, so their frequency can be similar. Right now this thread is configured to run at 30hz.</p>
+<p>Decoupling graphics and input allows the emulation engine to run at a much higher frequency and not be limited by drawing routines.</p>
+<p>Input is included here due to coupling between UI and input.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>struct <a class="el" href="structthread__args.html">thread_args</a> casted to void* </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>NULL </dd></dl>
 
 </div>
 </div>
@@ -114,6 +128,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>A convenience function used in <a class="el" href="graphics_8c.html#aa61d24457cd73c58a66a24937362cfe2" title="Render the CHIP-8&#39;s video memory to the screen. ">GraphicsPresent()</a> </p>
+<p>Wraps <a class="el" href="ui_8h.html#a28a1e4a0e391ebfaf291dc3a38847f8a" title="Renders the ui. ">UIRender()</a> to match the prototype function pointer in <a class="el" href="graphics_8c.html#aa61d24457cd73c58a66a24937362cfe2" title="Render the CHIP-8&#39;s video memory to the screen. ">GraphicsPresent()</a> </p>
 
 </div>
 </div>

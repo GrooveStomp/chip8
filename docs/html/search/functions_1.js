@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['inputcheck',['InputCheck',['../input_8c.html#a349e33d74822848e0db43cc56c0a03b1',1,'InputCheck(struct input *i, struct system *s, SDL_Event *event):&#160;input.c'],['../input_8h.html#aa3caa329b3a32f81e1907b86a3958a99',1,'InputCheck(struct input *input, struct system *system, SDL_Event *event):&#160;input.c']]],
-  ['inputdeinit',['InputDeinit',['../input_8c.html#a68054d62d814fb092e0927f163d0e8ad',1,'InputDeinit(struct input *i):&#160;input.c'],['../input_8h.html#a6767724b756cbf018c89f333927b2a60',1,'InputDeinit(struct input *input):&#160;input.c']]],
-  ['inputinit',['InputInit',['../input_8c.html#a1d6bc79955841788279b2eb5cf12d390',1,'InputInit():&#160;input.c'],['../input_8h.html#a1d6bc79955841788279b2eb5cf12d390',1,'InputInit():&#160;input.c']]]
+  ['gfxinputthread',['GFXInputThread',['../gfxinputthread_8c.html#aa9806ad61e4a2190287ece943768e3ec',1,'gfxinputthread.c']]],
+  ['graphicsdeinit',['GraphicsDeinit',['../graphics_8c.html#af08b9bb21695971ccac333eb31bc76ec',1,'GraphicsDeinit(struct graphics *g):&#160;graphics.c'],['../graphics_8h.html#a60bfad8b4f1ee06733460378fa8e56e0',1,'GraphicsDeinit(struct graphics *graphics):&#160;graphics.c']]],
+  ['graphicsinit',['GraphicsInit',['../graphics_8c.html#a9cf6cdea3e891b8bbac3aaef6247bb08',1,'GraphicsInit(int debug):&#160;graphics.c'],['../graphics_8h.html#a9cf6cdea3e891b8bbac3aaef6247bb08',1,'GraphicsInit(int debug):&#160;graphics.c']]],
+  ['graphicspresent',['GraphicsPresent',['../graphics_8c.html#aa61d24457cd73c58a66a24937362cfe2',1,'GraphicsPresent(struct graphics *g, struct system *s, void(*ui_render_fn)()):&#160;graphics.c'],['../graphics_8h.html#a37d620ab3693db857bfb772e386b15bb',1,'GraphicsPresent(struct graphics *graphics, struct system *system, void(*ui_render_fn)()):&#160;graphics.c']]],
+  ['graphicssdlwindow',['GraphicsSDLWindow',['../graphics_8c.html#a270bcf61374442e352f000d4aaf226fb',1,'GraphicsSDLWindow(struct graphics *g):&#160;graphics.c'],['../graphics_8h.html#a74c5d9e3c05ee107b74aae9344207ca8',1,'GraphicsSDLWindow(struct graphics *graphics):&#160;graphics.c']]]
 ];

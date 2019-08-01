@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound.c
   Created: 2019-07-07
-  Updated: 2019-07-30
+  Updated: 2019-08-01
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -12,12 +12,13 @@
 
 #include <soundio/soundio.h>
 
+//! \file sound.c
+
+//! Sound state
 struct sound {
         struct SoundIo *lib;
         struct SoundIoDevice *dev;
         struct SoundIoOutStream *stream;
-        char *errString;
-        int err;
 };
 
 void SoundStop(struct sound *s) {

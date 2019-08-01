@@ -78,7 +78,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="center"><img src="ui_8h__dep__incl.png" border="0" usemap="#ui_8hdep" alt=""/></div>
 <map name="ui_8hdep" id="ui_8hdep">
 <area shape="rect" id="node2" href="main_8c.html" title="main.c" alt="" coords="5,80,67,107"/>
-<area shape="rect" id="node3" href="ui_8c.html" title="ui.c" alt="" coords="91,80,133,107"/>
 </map>
 </div>
 </div>
@@ -86,44 +85,46 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a0daa87592ecdfc96309dd56d921f71f9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a0daa87592ecdfc96309dd56d921f71f9">UI_VERISON</a>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
-<tr class="separator:a0daa87592ecdfc96309dd56d921f71f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aded370a732e7628b4c47cbb5c427a015"><td class="memItemLeft" align="right" valign="top"><a id="aded370a732e7628b4c47cbb5c427a015"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#aded370a732e7628b4c47cbb5c427a015">UI_VERSION</a>&#160;&#160;&#160;&quot;0.1.0&quot;</td></tr>
+<tr class="memdesc:aded370a732e7628b4c47cbb5c427a015"><td class="mdescLeft">&#160;</td><td class="mdescRight">include guard <br /></td></tr>
+<tr class="separator:aded370a732e7628b4c47cbb5c427a015"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:af10440c51f37c62d11f22c57f2274b81"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structui.html">ui</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#af10440c51f37c62d11f22c57f2274b81">UIInit</a> (int shouldBeEnabled, unsigned int widgetWidth, unsigned int widgetHeight, SDL_Window *window)</td></tr>
+<tr class="memdesc:af10440c51f37c62d11f22c57f2274b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and initializes a new ui object instance.  <a href="#af10440c51f37c62d11f22c57f2274b81">More...</a><br /></td></tr>
 <tr class="separator:af10440c51f37c62d11f22c57f2274b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a825b12cf701f51e90d4e201fb66e0198"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a825b12cf701f51e90d4e201fb66e0198">UIInputBegin</a> (struct <a class="el" href="structui.html">ui</a> *u)</td></tr>
-<tr class="separator:a825b12cf701f51e90d4e201fb66e0198"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a172183352a4d489d6f97984467702b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a8a172183352a4d489d6f97984467702b">UIInputEnd</a> (struct <a class="el" href="structui.html">ui</a> *u)</td></tr>
-<tr class="separator:a8a172183352a4d489d6f97984467702b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea8420c4c3b95edfdb606e40351bf5c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#aea8420c4c3b95edfdb606e40351bf5c6">UIHandleEvent</a> (struct <a class="el" href="structui.html">ui</a> *u, SDL_Event *event)</td></tr>
-<tr class="separator:aea8420c4c3b95edfdb606e40351bf5c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7829c77712a0d57b0e8069b168fb96d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#ad7829c77712a0d57b0e8069b168fb96d">UIWidgets</a> (struct <a class="el" href="structui.html">ui</a> *u, struct <a class="el" href="structsystem.html">system</a> *s, struct <a class="el" href="structopcode.html">opcode</a> *c)</td></tr>
-<tr class="separator:ad7829c77712a0d57b0e8069b168fb96d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31b30dcf839f441b6274459780daff0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a31b30dcf839f441b6274459780daff0a">UIRender</a> (struct <a class="el" href="structui.html">ui</a> *u)</td></tr>
-<tr class="separator:a31b30dcf839f441b6274459780daff0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a172d639feedc8c11cebdb6685a300ce3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a172d639feedc8c11cebdb6685a300ce3">UIDeinit</a> (struct <a class="el" href="structui.html">ui</a> *u)</td></tr>
-<tr class="separator:a172d639feedc8c11cebdb6685a300ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7df4e72c4b282c72d4fffdfed321180b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a7df4e72c4b282c72d4fffdfed321180b">UIDeinit</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>)</td></tr>
+<tr class="memdesc:a7df4e72c4b282c72d4fffdfed321180b"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-initializes and frees memory for the given ui object.  <a href="#a7df4e72c4b282c72d4fffdfed321180b">More...</a><br /></td></tr>
+<tr class="separator:a7df4e72c4b282c72d4fffdfed321180b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab87c86bd19a9650edd7a300be968c64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#aab87c86bd19a9650edd7a300be968c64">UIInputBegin</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>)</td></tr>
+<tr class="memdesc:aab87c86bd19a9650edd7a300be968c64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates state of the UI to allow input processing.  <a href="#aab87c86bd19a9650edd7a300be968c64">More...</a><br /></td></tr>
+<tr class="separator:aab87c86bd19a9650edd7a300be968c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7e8419c3898dc147c76a59a2c854f90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#ab7e8419c3898dc147c76a59a2c854f90">UIInputEnd</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>)</td></tr>
+<tr class="memdesc:ab7e8419c3898dc147c76a59a2c854f90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates state of the UI to stop input processing.  <a href="#ab7e8419c3898dc147c76a59a2c854f90">More...</a><br /></td></tr>
+<tr class="separator:ab7e8419c3898dc147c76a59a2c854f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06d78a187caf1e667e62e4e72ffd9b55"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a06d78a187caf1e667e62e4e72ffd9b55">UIHandleEvent</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>, SDL_Event *event)</td></tr>
+<tr class="memdesc:a06d78a187caf1e667e62e4e72ffd9b55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes SDL input events.  <a href="#a06d78a187caf1e667e62e4e72ffd9b55">More...</a><br /></td></tr>
+<tr class="separator:a06d78a187caf1e667e62e4e72ffd9b55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3eb52284dffeced0f1bd5f63d47167c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a3eb52284dffeced0f1bd5f63d47167c1">UIWidgets</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>, struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, struct <a class="el" href="structopcode.html">opcode</a> *<a class="el" href="structopcode.html">opcode</a>)</td></tr>
+<tr class="memdesc:a3eb52284dffeced0f1bd5f63d47167c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up all UI widgets before rendering.  <a href="#a3eb52284dffeced0f1bd5f63d47167c1">More...</a><br /></td></tr>
+<tr class="separator:a3eb52284dffeced0f1bd5f63d47167c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28a1e4a0e391ebfaf291dc3a38847f8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ui_8h.html#a28a1e4a0e391ebfaf291dc3a38847f8a">UIRender</a> (struct <a class="el" href="structui.html">ui</a> *<a class="el" href="structui.html">ui</a>)</td></tr>
+<tr class="memdesc:a28a1e4a0e391ebfaf291dc3a38847f8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders the ui.  <a href="#a28a1e4a0e391ebfaf291dc3a38847f8a">More...</a><br /></td></tr>
+<tr class="separator:a28a1e4a0e391ebfaf291dc3a38847f8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a0daa87592ecdfc96309dd56d921f71f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0daa87592ecdfc96309dd56d921f71f9">&#9670;&nbsp;</a></span>UI_VERISON</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define UI_VERISON&#160;&#160;&#160;&quot;0.1.0&quot;</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The UI system uses nuklear internally for an immediate-mode UI. The UI isn't a general purpose UI, rather it's a graphical debugger embedded within the CHIP-8 emulator.</p>
+<div class="image">
+<img src="debugger-ui.png" alt="debugger-ui.png"/>
 </div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a172d639feedc8c11cebdb6685a300ce3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a172d639feedc8c11cebdb6685a300ce3">&#9670;&nbsp;</a></span>UIDeinit()</h2>
+<dl class="section see"><dt>See also</dt><dd>Nuklear: <a href="https://github.com/vurtun/nuklear">https://github.com/vurtun/nuklear</a> </dd>
+<dd>
+Immediate mode GUI: <a href="https://caseymuratori.com/blog_0001">https://caseymuratori.com/blog_0001</a> </dd></dl>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a7df4e72c4b282c72d4fffdfed321180b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7df4e72c4b282c72d4fffdfed321180b">&#9670;&nbsp;</a></span>UIDeinit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,16 +133,24 @@ Functions</h2></td></tr>
           <td class="memname">void UIDeinit </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em></td><td>)</td>
+          <td class="paramname"><em>ui</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>De-initializes and frees memory for the given ui object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>The initialized ui object to be cleaned and reclaimed </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="aea8420c4c3b95edfdb606e40351bf5c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea8420c4c3b95edfdb606e40351bf5c6">&#9670;&nbsp;</a></span>UIHandleEvent()</h2>
+<a id="a06d78a187caf1e667e62e4e72ffd9b55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06d78a187caf1e667e62e4e72ffd9b55">&#9670;&nbsp;</a></span>UIHandleEvent()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +159,7 @@ Functions</h2></td></tr>
           <td class="memname">void UIHandleEvent </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em>, </td>
+          <td class="paramname"><em>ui</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -165,6 +174,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Processes SDL input events. </p>
+<p>This needs to be called every frame between <a class="el" href="ui_8h.html#aab87c86bd19a9650edd7a300be968c64" title="Updates state of the UI to allow input processing. ">UIInputBegin()</a> and <a class="el" href="ui_8h.html#ab7e8419c3898dc147c76a59a2c854f90" title="Updates state of the UI to stop input processing. ">UIInputEnd()</a></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>UI state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">event</td><td>The SDL_Event that occurred and should be processed </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -206,10 +225,22 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates and initializes a new ui object instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">shouldBeEnabled</td><td>whether the UI will be rendered or not </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">widgetWidth</td><td>standard width of UI widgets </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">widgetHeight</td><td>standard height of UI widgets </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">window</td><td>SDL Window initialized by the graphics subsystem </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The initialized ui object </dd></dl>
+
 </div>
 </div>
-<a id="a825b12cf701f51e90d4e201fb66e0198"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a825b12cf701f51e90d4e201fb66e0198">&#9670;&nbsp;</a></span>UIInputBegin()</h2>
+<a id="aab87c86bd19a9650edd7a300be968c64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab87c86bd19a9650edd7a300be968c64">&#9670;&nbsp;</a></span>UIInputBegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -218,16 +249,25 @@ Functions</h2></td></tr>
           <td class="memname">void UIInputBegin </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em></td><td>)</td>
+          <td class="paramname"><em>ui</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Updates state of the UI to allow input processing. </p>
+<p>This needs to be called every frame before <a class="el" href="ui_8h.html#a06d78a187caf1e667e62e4e72ffd9b55" title="Processes SDL input events. ">UIHandleEvent()</a> and should be concluded with a call to <a class="el" href="ui_8h.html#ab7e8419c3898dc147c76a59a2c854f90" title="Updates state of the UI to stop input processing. ">UIInputEnd()</a></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>UI state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a8a172183352a4d489d6f97984467702b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a172183352a4d489d6f97984467702b">&#9670;&nbsp;</a></span>UIInputEnd()</h2>
+<a id="ab7e8419c3898dc147c76a59a2c854f90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7e8419c3898dc147c76a59a2c854f90">&#9670;&nbsp;</a></span>UIInputEnd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -236,16 +276,25 @@ Functions</h2></td></tr>
           <td class="memname">void UIInputEnd </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em></td><td>)</td>
+          <td class="paramname"><em>ui</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Updates state of the UI to stop input processing. </p>
+<p>This needs to be called every frame after <a class="el" href="ui_8h.html#a06d78a187caf1e667e62e4e72ffd9b55" title="Processes SDL input events. ">UIHandleEvent()</a> and should be preceded with a call to <a class="el" href="ui_8h.html#aab87c86bd19a9650edd7a300be968c64" title="Updates state of the UI to allow input processing. ">UIInputBegin()</a></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>UI state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="a31b30dcf839f441b6274459780daff0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31b30dcf839f441b6274459780daff0a">&#9670;&nbsp;</a></span>UIRender()</h2>
+<a id="a28a1e4a0e391ebfaf291dc3a38847f8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28a1e4a0e391ebfaf291dc3a38847f8a">&#9670;&nbsp;</a></span>UIRender()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -254,16 +303,25 @@ Functions</h2></td></tr>
           <td class="memname">void UIRender </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em></td><td>)</td>
+          <td class="paramname"><em>ui</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Renders the ui. </p>
+<p>Uses the SDL_Window used in <a class="el" href="ui_8h.html#af10440c51f37c62d11f22c57f2274b81" title="Creates and initializes a new ui object instance. ">UIInit()</a> to render the configured UI widgets. This must be called every frame aftr <a class="el" href="ui_8h.html#a3eb52284dffeced0f1bd5f63d47167c1" title="Sets up all UI widgets before rendering. ">UIWidgets()</a></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>UI state to be used for rendering </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
-<a id="ad7829c77712a0d57b0e8069b168fb96d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7829c77712a0d57b0e8069b168fb96d">&#9670;&nbsp;</a></span>UIWidgets()</h2>
+<a id="a3eb52284dffeced0f1bd5f63d47167c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3eb52284dffeced0f1bd5f63d47167c1">&#9670;&nbsp;</a></span>UIWidgets()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -272,19 +330,19 @@ Functions</h2></td></tr>
           <td class="memname">void UIWidgets </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structui.html">ui</a> *&#160;</td>
-          <td class="paramname"><em>u</em>, </td>
+          <td class="paramname"><em>ui</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>s</em>, </td>
+          <td class="paramname"><em>system</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">struct <a class="el" href="structopcode.html">opcode</a> *&#160;</td>
-          <td class="paramname"><em>c</em>&#160;</td>
+          <td class="paramname"><em>opcode</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -293,6 +351,18 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Sets up all UI widgets before rendering. </p>
+<p>This needs to be called every frame and should be succeeded with a call to <a class="el" href="ui_8h.html#a28a1e4a0e391ebfaf291dc3a38847f8a" title="Renders the ui. ">UIRender()</a>.</p>
+<p>NOTE: <a class="el" href="ui_8h.html#a28a1e4a0e391ebfaf291dc3a38847f8a" title="Renders the ui. ">UIRender()</a> is invoked in <a class="el" href="gfxinputthread_8c.html">gfxinputthread.c</a> via a wrapper function: <a class="el" href="gfxinputthread_8c.html#a4159a948932adb8dcaad5bde5939c301" title="A convenience function used in GraphicsPresent() ">UIRenderFn()</a>. This is done to simplify the graphics API.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ui</td><td>UI state to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">system</td><td>system state to be read and presented in the ui </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opcode</td><td>opcode state to be read and presented in the ui </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

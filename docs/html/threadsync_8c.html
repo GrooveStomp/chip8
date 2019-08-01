@@ -78,18 +78,51 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structthread__sync.html">thread_sync</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cross-thread signalling.  <a href="structthread__sync.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a9c0da14f3a9af78d03fa00bc6e104b51"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structthread__sync.html">thread_sync</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#a9c0da14f3a9af78d03fa00bc6e104b51">ThreadSyncInit</a> ()</td></tr>
+<tr class="memdesc:a9c0da14f3a9af78d03fa00bc6e104b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and initializes a new <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object instance.  <a href="#a9c0da14f3a9af78d03fa00bc6e104b51">More...</a><br /></td></tr>
 <tr class="separator:a9c0da14f3a9af78d03fa00bc6e104b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9c141d80e9a0654e9ea69a4fe3072e9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#ae9c141d80e9a0654e9ea69a4fe3072e9">ThreadSyncShouldShutdown</a> (struct <a class="el" href="structthread__sync.html">thread_sync</a> *s)</td></tr>
-<tr class="separator:ae9c141d80e9a0654e9ea69a4fe3072e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed224ea75099b2942e39368168e50d20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#aed224ea75099b2942e39368168e50d20">ThreadSyncSignalShutdown</a> (struct <a class="el" href="structthread__sync.html">thread_sync</a> *s)</td></tr>
-<tr class="separator:aed224ea75099b2942e39368168e50d20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7faaa00460b0f172c15b43d140a776db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#a7faaa00460b0f172c15b43d140a776db">ThreadSyncDeinit</a> (struct <a class="el" href="structthread__sync.html">thread_sync</a> *threadSync)</td></tr>
+<tr class="memdesc:a7faaa00460b0f172c15b43d140a776db"><td class="mdescLeft">&#160;</td><td class="mdescRight">De-initializes and frees memory for the given <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object.  <a href="#a7faaa00460b0f172c15b43d140a776db">More...</a><br /></td></tr>
+<tr class="separator:a7faaa00460b0f172c15b43d140a776db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5373c1344e21711062c4cdc347e8a63"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#ad5373c1344e21711062c4cdc347e8a63">ThreadSyncShouldShutdown</a> (struct <a class="el" href="structthread__sync.html">thread_sync</a> *threadSync)</td></tr>
+<tr class="memdesc:ad5373c1344e21711062c4cdc347e8a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">atomically updates shouldShutdown status of <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> state  <a href="#ad5373c1344e21711062c4cdc347e8a63">More...</a><br /></td></tr>
+<tr class="separator:ad5373c1344e21711062c4cdc347e8a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2d84c8fd9d8904ab1b539e5f58b80b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threadsync_8c.html#aa2d84c8fd9d8904ab1b539e5f58b80b7">ThreadSyncSignalShutdown</a> (struct <a class="el" href="structthread__sync.html">thread_sync</a> *threadSync)</td></tr>
+<tr class="memdesc:aa2d84c8fd9d8904ab1b539e5f58b80b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">atomically updates shouldShutdown status of <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> state  <a href="#aa2d84c8fd9d8904ab1b539e5f58b80b7">More...</a><br /></td></tr>
+<tr class="separator:aa2d84c8fd9d8904ab1b539e5f58b80b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a7faaa00460b0f172c15b43d140a776db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7faaa00460b0f172c15b43d140a776db">&#9670;&nbsp;</a></span>ThreadSyncDeinit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ThreadSyncDeinit </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="structthread__sync.html">thread_sync</a> *&#160;</td>
+          <td class="paramname"><em>threadSync</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>De-initializes and frees memory for the given <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">threadSync</td><td>The initialized <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object to be cleaned and reclaimed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a9c0da14f3a9af78d03fa00bc6e104b51"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9c0da14f3a9af78d03fa00bc6e104b51">&#9670;&nbsp;</a></span>ThreadSyncInit()</h2>
 
@@ -105,10 +138,13 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Creates and initializes a new <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>The initialized <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> object </dd></dl>
+
 </div>
 </div>
-<a id="ae9c141d80e9a0654e9ea69a4fe3072e9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9c141d80e9a0654e9ea69a4fe3072e9">&#9670;&nbsp;</a></span>ThreadSyncShouldShutdown()</h2>
+<a id="ad5373c1344e21711062c4cdc347e8a63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5373c1344e21711062c4cdc347e8a63">&#9670;&nbsp;</a></span>ThreadSyncShouldShutdown()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -117,16 +153,25 @@ Functions</h2></td></tr>
           <td class="memname">int ThreadSyncShouldShutdown </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structthread__sync.html">thread_sync</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>threadSync</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>atomically updates shouldShutdown status of <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> state </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">threadSync</td><td><a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> state to read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1 when threadSync has been triggered, otherwise 0 </dd></dl>
+
 </div>
 </div>
-<a id="aed224ea75099b2942e39368168e50d20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed224ea75099b2942e39368168e50d20">&#9670;&nbsp;</a></span>ThreadSyncSignalShutdown()</h2>
+<a id="aa2d84c8fd9d8904ab1b539e5f58b80b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2d84c8fd9d8904ab1b539e5f58b80b7">&#9670;&nbsp;</a></span>ThreadSyncSignalShutdown()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -135,11 +180,19 @@ Functions</h2></td></tr>
           <td class="memname">void ThreadSyncSignalShutdown </td>
           <td>(</td>
           <td class="paramtype">struct <a class="el" href="structthread__sync.html">thread_sync</a> *&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>threadSync</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>atomically updates shouldShutdown status of <a class="el" href="structthread__sync.html" title="Cross-thread signalling. ">thread_sync</a> state </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname"></td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

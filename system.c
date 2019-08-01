@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-07-30
+  Updated: 2019-08-01
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -22,7 +22,7 @@
 #define FONT_SIZE 80
 
 struct system_wfk { // wait for key
-        unsigned char key; // 0 - 16
+        unsigned char reg; // 0 - 16
         int waiting;
         int justChanged;
         pthread_rwlock_t lock;
@@ -33,13 +33,6 @@ struct system_debug {
         int fetchAndDecode;
         int execute;
         pthread_rwlock_t lock;
-};
-
-struct rect {
-        unsigned int x1;
-        unsigned int y1;
-        unsigned int x2;
-        unsigned int y2;
 };
 
 struct system_private {
@@ -54,9 +47,6 @@ struct system_private {
         int soundTimerTriggered;
 
         int shouldQuit; // Inidicates if program is closed or otherwise quit.
-
-        int isGfxDirty;
-        struct rect gfxDirtyRegion;
 
         pthread_rwlock_t timerRwLock;
         pthread_rwlock_t soundRwLock;
@@ -233,43 +223,22 @@ int SystemGfxUnlock(struct system *s) {
         return pthread_rwlock_unlock(&s->prv->gfxRwLock);
 }
 
-void SystemGfxPresent(struct system *s) {
-        if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
-                fprintf(stderr, "Failed to lock system gfx rw lock");
-                return;
-        }
-
-        s->prv->isGfxDirty = 0;
-        pthread_rwlock_unlock(&s->prv->gfxRwLock);
-}
-
 void SystemClearScreen(struct system *s) {
         if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
                 fprintf(stderr, "Failed to lock system gfx rw lock");
                 return;
         }
 
-        s->prv->isGfxDirty = 1;
-        s->prv->gfxDirtyRegion = (struct rect){ .x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0 };
         memset(s->gfx, 0, GRAPHICS_MEM_SIZE);
         pthread_rwlock_unlock(&s->prv->gfxRwLock);
 }
 
-// Display: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels
-// and a height of N pixels. Each row of 8 pixels is read as bit-coded starting
-// from memory location I; I value doesn’t change after the execution of this
-// instruction. As described above, VF is set to 1 if any screen pixels are
-// flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t
-// happen.
-// I'm assuming (VX, VY) is the lower-left corner of the sprint, not the center.
 void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, unsigned int height) {
         if (0 != pthread_rwlock_rdlock(&s->prv->gfxRwLock)) {
                 fprintf(stderr, "Failed to lock system gfx rw lock");
                 return;
         }
 
-        s->prv->isGfxDirty = 1;
-        s->prv->gfxDirtyRegion = (struct rect){ .x1 = x_pos, .y1 = y_pos, .x2 = x_pos + 8, .y2 = y_pos + height };
         s->v[15] = 0;
 
         for (int y = 0; y < height; y++) {
@@ -296,14 +265,14 @@ void SystemDrawSprite(struct system *s, unsigned int x_pos, unsigned int y_pos, 
         pthread_rwlock_unlock(&s->prv->gfxRwLock);
 }
 
-void SystemWFKSet(struct system *s, unsigned char key) {
+void SystemWFKSet(struct system *s, unsigned char reg) {
         if (0 != pthread_rwlock_wrlock(&s->prv->wfk.lock)) {
                 fprintf(stderr, "Failed to lock system wfk rwlock");
                 return;
         }
         s->prv->wfk.waiting = 1;
         s->prv->wfk.justChanged = 0;
-        s->prv->wfk.key = key;
+        s->prv->wfk.reg = reg;
         pthread_rwlock_unlock(&s->prv->wfk.lock);
 }
 
@@ -325,7 +294,7 @@ void SystemWFKOccurred(struct system *s, unsigned char key) {
         }
         s->prv->wfk.waiting = 0;
         s->prv->wfk.justChanged = 1;
-        s->v[s->prv->wfk.key] = key;
+        s->v[s->prv->wfk.reg] = key;
         pthread_rwlock_unlock(&s->prv->wfk.lock);
 }
 
