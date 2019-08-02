@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-08-01
+  Updated: 2019-08-02
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -323,28 +323,120 @@ SystemSignalQuit(struct system *system);
 //! \brief Has the embedded graphical debugger been enabled?
 //!
 //! Threadsafe.
-//! \param[in,out] system system state to be read
+//!
+//! \param[in] system system state to be read
 //! \return 0 if debugging is _NOT_ enabled, otherwise non-zero
+//!
+//! \see SystemDebugSetEnabled()
+//! \see SystemDebugShouldFetchAndDecode()
+//! \see SystemDebugShouldExecute()
+//! \see SystemDebugSetFetchAndDecode()
+//! \see SystemDebugSetExecute()
+//! \see main()
+//! \see TimerThread()
 int
 SystemDebugIsEnabled(struct system *system);
 
 //! \brief Tell the system to enable or disable the embedded graphical debugger
 //!
 //! Threadsafe.
-//! \param[in,out] system system state to be udpated
-//! \param[in] onOrOff 0 to disable debugger, or non-zero to enable
+//!
+//! \param[in] system system state to be udpated
+//! \param[in,out] onOrOff 0 to disable debugger, or non-zero to enable
+//!
+//! \see SystemDebugIsEnabled()
+//! \see SystemDebugShouldFetchAndDecode()
+//! \see SystemDebugShouldExecute()
+//! \see SystemDebugSetFetchAndDecode()
+//! \see SystemDebugSetExecute()
+//! \see UIWidgets()
 void
 SystemDebugSetEnabled(struct system *system, int onOrOff);
 
+//! \brief Should the system perform opcode fetch and decode?
+//!
+//! Threadsafe.
+//!
+//! When the debugging UI is enabled, we need to stop the normal flow of:
+//! opcode:fetch -> opcode:decode -> opcode:execute.
+//!
+//! This query tells us whether it is time to do one step through that flow or
+//! not.
+//!
+//! \param[in] system system state to be read
+//! \return 0 if fetch and decode should _not_ happen, otherwise non-zero
+//!
+//! \see SystemDebugIsEnabled()
+//! \see SystemDebugSetEnabled()
+//! \see SystemDebugShouldExecute()
+//! \see SystemDebugSetFetchAndDecode()
+//! \see SystemDebugSetExecute()
+//! \see main()
 int
-SystemDebugShouldFetchAndDecode(struct system *s);
+SystemDebugShouldFetchAndDecode(struct system *system);
 
+//! \brief Should the system perform opcode execution?
+//!
+//! Threadsafe.
+//!
+//! When the debugging UI is enabled, we need to stop the normal flow of:
+//! opcode:fetch -> opcode:decode -> opcode:execute.
+//!
+//! This query tells us whether opcode execution should occur this "tick."
+//!
+//! After doing a fetch and decode, we usually want to inspect the system state
+//! in the debugger, so we don't want to automatically perform the execute. We
+//! need a pause between fetch+decode and then execute.
+//!
+//! \param[in] system system state to be read
+//! \return 0 if execute should _not_ happen, otherwise non-zero
+//!
+//! \see SystemDebugIsEnabled()
+//! \see SystemDebugSetEnabled()
+//! \see SystemDebugShouldFetchAndDecode()
+//! \see SystemDebugSetFetchAndDecode()
+//! \see SystemDebugSetExecute()
+//! \see main()
 int
 SystemDebugShouldExecute(struct system *s);
 
+//! \brief Tell the system whether fetch and decode should occur this tick or not.
+//!
+//! Threadsafe.
+//!
+//! When the debugging UI is enabled, we need to stop the normal flow of:
+//! opcode:fetch -> opcode:decode -> opcode:execute.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] onOrOff 0 to indicate fetch and decode should _not_ occur, otherwise non-zero
+//!
+//! \see SystemDebugIsEnabled()
+//! \see SystemDebugSetEnabled()
+//! \see SystemDebugShouldFetchAndDecode()
+//! \see SystemDebugShouldExecute()
+//! \see SystemDebugSetExecute()
+//! \see main()
+//! \see UIWidgets()
 void
 SystemDebugSetFetchAndDecode(struct system *s, int onOrOff);
 
+//! \brief Tell the system whether execute should occur this tick or not.
+//!
+//! Threadsafe.
+//!
+//! When the debugging UI is enabled, we need to stop the normal flow of:
+//! opcode:fetch -> opcode:decode -> opcode:execute.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] onOrOff 0 to indicate execute should _not_ occur, otherwise non-zero
+//!
+//! \see SystemDebugIsEnabled()
+//! \see SystemDebugSetEnabled()
+//! \see SystemDebugShouldFetchAndDecode()
+//! \see SystemDebugShouldExecute()
+//! \see SystemDebugSetFetchAndDecode()
+//! \see main()
+//! \see UIWidgets()
 void
 SystemDebugSetExecute(struct system *s, int onOrOff);
 
