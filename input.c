@@ -1,7 +1,7 @@
 /******************************************************************************
   File: input.c
   Created: 2019-06-21
-  Updated: 2019-07-31
+  Updated: 2019-08-03
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -59,10 +59,7 @@ void HandleKeyDown(struct input *input, struct system *system, SDL_Keycode keyco
 
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (keycode == input->keycodeIndices[i]) {
-                        // Dangerous. Currently this is the only thread updating
-                        // these values, but poking into shared memory directly
-                        // like this is ripe for errors.
-                        system->key[i] = 0xFF; // Pressed.
+                        SystemKeySetPressed(system, i, 1);
                         if (SystemWFKWaiting(system)) {
                                 SystemWFKOccurred(system, i);
                         }
@@ -81,10 +78,7 @@ void HandleKeyUp(struct input *input, struct system *system, SDL_Keycode keycode
 
         for (int i = 0; i < NUM_KEYS; i++) {
                 if (keycode == input->keycodeIndices[i]) {
-                        // Dangerous. Currently this is the only thread updating
-                        // these values, but poking into shared memory directly
-                        // like this is ripe for errors.
-                        system->key[i] = 0x00; // Un-Pressed.
+                        SystemKeySetPressed(system, i, 0);
                         break;
                 }
         }

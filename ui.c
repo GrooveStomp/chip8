@@ -296,7 +296,7 @@ void UIWidgets(struct ui *ui, struct system *system, struct opcode *opcode) {
                 static int textLength[16];
 
                 for (int i = 0; i < 16; i++) {
-                        if (system->key[i]) {
+                        if (SystemKeyIsPressed(system, i)) {
                                 sprintf(textHexInput[i], "PRESSED");
                                 textLength[i] = 7;
                         } else {

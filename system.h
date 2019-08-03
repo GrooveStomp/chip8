@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-08-02
+  Updated: 2019-08-03
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -398,7 +398,7 @@ SystemDebugShouldFetchAndDecode(struct system *system);
 //! \see SystemDebugSetExecute()
 //! \see main()
 int
-SystemDebugShouldExecute(struct system *s);
+SystemDebugShouldExecute(struct system *system);
 
 //! \brief Tell the system whether fetch and decode should occur this tick or not.
 //!
@@ -418,7 +418,7 @@ SystemDebugShouldExecute(struct system *s);
 //! \see main()
 //! \see UIWidgets()
 void
-SystemDebugSetFetchAndDecode(struct system *s, int onOrOff);
+SystemDebugSetFetchAndDecode(struct system *system, int onOrOff);
 
 //! \brief Tell the system whether execute should occur this tick or not.
 //!
@@ -438,6 +438,36 @@ SystemDebugSetFetchAndDecode(struct system *s, int onOrOff);
 //! \see main()
 //! \see UIWidgets()
 void
-SystemDebugSetExecute(struct system *s, int onOrOff);
+SystemDebugSetExecute(struct system *system, int onOrOff);
+
+//! \brief Is the key at the given index pressed?
+//!
+//! Threadsafe.
+//!
+//! Called by opcode.c in FnEX9E() and FnEXA1().
+//!
+//! Called by ui.c in UIWidgets().
+//!
+//! \param[in] system system state to be read
+//! \param[in] key Index of the hex key state being queried. [0..F]
+//! \return 0 if key is _not_ pressed, otherwise non-zero
+//!
+//! \see SystemKeySetPressed()
+int
+SystemKeyIsPressed(struct system *system, int key);
+
+//! \brief Tell the system whether the given key has been pressed or not.
+//!
+//! Threadsafe.
+//!
+//! Called via InputCheck() in input.c.
+//!
+//! \param[in,out] system system state to be updated
+//! \param[in] key Index of hex key that has been pressed [0..F]
+//! \param[in] pressed 0 if not pressed, otherwise non-zero
+//!
+//! \see SystemKeyIsPressed()
+void
+SystemKeySetPressed(struct system *system, int key, int pressed);
 
 #endif // SYSTEM_VERSION

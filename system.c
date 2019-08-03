@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-08-01
+  Updated: 2019-08-03
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -52,6 +52,7 @@ struct system_private {
         pthread_rwlock_t soundRwLock;
         pthread_rwlock_t gfxRwLock;
         pthread_rwlock_t shouldQuitLock;
+        pthread_rwlock_t keyLock;
 };
 
 static unsigned char MEMORY[MEMORY_SIZE];
@@ -106,6 +107,11 @@ struct system *SystemInit(int isDebugEnabled) {
         pthread_rwlockattr_init(&attr);
         pthread_rwlockattr_setpshared(&attr, 1);
 
+        if (0 != pthread_rwlock_init(&s->prv->keyLock, &attr)) {
+                fprintf(stderr, "Couldn't initialize system key rwlock");
+                return NULL;
+        }
+
         if (0 != pthread_rwlock_init(&s->prv->debug.lock, &attr)) {
                 fprintf(stderr, "Couldn't initialize system debugUi rwlock");
                 return NULL;
@@ -142,6 +148,10 @@ struct system *SystemInit(int isDebugEnabled) {
 void SystemDeinit(struct system *s) {
         if (NULL == s)
                 return;
+
+        if (0 != pthread_rwlock_destroy(&s->prv->keyLock)) {
+                fprintf(stderr, "Couldn't destroy system key rwlock");
+        }
 
         if (0 != pthread_rwlock_destroy(&s->prv->debug.lock)) {
                 fprintf(stderr, "Couldn't destroy system debugUi rwlock");
@@ -482,4 +492,37 @@ void SystemDebugSetExecute(struct system *s, int onOrOff) {
 
         s->prv->debug.execute = onOrOff;
         pthread_rwlock_unlock(&s->prv->debug.lock);
+}
+
+int SystemKeyIsPressed(struct system *s, int key) {
+        int result = 0;
+        if (key < 0 || key > 0xF) {
+                return result;
+        }
+
+        if (0 != pthread_rwlock_rdlock(&s->prv->keyLock)) {
+                fprintf(stderr, "Failed to lock system key rwlock");
+                return 0;
+        }
+
+        result = s->key[key];
+
+        pthread_rwlock_unlock(&s->prv->keyLock);
+
+        return result;
+}
+
+void SystemKeySetPressed(struct system *s, int key, int pressed) {
+        if (0 != pthread_rwlock_wrlock(&s->prv->keyLock)) {
+                fprintf(stderr, "Failed to lock system key rwlock");
+                return;
+        }
+
+        if (0 == pressed) {
+                s->key[key] = 0;
+        } else {
+                s->key[key] = 0xFF;
+        }
+
+        pthread_rwlock_unlock(&s->prv->keyLock);
 }

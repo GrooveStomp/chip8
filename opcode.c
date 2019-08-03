@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.c
   Created: 2019-06-04
-  Updated: 2019-0
+  Updated: 2019-08-03
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -335,7 +335,7 @@ static void FnEX9E(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned char key = s->v[x];
 
-        if (s->key[key]) {
+        if (SystemKeyIsPressed(s, key)) {
                 c->skipNextInstruction = 1;
         }
 }
@@ -345,7 +345,7 @@ static void FnEXA1(struct opcode *c, struct system *s) {
         unsigned int x = NibbleAt(c, 2);
         unsigned char key = s->v[x];
 
-        if (!(s->key[key])) {
+        if (!SystemKeyIsPressed(s, key)) {
                 c->skipNextInstruction = 1;
         }
 }
