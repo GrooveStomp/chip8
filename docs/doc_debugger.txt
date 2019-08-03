@@ -1,0 +1,92 @@
+//! \page debugger
+//!
+//! \section intro Debugger
+//! This emulator includes a graphical debugger!
+//! \par
+//!
+//! \image html debugger-ui.png
+//! \tableofcontents
+//! \section registers Registers
+//! \image html chip8-debugger-registers.png
+//! Displays the state of all CHIP-8 registers.
+//! \section system System
+//! \image html chip8-debugger-system.png
+//! Displays the state of various CHIP-8 system components, including:
+//! \li *i*: special pointer into system memory
+//! \par
+//! This is used by some opcodes.
+//! It contains an index into CHIP-8 system memory.
+//!
+//! \li *pc*: program counter
+//! \par
+//! The next instruction to execute.
+//! It contains an index into CHIP-8 system memory.
+//!
+//! \li *sp*: stack pointer
+//! \par
+//! Head-of-stack pointer, containing the index of the stack register that is the current head.
+//!
+//! \li *gfx*: pointer to beginning of graphics memory
+//! \par
+//! It contains an index into CHIP-8 system memory where display memory begins.
+//! This will typically be static throughout the lifecycle of a program.
+//!
+//! \li *font ptr*: pointer to beginning font memory
+//! \par
+//! It contains an index into CHIP-8 system memory where font sprite data begins.
+//! This will typically be static throughout the lifecycle of a program.
+//!
+//! \li *delay timer*
+//! \par
+//! It contains the value of the delay timer.
+//!
+//! \li *sound timer*
+//! \par
+//! It contains the value of the sound timer.
+//! \li *opcode*: current instruction about to be executed.
+//! \par
+//! It contains the 16-bit instruction previously pointed to by the program counter (pc).
+//!
+//! \section stack Stack
+//! \image html chip8-debugger-stack.png
+//! Displays the state of the stack registers.
+//! \par
+//! Each stack pointer, when not zero, contains a 16-bit index into system
+//! memory that acts like a pointer.  Each of these values represents where the
+//! program counter (pc) was pointing to before the stack was pushed onto.
+//! The stack is how the CHIP-8 supports function calls.
+//!
+//! \section debugger Debugger
+//! \image html chip8-debugger-debugger.png
+//! \subsection step Step
+//! Proceed one CHIP-8 instruction.
+//! \par
+//! This means the currently decoded opcode executes, then the next instruction
+//! is fetched and decoded.
+//!
+//! \subsection continue Continue
+//! Resume program operation as if the debugger had not been invoked, but leave
+//! the debugging UI available.
+//!
+//! \subsection break Break
+//! Halt program execution so the current opcode finishes executing and the next
+//! instruction is fetched and decoded.
+//!
+//! \section opcode Opcode
+//! \image html chip8-debugger-opcode.png
+//! Displays the last 16-bit instruction the pc was pointing at.
+//! \par
+//! This also contains the "high level" opcode function name and a description
+//! of what the opcode does.
+//!
+//! \section keys Keys
+//! \image html chip8-debugger-keys.png
+//! Displays the state of each key in the CHIP-8 system; either "PRESSED" or not
+//! pressed (empty).
+//!
+//! \section memory Memory
+//! \image html chip8-debugger-memory.png
+//! The entire contents of CHIP-8 memory, laid out byte-by-byte.
+//!
+//! \section display Display Window
+//! Shows the output of the CHIP-8 system.

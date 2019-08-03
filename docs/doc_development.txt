@@ -1,0 +1,54 @@
+//! \page development
+//!
+//! \section dep Dependencies
+//! - [SDL 2.0](https://wiki.libsdl.org/FrontPage)
+//! - OpenGL 3
+//! - [GLEW](http://glew.sourceforge.net/) (OpenGL Extension Wrangler)
+//! - libmath
+//! - [POSIX Threads](http://man7.org/linux/man-pages/man7/pthreads.7.html)
+//! - [libsoundio](http://libsound.io/)
+//! - gcc (Built using 8.3.0)
+//! - [Doxygen](http://doxygen.nl/) (For building documentation. Tested with 1.8.13)
+//! - [Nuklear](https://github.com/vurtun/nuklear)
+//!
+//!
+//! \section build Build
+//! ```
+//! make
+//! make debug
+//! make release
+//! ```
+//!
+//! By default the release target is built.
+//! `make release` outputs to `release/` and `make debug` outputs to `debug/`
+//!
+//! \section run Run
+//! Where `$FILE` is one of the premade games in the `games/` directory.
+//! ```
+//! ./release/chip8 games/$FILE
+//! ```
+//!
+//! \section test Test
+//! All tests are in `test/*_test.c` and each `_test.c` file is expected to have its own `%main()`.
+//!
+//! When built, each `_test.c` file creates a correspondingly named `test/*_test` executable that can be run at any time.
+//! For convenience, run them all with the `runtests` target.
+//!
+//! To build a specific test:
+//! ```
+//! make test/opcode_test
+//! ```
+//! Then just run it by invoking that file directly.
+//!
+//! To build all tests and run them:
+//! ```
+//! make test
+//! make runtests
+//! ```
+//!
+//! \section doc Documentation
+//! Doxygen is used to generate sourcecode documentation.
+//! Use the `docs` make target to generate Doxygen output in the `docs/` directory.
+//! ```
+//! make docs
+//! ```

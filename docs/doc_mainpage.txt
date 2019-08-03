@@ -1,0 +1,68 @@
+//! \mainpage Aaron Oman's CHIP-8 Emulator
+//!
+//! \section intro_sec Introduction
+//!
+//! This is my first emulation project.
+//! I chose to emulate the CHIP-8 as I've seen it referenced as a good first emulation project.
+//! Based on my experience building this emulator, I think I'd have to agree!
+//!
+//! This documentation is split into several pages (See [Related Pages](pages.html)):
+//!
+//! - \ref chip8
+//! \par
+//! About the CHIP-8 system.
+//! \par
+//! Hardware specifications and other important information.
+//!
+//! - \ref development
+//! \par
+//! Developing the CHIP-8 emulator.
+//! \par
+//! Requirements, tools, commands, etc. used to develop this CHIP-8 emulator.
+//!
+//! - \ref debugger
+//! \par
+//! About the embedded graphical debugger.
+//! \par
+//!
+//! - \ref license
+//! \par
+//! The license this software is licensed under.
+//!
+//!
+//! \section keys Key Mapping
+//! The CHIP-8 has 16 keys. It is not intuitive how this should map to a modern keyboard.
+//!
+//! | CHIP-8 Key | Modern Keyboard Key |
+//! |------------|---------------------|
+//! | 0 | k |
+//! | 1 | q |
+//! | 2 | w |
+//! | 3 | e |
+//! | 4 | a |
+//! | 5 | s |
+//! | 6 | d |
+//! | 7 | u |
+//! | 8 | i |
+//! | 9 | o |
+//! | A | j |
+//! | B | l |
+//! | C | r |
+//! | D | f |
+//! | E | p |
+//! | F | ; |
+//!
+//! A better way to view this may be overlayed on a modern english (Canadian) keyboard:
+//!
+//! |       |       |       |       | |       |       |       |       |
+//! |-------|-------|-------|-------|-|-------|-------|-------|-------|
+//! | 1 (q) | 2 (w) | 3 (e) | C (r) | | 7 (u) | 8 (i) | 9 (o) | E (p) |
+//! | 4 (a) | 5 (s) | 6 (d) | D (f) | | A (j) | 0 (k) | B (l) | F (;) |
+//!
+//! \section screenshots Screenshots
+//!
+//! \image html chip8-1.png
+//!
+//! \par
+//!
+//! \image html chip8-2.png
