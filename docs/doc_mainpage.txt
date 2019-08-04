@@ -14,7 +14,7 @@
 //!
 //! - \ref development "Developing the CHIP-8 Emulator"
 //! <br/>
-//! Requirements, tools, commands, etc. used to develop this CHIP-8 emulator.
+//! Dependencies, tools, commands, etc. used to develop this CHIP-8 emulator.
 //!
 //! - \ref debug_page "About the Embedded Graphical Debugger"
 //! <br/>
@@ -24,6 +24,7 @@
 //! <br/>
 //! The license this software is licensed under.
 //!
+//! - [<b>Source Code</b>](https://github.com/GrooveStomp/chip8)
 //!
 //! \section keys Key Mapping
 //! The CHIP-8 has 16 keys.  The mapping to a modern keyboard is fairly arbitrary.

@@ -110,12 +110,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a6e4c217c70f4b9ba534159c73679b307"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a6e4c217c70f4b9ba534159c73679b307">SystemLoadProgram</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>, unsigned char *rom, unsigned int size)</td></tr>
 <tr class="memdesc:a6e4c217c70f4b9ba534159c73679b307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies ROM into the CHIP-8's memory.  <a href="#a6e4c217c70f4b9ba534159c73679b307">More...</a><br /></td></tr>
 <tr class="separator:a6e4c217c70f4b9ba534159c73679b307"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa558418465b3d50d58b59ab42117602"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#aaa558418465b3d50d58b59ab42117602">SystemPushStack</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
-<tr class="memdesc:aaa558418465b3d50d58b59ab42117602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets stack[sp] to pc and increments sp.  <a href="#aaa558418465b3d50d58b59ab42117602">More...</a><br /></td></tr>
-<tr class="separator:aaa558418465b3d50d58b59ab42117602"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd5b0b79c6949585268a718b64983234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#acd5b0b79c6949585268a718b64983234">SystemPopStack</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
-<tr class="memdesc:acd5b0b79c6949585268a718b64983234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pc to stack[sp] and decrements sp.  <a href="#acd5b0b79c6949585268a718b64983234">More...</a><br /></td></tr>
-<tr class="separator:acd5b0b79c6949585268a718b64983234"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85313e128bc3da8a9d0960d3a75bd417"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a85313e128bc3da8a9d0960d3a75bd417">SystemStackPush</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a85313e128bc3da8a9d0960d3a75bd417"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets stack[sp] to pc and increments sp.  <a href="#a85313e128bc3da8a9d0960d3a75bd417">More...</a><br /></td></tr>
+<tr class="separator:a85313e128bc3da8a9d0960d3a75bd417"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a852be41b592aee289ccf29529c083133"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#a852be41b592aee289ccf29529c083133">SystemStackPop</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
+<tr class="memdesc:a852be41b592aee289ccf29529c083133"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pc to stack[sp] and decrements sp.  <a href="#a852be41b592aee289ccf29529c083133">More...</a><br /></td></tr>
+<tr class="separator:a852be41b592aee289ccf29529c083133"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3c0ed87598fcc470bff4f2245d705c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="system_8h.html#ad3c0ed87598fcc470bff4f2245d705c0">SystemGfxLock</a> (struct <a class="el" href="structsystem.html">system</a> *<a class="el" href="structsystem.html">system</a>)</td></tr>
 <tr class="memdesc:ad3c0ed87598fcc470bff4f2245d705c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Atomically locks the CHIP-8's graphics memory.  <a href="#ad3c0ed87598fcc470bff4f2245d705c0">More...</a><br /></td></tr>
 <tr class="separator:ad3c0ed87598fcc470bff4f2245d705c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -927,58 +927,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="acd5b0b79c6949585268a718b64983234"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd5b0b79c6949585268a718b64983234">&#9670;&nbsp;</a></span>SystemPopStack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SystemPopStack </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>system</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets pc to stack[sp] and decrements sp. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aaa558418465b3d50d58b59ab42117602"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa558418465b3d50d58b59ab42117602">&#9670;&nbsp;</a></span>SystemPushStack()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SystemPushStack </td>
-          <td>(</td>
-          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
-          <td class="paramname"><em>system</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets stack[sp] to pc and increments sp. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a972656c4c54821cdcbd36104f09edb38"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a972656c4c54821cdcbd36104f09edb38">&#9670;&nbsp;</a></span>SystemSetTimers()</h2>
 
@@ -1169,6 +1117,58 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 if sound has not been triggered, otherwise non-zero </dd></dl>
+
+</div>
+</div>
+<a id="a852be41b592aee289ccf29529c083133"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a852be41b592aee289ccf29529c083133">&#9670;&nbsp;</a></span>SystemStackPop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SystemStackPop </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets pc to stack[sp] and decrements sp. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a85313e128bc3da8a9d0960d3a75bd417"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85313e128bc3da8a9d0960d3a75bd417">&#9670;&nbsp;</a></span>SystemStackPush()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SystemStackPush </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="structsystem.html">system</a> *&#160;</td>
+          <td class="paramname"><em>system</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets stack[sp] to pc and increments sp. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">system</td><td>system state to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
