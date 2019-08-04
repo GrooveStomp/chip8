@@ -1,7 +1,7 @@
 /******************************************************************************
  * File: gstest.h
  * Created: 2016-08-19
- * Updated: 2019-07-21
+ * Updated: 2019-08-04
  * Creator: Aaron Oman
  * Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  *-----------------------------------------------------------------------------
@@ -14,6 +14,8 @@
 
 #include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE //
 #include <stdio.h> // fprintf, snprintf
+
+#define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
 #define GSTestErrMsgSize 1024
 extern int GSTestNumTestsRun;
