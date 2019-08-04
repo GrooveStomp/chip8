@@ -8,30 +8,26 @@
 //!
 //! This documentation is split into several pages (See [Related Pages](pages.html)):
 //!
-//! - \ref chip8
-//! \par
-//! About the CHIP-8 system.
-//! \par
+//! - \ref chip8 "About the CHIP-8 System"
+//! <br/>
 //! Hardware specifications and other important information.
 //!
-//! - \ref development
-//! \par
-//! Developing the CHIP-8 emulator.
-//! \par
+//! - \ref development "Developing the CHIP-8 Emulator"
+//! <br/>
 //! Requirements, tools, commands, etc. used to develop this CHIP-8 emulator.
 //!
-//! - \ref debugger
-//! \par
+//! - \ref debug_page "About the Embedded Graphical Debugger"
+//! <br/>
 //! About the embedded graphical debugger.
-//! \par
 //!
-//! - \ref license
-//! \par
+//! - \ref license "License"
+//! <br/>
 //! The license this software is licensed under.
 //!
 //!
 //! \section keys Key Mapping
-//! The CHIP-8 has 16 keys. It is not intuitive how this should map to a modern keyboard.
+//! The CHIP-8 has 16 keys.  The mapping to a modern keyboard is fairly arbitrary.
+//! Here's what this emulator uses:
 //!
 //! | CHIP-8 Key | Modern Keyboard Key |
 //! |------------|---------------------|

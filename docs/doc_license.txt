@@ -1,4 +1,4 @@
-//! \page license
+//! \page license License
 //! \verbatim
 Attribution 4.0 International
 

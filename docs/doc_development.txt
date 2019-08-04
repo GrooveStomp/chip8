@@ -1,4 +1,4 @@
-//! \page development
+//! \page development Developing the CHIP-8 Emulator
 //!
 //! \section dep Dependencies
 //! - [SDL 2.0](https://wiki.libsdl.org/FrontPage)
