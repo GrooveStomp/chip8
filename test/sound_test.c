@@ -5,6 +5,7 @@
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+#include <dlfcn.h> // dlsym, RTLD_NEXT
 #include <stdio.h>
 
 #include "gstest.h"
@@ -26,6 +27,17 @@ char GSTestErrMsg[GSTestErrMsgSize];
 //------------------------------------------------------------------------------
 // Helper functions and globals
 //------------------------------------------------------------------------------
+
+int customFreeCount = 0;
+int useCustomFree = 0;
+
+void free(void *p) {
+        void (*libcFree)(void *) = (void (*)(void *))dlsym(RTLD_NEXT, "free");
+        if (useCustomFree) {
+                customFreeCount++;
+        }
+        libcFree(p);
+}
 
 int soundStartCount = 0;
 int soundPauseCount = 0;
@@ -66,6 +78,18 @@ static char *TestSoundInit() {
         return NULL;
 }
 
+static char *TestSoundDeinit() {
+        struct sound *sound = SoundInit();
+
+        int before = customFreeCount;
+        useCustomFree = 1;
+        SoundDeinit(sound);
+        useCustomFree = 0;
+        GSTestAssert(customFreeCount > before, "got %d, wanted greater than %d", customFreeCount, before);
+
+        return NULL;
+}
+
 static char *TestSoundPlay() {
         struct sound *sound = SoundInit();
 
@@ -93,6 +117,7 @@ static char *TestSoundStop() {
 
 static char *RunAllTests() {
         GSTestRun(TestSoundInit);
+        GSTestRun(TestSoundDeinit);
         GSTestRun(TestSoundPlay);
         GSTestRun(TestSoundStop);
         return NULL;

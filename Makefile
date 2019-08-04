@@ -1,7 +1,7 @@
 #******************************************************************************
 # File: Makefile
 # Created: 2019-06-27
-# Updated: 2019-07-30
+# Updated: 2019-08-04
 # Author: Aaron Oman
 # Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
 #******************************************************************************
@@ -29,6 +29,7 @@ DBGFLG = -g -Og
 TSTDIR = test
 TSTSRC = $(wildcard $(TSTDIR)/*.c)
 TSTEXE = $(patsubst $(TSTDIR)/%.c,$(TSTDIR)/%,$(TSTSRC))
+TSTLIB = $(LIBS) -ldl
 TSTOBJ = $(filter-out $(TSTDIR)/main.o,$(addprefix $(TSTDIR)/,$(OBJFILES)))
 
 DEFAULT_GOAL := $(release)
@@ -55,7 +56,7 @@ $(DBGDIR)/%.o: %.c $(HEADERS) $(SRC_DEP)
 test: $(TSTEXE)
 
 $(TSTDIR)/%_test: $(TSTOBJ) $(TSTDIR)/%_test.o
-	$(CC) -o $@ $(TSTDIR)/$*_test.o $(filter-out $(TSTDIR)/$*.o,$(TSTOBJ)) $(LIBS)
+	$(CC) -o $@ $(TSTDIR)/$*_test.o $(filter-out $(TSTDIR)/$*.o,$(TSTOBJ)) $(TSTLIB)
 
 $(TSTDIR)/%_test.o: $(HEADERS) $(TSTDIR)/gstest.h $(TSTDIR)/%_test.c
 	$(CC) -c $(TSTDIR)/$*_test.c $(INC) $(CFLAGS) $(DBGFLG) -o $@
