@@ -40,15 +40,10 @@ char *TestInputInit() {
         return NULL;
 }
 
-char *TestInputDeinit() {
-        // TODO: Any way to realistically test this?
-        return NULL;
-}
-
 char *TestInputCheck_Quit(struct input *input, struct system *system) {
         SDL_Event event = { .type = SDL_QUIT };
         InputCheck(input, system, &event);
-        GSTestAssert(SystemShouldQuit(system), "got %d, wanted %d", SystemShouldQuit(system), !0);
+        GSTestAssert(SystemShouldQuit(system), "got %d, want %d", SystemShouldQuit(system), !0);
 
         return NULL;
 }
@@ -57,7 +52,7 @@ char *TestInputCheck_Escape(struct input *input, struct system *system) {
         SDL_Event event = { .type = SDL_KEYDOWN };
         event.key.keysym.sym = SDLK_ESCAPE;
         InputCheck(input, system, &event);
-        GSTestAssert(SystemShouldQuit(system), "got %d, wanted %d", SystemShouldQuit(system), !0);
+        GSTestAssert(SystemShouldQuit(system), "got %d, want %d", SystemShouldQuit(system), !0);
 
         return NULL;
 }
@@ -68,12 +63,12 @@ char *TestInputCheck_R(struct input *input, struct system *system) {
         event = (SDL_Event){ .type = SDL_KEYDOWN };
         event.key.keysym.sym = SDLK_r;
         InputCheck(input, system, &event);
-        GSTestAssert(SystemKeyIsPressed(system, 0xC), "got %d, wanted %d", SystemKeyIsPressed(system, 0xC), !0);
+        GSTestAssert(SystemKeyIsPressed(system, 0xC), "got %d, want %d", SystemKeyIsPressed(system, 0xC), !0);
 
         event = (SDL_Event){ .type = SDL_KEYUP };
         event.key.keysym.sym = SDLK_r;
         InputCheck(input, system, &event);
-        GSTestAssert(SystemKeyIsPressed(system, 0xC) == 0, "got %d, wanted %d", SystemKeyIsPressed(system, 0xC), 0);
+        GSTestAssert(SystemKeyIsPressed(system, 0xC) == 0, "got %d, want %d", SystemKeyIsPressed(system, 0xC), 0);
 
         return NULL;
 }
@@ -101,7 +96,6 @@ char *TestInputCheck() {
 
 static char *RunAllTests() {
         GSTestRun(TestInputInit);
-        GSTestRun(TestInputDeinit);
         GSTestRun(TestInputCheck);
         return NULL;
 }
