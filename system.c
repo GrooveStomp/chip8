@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.c
   Created: 2019-06-04
-  Updated: 2019-08-03
+  Updated: 2019-08-04
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -149,6 +149,9 @@ void SystemDeinit(struct system *s) {
         if (NULL == s)
                 return;
 
+        if (NULL != s->prv)
+                free(s->prv);
+
         if (0 != pthread_rwlock_destroy(&s->prv->keyLock)) {
                 fprintf(stderr, "Couldn't destroy system key rwlock");
         }
@@ -204,23 +207,22 @@ int SystemLoadProgram(struct system *s, unsigned char *m, unsigned int size) {
         return !0;
 }
 
-void SystemPushStack(struct system *s) {
+void SystemStackPush(struct system *s) {
         if (s->sp > 0xF) {
                 return;
-                fprintf(stderr, "SystemPushStack() Tried to push full stack\n");
+                fprintf(stderr, "SystemStackPush() Tried to push full stack\n");
         }
 
         s->stack[s->sp] = s->pc;
         s->sp++;
 }
 
-void SystemPopStack(struct system *s) {
+void SystemStackPop(struct system *s) {
         if (s->sp < 1) {
                 return;
-                fprintf(stderr, "SystemPopStack() Tried to pop empty stack\n");
+                fprintf(stderr, "SystemStackPop() Tried to pop empty stack\n");
         }
 
-        s->stack[s->sp] = 0; // Unset "previous" stack head.
         s->sp--;
         s->pc = s->stack[s->sp];
 }

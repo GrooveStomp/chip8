@@ -1,7 +1,7 @@
 /******************************************************************************
   File: opcode.c
   Created: 2019-06-04
-  Updated: 2019-08-03
+  Updated: 2019-08-04
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -119,7 +119,7 @@ static void Fn00E0(struct opcode *c, struct system *s) {
 
 // Flow control: Returns from a subroutine.
 static void Fn00EE(struct opcode *c, struct system *s) {
-        SystemPopStack(s);
+        SystemStackPop(s);
 }
 
 // Flow control: goto NNN;
@@ -136,7 +136,7 @@ static void Fn2NNN(struct opcode *c, struct system *s) {
         unsigned int nibble = NibbleAt(c, 2);
         unsigned int address = ((nibble << 8) | low_byte);
 
-        SystemPushStack(s);
+        SystemStackPush(s);
         c->jumpToInstruction = address;
 }
 

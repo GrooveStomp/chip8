@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system.h
   Created: 2019-06-13
-  Updated: 2019-08-03
+  Updated: 2019-08-04
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -108,12 +108,12 @@ SystemLoadProgram(struct system *system, unsigned char *rom, unsigned int size);
 //! \brief Sets stack[sp] to pc and increments sp
 //! \param[in,out] system system state to be updated
 void
-SystemPushStack(struct system *system);
+SystemStackPush(struct system *system);
 
 //! \brief Sets pc to stack[sp] and decrements sp
 //! \param[in,out] system system state to be updated
 void
-SystemPopStack(struct system *system);
+SystemStackPop(struct system *system);
 
 //! \brief Atomically locks the CHIP-8's graphics memory
 //!
