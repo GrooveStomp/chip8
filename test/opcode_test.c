@@ -1,10 +1,11 @@
 /******************************************************************************
   File: opcode_test.c
   Created: 2019-07-07
-  Updated: 2019-08-04
+  Updated: 2019-08-06
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+#include <dlfcn.h> // dlsym, RTLD_NEXT
 #include <stdio.h>
 
 #include "gstest.h"
@@ -18,6 +19,26 @@
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[GSTestErrMsgSize];
+
+//------------------------------------------------------------------------------
+// Helper functions and globals
+//------------------------------------------------------------------------------
+
+int customFreeCount = 0;
+int useCustomFree = 0;
+
+void free(void *p) {
+        void (*libcFree)(void *) = NULL;
+        *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        if (useCustomFree) {
+                customFreeCount++;
+        }
+        libcFree(p);
+}
+
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
 
 char *TestOpcodeInstruction() {
         struct opcode *c = OpcodeInit();
@@ -95,6 +116,18 @@ char *TestOpcodeInit() {
         return NULL;
 }
 
+char *TestOpcodeDeinit() {
+        struct opcode *opcode = OpcodeInit();
+
+        int before = customFreeCount;
+        useCustomFree = 1;
+        OpcodeDeinit(opcode);
+        useCustomFree = 0;
+        GSTestAssert(customFreeCount > before, "got %d, want greater than %d", customFreeCount, before);
+
+        return NULL;
+}
+
 char *TestOpcodeFetch() {
         struct system *s = SystemInit(0);
         struct opcode *c = OpcodeInit();
@@ -107,6 +140,7 @@ char *TestOpcodeFetch() {
 
         OpcodeDeinit(c);
         SystemDeinit(s);
+
         return NULL;
 }
 
@@ -127,11 +161,25 @@ char *TestOpcodeDecode() {
         GSTestAssert(c->fn == FnFX18, "Expected c->fn(%p) to be FnFX18(%p)", c->fn, FnFX18);
 
         OpcodeDeinit(c);
+
         return NULL;
 }
 
 char *TestOpcodeExecute() {
-        // TODO Any way to realistically test this?
+        struct system *s = SystemInit(0);
+        struct opcode *c = OpcodeInit();
+
+        s->memory[s->pc] = 0xA2;
+        s->memory[s->pc+1] = 0x34;
+
+        OpcodeFetch(c, s);
+        OpcodeDecode(c);
+        OpcodeExecute(c, s);
+        GSTestAssert(0x234 == s->i, "got 0x%02x, want 0x%02x", s->i, 0x234);
+
+        OpcodeDeinit(c);
+        SystemDeinit(s);
+
         return NULL;
 }
 
@@ -142,6 +190,7 @@ static char *RunAllTests() {
         GSTestRun(TestLowByte);
         GSTestRun(TestNibbleAt);
         GSTestRun(TestOpcodeInit);
+        GSTestRun(TestOpcodeDeinit);
         GSTestRun(TestOpcodeFetch);
         GSTestRun(TestOpcodeDecode);
         GSTestRun(TestOpcodeExecute);
@@ -149,13 +198,14 @@ static char *RunAllTests() {
 }
 
 int main(int argC, char **argV) {
+        printf("opcode_test:\n");
         char *result = RunAllTests();
         if (result != NULL) {
-                printf("%s\n", result);
+                printf("\t%s\n", result);
         } else {
-                printf("ALL TESTS PASSED\n");
+                printf("\tALL TESTS PASSED\n");
         }
-        printf("opcode_test tests run: %d\n", GSTestNumTestsRun);
+        printf("\ttests run: %d\n", GSTestNumTestsRun);
 
         return result != NULL;
 }

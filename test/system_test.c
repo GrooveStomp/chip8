@@ -1,7 +1,7 @@
 /******************************************************************************
   File: system_test.c
   Created: 2019-07-07
-  Updated: 2019-08-04
+  Updated: 2019-08-06
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -164,13 +164,14 @@ static char *RunAllTests() {
 }
 
 int main(int argC, char **argV) {
+        printf("system_test:\n");
         char *result = RunAllTests();
         if (result != NULL) {
-                printf("%s\n", result);
+                printf("\t%s\n", result);
         } else {
-                printf("ALL TESTS PASSED\n");
+                printf("\tALL TESTS PASSED\n");
         }
-        printf("system_test tests run: %d\n", GSTestNumTestsRun);
+        printf("\ttests run: %d\n", GSTestNumTestsRun);
 
         return result != NULL;
 }

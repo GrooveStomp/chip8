@@ -235,13 +235,14 @@ static char *RunAllTests() {
 }
 
 int main(int argC, char **argV) {
+        printf("ui_test:\n");
         char *result = RunAllTests();
         if (result != NULL) {
-                printf("%s\n", result);
+                printf("\t%s\n", result);
         } else {
-                printf("ALL TESTS PASSED\n");
+                printf("\tALL TESTS PASSED\n");
         }
-        printf("opcode_test tests run: %d\n", GSTestNumTestsRun);
+        printf("\ttests run: %d\n", GSTestNumTestsRun);
 
         return result != NULL;
 }

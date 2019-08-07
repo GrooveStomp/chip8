@@ -1,10 +1,11 @@
 /******************************************************************************
   File: graphics_test.c
   Created: 2019-07-23
-  Updated: 2019-08-04
+  Updated: 2019-08-06
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+#include <dlfcn.h> // dlsym, RTLD_NEXT
 #include <stdio.h>
 
 #include "gstest.h"
@@ -18,6 +19,30 @@
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[GSTestErrMsgSize];
+
+//------------------------------------------------------------------------------
+// Helper functions and globals
+//------------------------------------------------------------------------------
+
+int customFreeCount = 0;
+int useCustomFree = 0;
+
+void free(void *p) {
+        static void (*libcFree)(void *) = NULL;
+        if (NULL == libcFree) {
+                *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        }
+
+        if (useCustomFree) {
+                customFreeCount++;
+        }
+
+        libcFree(p);
+}
+
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
 
 static char *TestGraphicsInit() {
         { // With debugging enabled
@@ -49,6 +74,18 @@ static char *TestGraphicsInit() {
         return NULL;
 }
 
+static char *TestGraphicsDeinit() {
+        struct graphics *graphics = GraphicsInit(0);
+
+        int before = customFreeCount;
+        useCustomFree = 1;
+        GraphicsDeinit(graphics);
+        useCustomFree = 0;
+        GSTestAssert(customFreeCount > before, "got %d, want greater than %d", customFreeCount, before);
+
+        return NULL;
+}
+
 static char *TestGraphicsSDLWindow() {
         struct graphics *graphics = GraphicsInit(1);
 
@@ -62,18 +99,20 @@ static char *TestGraphicsSDLWindow() {
 
 static char *RunAllTests() {
         GSTestRun(TestGraphicsInit);
+        GSTestRun(TestGraphicsDeinit);
         GSTestRun(TestGraphicsSDLWindow);
         return NULL;
 }
 
 int main(int argC, char **argV) {
+        printf("graphics_test:\n");
         char *result = RunAllTests();
         if (result != NULL) {
-                printf("%s\n", result);
+                printf("\t%s\n", result);
         } else {
-                printf("ALL TESTS PASSED\n");
+                printf("\tALL TESTS PASSED\n");
         }
-        printf("opcode_test tests run: %d\n", GSTestNumTestsRun);
+        printf("\ttests run: %d\n", GSTestNumTestsRun);
 
         return result != NULL;
 }

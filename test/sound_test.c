@@ -32,11 +32,15 @@ int customFreeCount = 0;
 int useCustomFree = 0;
 
 void free(void *p) {
-        void (*libcFree)(void *) = NULL;
-        *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        static void (*libcFree)(void *) = NULL;
+        if (NULL == libcFree) {
+                *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        }
+
         if (useCustomFree) {
                 customFreeCount++;
         }
+
         libcFree(p);
 }
 
@@ -125,13 +129,14 @@ static char *RunAllTests() {
 }
 
 int main(int argC, char **argV) {
+        printf("sound_test:\n");
         char *result = RunAllTests();
         if (result != NULL) {
-                printf("%s\n", result);
+                printf("\t%s\n", result);
         } else {
-                printf("ALL TESTS PASSED\n");
+                printf("\tALL TESTS PASSED\n");
         }
-        printf("opcode_test tests run: %d\n", GSTestNumTestsRun);
+        printf("\ttests run: %d\n", GSTestNumTestsRun);
 
         return result != NULL;
 }
