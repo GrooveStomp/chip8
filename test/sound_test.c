@@ -1,7 +1,7 @@
 /******************************************************************************
   File: sound_test.c
   Created: 2019-08-04
-  Updated: 2019-08-04
+  Updated: 2019-08-06
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
@@ -32,7 +32,8 @@ int customFreeCount = 0;
 int useCustomFree = 0;
 
 void free(void *p) {
-        void (*libcFree)(void *) = (void (*)(void *))dlsym(RTLD_NEXT, "free");
+        void (*libcFree)(void *) = NULL;
+        *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
         if (useCustomFree) {
                 customFreeCount++;
         }
@@ -85,7 +86,7 @@ static char *TestSoundDeinit() {
         useCustomFree = 1;
         SoundDeinit(sound);
         useCustomFree = 0;
-        GSTestAssert(customFreeCount > before, "got %d, wanted greater than %d", customFreeCount, before);
+        GSTestAssert(customFreeCount > before, "got %d, want greater than %d", customFreeCount, before);
 
         return NULL;
 }
