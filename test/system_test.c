@@ -1,10 +1,11 @@
 /******************************************************************************
   File: system_test.c
   Created: 2019-07-07
-  Updated: 2019-08-06
+  Updated: 2019-08-07
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+#include <dlfcn.h> // dlsym, RTLD_NEXT
 #include <stdio.h>
 
 #include "gstest.h"
@@ -18,6 +19,30 @@
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[GSTestErrMsgSize];
+
+//------------------------------------------------------------------------------
+// Helper functions and globals
+//------------------------------------------------------------------------------
+
+int customFreeCount = 0;
+int useCustomFree = 0;
+
+void free(void *p) {
+        static void (*libcFree)(void *) = NULL;
+        if (NULL == libcFree) {
+                *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        }
+
+        if (useCustomFree) {
+                customFreeCount++;
+        }
+
+        libcFree(p);
+}
+
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
 
 static char *TestSystemInit() {
         {
@@ -46,6 +71,19 @@ static char *TestSystemInit() {
 
         return NULL;
 }
+
+static char *TestSystemDeinit() {
+        struct system *system = SystemInit(0);
+
+        int before = customFreeCount;
+        useCustomFree = 1;
+        SystemDeinit(system);
+        useCustomFree = 0;
+        GSTestAssert(customFreeCount > before, "got %d, want greater than %d", customFreeCount, before);
+
+        return NULL;
+}
+
 
 static char *TestSystemIncrementPC() {
         struct system *system = SystemInit(0);
@@ -153,13 +191,185 @@ static char *TestSystemStackPop() {
         return NULL;
 }
 
+static char *TestSystemKey() {
+       struct system *system = SystemInit(0);
+
+       int got, want;
+
+       for (int i = 0; i < 0xF; i++) {
+               SystemKeySetPressed(system, i, 0);
+       }
+
+       want = 0;
+       for (int i = 0; i < 0xF; i++) {
+               got = SystemKeyIsPressed(system, i);
+               GSTestAssert(got == want, "got %d, want %d", got, want);
+       }
+
+       SystemKeySetPressed(system, 3, 1);
+       for (int i = 0; i < 0xF; i++) {
+               want = 0;
+               got = SystemKeyIsPressed(system, i);
+               if (i == 3) want = 0xFF;
+
+               GSTestAssert(got == want, "got %d, want %d", got, want);
+       }
+
+       want = 0xFF;
+       for (int i = 0; i < 0xF; i++) {
+               SystemKeySetPressed(system, i, want);
+       }
+
+       for (int i = 0; i < 0xF; i++) {
+               got = SystemKeyIsPressed(system, i);
+               GSTestAssert(got == want, "got %d, want %d", got, want);
+       }
+
+       SystemDeinit(system);
+
+       return NULL;
+}
+
+static char *TestSystemQuit() {
+        struct system *system = SystemInit(0);
+
+        int got, want;
+
+        // Default is not to be in a quit state.
+        want = 0;
+        got = SystemShouldQuit(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Signal quit, then test that status is correctly set.
+        want = 1;
+        SystemSignalQuit(system);
+        got = SystemShouldQuit(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        SystemDeinit(system);
+
+        return NULL;
+}
+
+static char *TestSystemTimers() {
+        struct system *system = SystemInit(0);
+
+        int got, want;
+
+        // Verify setting -1 results in no change.
+        SystemSetTimers(system, -1, -1);
+        want = 0;
+        got = SystemDelayTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemSoundTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Verify we can set one timer at a time.
+        SystemSetTimers(system, 5, -1);
+        want = 5;
+        got = SystemDelayTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemSoundTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Verify decrement works only when value is above zero.
+        SystemDecrementTimers(system);
+        want = 4;
+        got = SystemDelayTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemSoundTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Verify we can set both timers;
+        SystemSetTimers(system, 17, 25);
+        want = 17;
+        got = SystemDelayTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 25;
+        got = SystemSoundTimer(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        SystemDeinit(system);
+
+        return NULL;
+}
+
+static char *TestSystemWFK() {
+        struct system *system = SystemInit(0);
+
+        int got, want;
+
+        // Initial state, not in WFK mode.
+        want = 0;
+        got = SystemWFKWaiting(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemWFKChanged(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Signal WFK mode and verify state.
+        SystemWFKSet(system, 5);
+        want = 1;
+        got = SystemWFKWaiting(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemWFKChanged(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Signal WFK occurrence.
+        SystemWFKOccurred(system, 6);
+        want = 0;
+        got = SystemWFKWaiting(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 1;
+        got = SystemWFKChanged(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        // Verify register 5 receives hex key 6 as the pressed key.
+        want = 6;
+        got = system->v[5];
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        // Stop WFK mode.
+        SystemWFKStop(system);
+        want = 0;
+        got = SystemWFKWaiting(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+        want = 0;
+        got = SystemWFKChanged(system);
+        GSTestAssert(got == want, "got %d, want %d", got, want);
+
+        SystemDeinit(system);
+
+        return NULL;
+}
+
 static char *RunAllTests() {
         GSTestRun(TestSystemInit);
+        GSTestRun(TestSystemDeinit);
         GSTestRun(TestSystemIncrementPC);
         GSTestRun(TestSystemFontSprite);
         GSTestRun(TestSystemLoadProgram);
         GSTestRun(TestSystemStackPush);
         GSTestRun(TestSystemStackPop);
+        // GSTestRun(TestSystemGfxLock);
+        // GSTestRun(TestSystemGfxUnlock);
+        // GSTestRun(TestSystemClearScreen);
+        // GSTestRun(TestSystemDrawSprite);
+        GSTestRun(TestSystemWFK);
+        GSTestRun(TestSystemTimers);
+        // GSTestRun(TestSystemSoundTriggered);
+        // GSTestRun(TestSystemSetTrigger);
+        GSTestRun(TestSystemQuit);
+        // GSTestRun(TestSystemDebugIsEnabled);
+        // GSTestRun(TestSystemDebugSetEnabled);
+        // GSTestRun(TestSystemDebugShouldFetchAndDecode);
+        // GSTestRun(TestSystemDebugSetFetchAndExecute);
+        // GSTestRun(TestSystemDebugShouldExecute);
+        // GSTestRun(TestSystemDebugSetExecute);
+        GSTestRun(TestSystemKey);
         return NULL;
 }
 

@@ -1,10 +1,11 @@
 /******************************************************************************
   File: input_test.c
   Created: 2019-08-04
-  Updated: 2019-08-06
+  Updated: 2019-08-07
   Author: Aaron Oman
   Notice: Creative Commons Attribution 4.0 International License (CC-BY 4.0)
  ******************************************************************************/
+#include <dlfcn.h> // dlsym, RTLD_NEXT
 #include <stdio.h>
 
 #include "gstest.h"
@@ -15,6 +16,30 @@
 
 int GSTestNumTestsRun = 0;
 char GSTestErrMsg[GSTestErrMsgSize];
+
+//------------------------------------------------------------------------------
+// Helper functions and globals
+//------------------------------------------------------------------------------
+
+int customFreeCount = 0;
+int useCustomFree = 0;
+
+void free(void *p) {
+        static void (*libcFree)(void *) = NULL;
+        if (NULL == libcFree) {
+                *(void **)&libcFree = dlsym(RTLD_NEXT, "free");
+        }
+
+        if (useCustomFree) {
+                customFreeCount++;
+        }
+
+        libcFree(p);
+}
+
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
 
 char *TestInputInit() {
         struct input *input = InputInit();
@@ -37,6 +62,18 @@ char *TestInputInit() {
         GSTestAssert(input->keycodeIndices[0xF] == SDLK_SEMICOLON, "Expected hex key 0x%02x to map to %d, but got %d", 0xF, SDLK_SEMICOLON, SDLK_SEMICOLON);
 
         InputDeinit(input);
+        return NULL;
+}
+
+static char *TestInputDeinit() {
+        struct input *input = InputInit();
+
+        int before = customFreeCount;
+        useCustomFree = 1;
+        InputDeinit(input);
+        useCustomFree = 0;
+        GSTestAssert(customFreeCount > before, "got %d, want greater than %d", customFreeCount, before);
+
         return NULL;
 }
 
@@ -96,6 +133,7 @@ char *TestInputCheck() {
 
 static char *RunAllTests() {
         GSTestRun(TestInputInit);
+        GSTestRun(TestInputDeinit);
         GSTestRun(TestInputCheck);
         return NULL;
 }
