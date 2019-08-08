@@ -68,7 +68,7 @@ runtests: test
 	$(foreach exe,$(TSTEXE),./$(exe);)
 
 clean:
-	rm -rf core debug release ${LINTFILES} ${TSTOBJ} ${TSTEXE} cachegrind.out.* callgrind.out.* docs
+	rm -rf core debug release ${LINTFILES} ${DBGOBJ} ${RELOBJ} ${TSTOBJ} ${TSTEXE} cachegrind.out.* callgrind.out.*
 
 docs:
 	doxygen .doxygen.conf

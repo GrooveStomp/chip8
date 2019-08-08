@@ -1,5 +1,5 @@
-- Code cleanup (remove dead code, remove unnecessary synchronization primitives)
-- more investigation into making splint/uno/valgrind give meanginful results
-- Unit tests!
-- Support key remapping
-- Documentation
+- Finish up unit tests.
+- Investigate sound playback. Something seem buggy in the implmentation or
+  documentation; although it appears to be working as desired in practice.
+- More investigation into making splint/uno/valgrind give meanginful results.
+- Support key remapping.
