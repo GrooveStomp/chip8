@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ubuntu:disco
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Dependencies
+          command: apt update && apt install -y build-essential libsdl2-dev libsdl2-2.0-0 libglew-dev libglew2.1 libsoundio-dev libsoundio1
+
+      - run:
+          name: Build Tests
+          command: make test
+
+      - run:
+          name: Run Tests
+          command: make runtests
